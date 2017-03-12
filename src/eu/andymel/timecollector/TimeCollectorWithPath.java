@@ -5,10 +5,11 @@ import static eu.andymel.timecollector.util.Preconditions.nn;
 import java.time.Clock;
 import java.time.Instant;
 
-import eu.andymel.timecollector.path.AllowedPath;
+import eu.andymel.timecollector.path.AllowedPathsGraph;
 import eu.andymel.timecollector.path.NodePermissions;
 import eu.andymel.timecollector.path.Path;
-import eu.andymel.timecollector.path.PathNode;
+import eu.andymel.timecollector.path.Graph;
+import eu.andymel.timecollector.path.GraphNode;
 
 public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILESTONE_TYPE> {
 
@@ -18,18 +19,18 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	/**This path models which milestones are allowed in whic order. The path
 	 * that is taken at runtime can be different but has to be a "part" of this one
 	 * at least if the {@link NodePermissions} are set so. */
-	private final AllowedPath<MILESTONE_TYPE> allowedPath;
+	private final AllowedPathsGraph<MILESTONE_TYPE> allowedPath;
 	
 	/** This saves the real path that this time collector went through */
 	private Path<MILESTONE_TYPE, Instant> recordedPath;
 	
-	private PathNode<MILESTONE_TYPE, Instant> lastRecordedNode;
+	private GraphNode<MILESTONE_TYPE, Instant> lastRecordedNode;
 	
-	private TimeCollectorWithPath(AllowedPath<MILESTONE_TYPE> allowedPath){
+	private TimeCollectorWithPath(AllowedPathsGraph<MILESTONE_TYPE> allowedPath){
 		this(Clock.systemDefaultZone(), allowedPath);
 	}
 	
-	private TimeCollectorWithPath(Clock clock, AllowedPath<MILESTONE_TYPE> allowed) {
+	private TimeCollectorWithPath(Clock clock, AllowedPathsGraph<MILESTONE_TYPE> allowed) {
 		nn(clock, "'clock' my not be null!");
 		nn(allowed, "'path' my not be null!");
 		
@@ -41,7 +42,7 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 
 	
 //	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollector<MILESTONE_TYPE> createWithPath(Path<MILESTONE_TYPE, NodePermissions> path){
-	public static <MILESTONE_TYPE> TimeCollector<MILESTONE_TYPE> createWithPath(AllowedPath<MILESTONE_TYPE> path){
+	public static <MILESTONE_TYPE> TimeCollector<MILESTONE_TYPE> createWithPath(AllowedPathsGraph<MILESTONE_TYPE> path){
 		return new TimeCollectorWithPath<MILESTONE_TYPE>(path);
 	}
 	
@@ -69,6 +70,7 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 			recordedPath = new Path<>(m, now);
 			
 		}else{
+			allowedPath.checkPath(recordedPath, m);
 			recordedPath.addNode(m, now);
 		}
 		

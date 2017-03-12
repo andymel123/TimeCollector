@@ -19,22 +19,31 @@ public class AllowedPathBuilder<ID_TYPE> {
 	private static final NodePermissions REQUIRED_AND_NO_MULTISET = NodePermissions.create(true, true);
 	private static final NodePermissions NOT_REQUIRED_BUT_NO_MULTISET = NodePermissions.create(true, true);
 	
-	private final AllowedPath<ID_TYPE> allowedPath;
+	private final AllowedPathsGraph<ID_TYPE> allowedPath;
 	
 	/** to prevent changes on the path after it has been built */
 	private boolean pathHasBeenBuilt = false;
 	
-	public AllowedPathBuilder(ID_TYPE idOfStartNode, NodePermissions nodePermissions) {
+	private final boolean isSubpath;
+	
+	public AllowedPathBuilder(ID_TYPE idOfStartNode, NodePermissions nodePermissions, boolean isSubPath) {
 		nn(idOfStartNode, "'idOfStartNode' is null!");
-		this.allowedPath = new AllowedPath<ID_TYPE>(idOfStartNode, nodePermissions);
+		this.allowedPath = new AllowedPathsGraph<ID_TYPE>(idOfStartNode, nodePermissions);
+		this.isSubpath = isSubPath;
 	}
 
 	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> start(ID_TYPE id){
 		return start(id, REQUIRED_AND_NO_MULTISET);
 	}
-	
 	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> start(ID_TYPE id, NodePermissions nodePermissions){
-		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions);
+		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions, false);
+	}
+
+	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> startSubpath(ID_TYPE id){
+		return startSubpath(id, REQUIRED_AND_NO_MULTISET);
+	}
+	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> startSubpath(ID_TYPE id, NodePermissions nodePermissions){
+		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions, true);
 	}
 
 	public AllowedPathBuilder<ID_TYPE> then(ID_TYPE m){
@@ -53,10 +62,10 @@ public class AllowedPathBuilder<ID_TYPE> {
 		return this;
 	}
 
-	public AllowedPathBuilder<ID_TYPE> thenEither(Path<ID_TYPE, NodePermissions>... anyOfThoseSubPaths) {
+	public AllowedPathBuilder<ID_TYPE> thenEither(Graph<ID_TYPE, NodePermissions>... anyOfThoseSubPaths) {
 		return thenEither(Arrays.asList(anyOfThoseSubPaths));
 	}
-	public AllowedPathBuilder<ID_TYPE> thenEither(List<Path<ID_TYPE, NodePermissions>> anyOfThoseSubPaths) {
+	public AllowedPathBuilder<ID_TYPE> thenEither(List<Graph<ID_TYPE, NodePermissions>> anyOfThoseSubPaths) {
 		
 		// preconditions
 		checkMutable();
@@ -68,7 +77,7 @@ public class AllowedPathBuilder<ID_TYPE> {
 	}
 
 
-	public AllowedPath<ID_TYPE> build() {
+	public AllowedPathsGraph<ID_TYPE> build() {
 		if(pathHasBeenBuilt){
 			throw new IllegalStateException("You have already build this path! Use the previously returned instance.");
 		}
@@ -90,6 +99,14 @@ public class AllowedPathBuilder<ID_TYPE> {
 		 */
 		
 		pathHasBeenBuilt = true;
+		if(!isSubpath){
+			/* TODO this is not very nice...refactor
+			 * a subpath is linked to the main path after build was called on it...
+			 * so it can't be closed for linking earlier than the 
+			 * build() call of the main path, for now I simply don't call finish 
+			 * on subpaths ... at least not here in build()*/
+			allowedPath.setFinishLinking();
+		}
 		return allowedPath;
 	}
 

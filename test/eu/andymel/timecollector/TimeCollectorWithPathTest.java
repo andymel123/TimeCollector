@@ -39,12 +39,12 @@ public class TimeCollectorWithPathTest {
 					
 					.then(BEFORE_DAO_SAVE)
 						.thenEither(
-							AllowedPathBuilder.<TestMilestones>start(BEFORE_DB_SAVE_DESICION1)
+							AllowedPathBuilder.<TestMilestones>startSubpath(BEFORE_DB_SAVE_DESICION1)
 								.then(AFTER_DB_SAVE_DESICION1)
 								.then(BEFORE_DB_SAVE_DECISION1_RESULTSET)
 								.then(AFTER_DB_SAVE_DECISION1_RESULTSET)
 								.build(),
-							AllowedPathBuilder.<TestMilestones>start(BEFORE_DB_SAVE_DESICION2)
+							AllowedPathBuilder.<TestMilestones>startSubpath(BEFORE_DB_SAVE_DESICION2)
 								.then(AFTER_DB_SAVE_DESICION2)
 								.then(BEFORE_DB_SAVE_DECISION2_RESULTSET)
 								.then(AFTER_DB_SAVE_DECISION2_RESULTSET)
@@ -64,15 +64,16 @@ public class TimeCollectorWithPathTest {
 	}
 
 	@Test (expected=IllegalStateException.class)
+	public void testWrongFirstMileStone() {
+		tc.saveTime(BEFORE_HANDLER_CONTEXT);
+	}
+
+	@Test //(expected=IllegalStateException.class)
 	public void testSetMultipleTimes() {
 		tc.saveTime(CREATION);	
 		tc.saveTime(CREATION);
 	}
 
-	@Test (expected=IllegalStateException.class)
-	public void testWrongFirstMileStone() {
-		tc.saveTime(BEFORE_HANDLER_CONTEXT);
-	}
 
 	
 }
