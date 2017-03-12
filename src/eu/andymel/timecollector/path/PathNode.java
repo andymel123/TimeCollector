@@ -10,7 +10,7 @@ import java.util.List;
  * @author andymatic
  *
  */
-class PathNode<ID_TYPE, PAYLOAD_TYPE> {
+public class PathNode<ID_TYPE, PAYLOAD_TYPE> {
 
 	private PAYLOAD_TYPE payload;
 	private List<PathNode<ID_TYPE, PAYLOAD_TYPE>> possiblePrev;
@@ -53,6 +53,8 @@ class PathNode<ID_TYPE, PAYLOAD_TYPE> {
 		possiblePrev.add(n);
 	}
 	
+
+	// ids have to be unique because otherwise it's not possible to simply say timeCollector.getTime(milestone)
 	PathNode<ID_TYPE, PAYLOAD_TYPE> getChildWithId(ID_TYPE idToSearch) {
 		
 		// preconditions

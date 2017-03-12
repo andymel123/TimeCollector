@@ -5,8 +5,10 @@ import static eu.andymel.timecollector.util.Preconditions.nn;
 import java.time.Clock;
 import java.time.Instant;
 
+import eu.andymel.timecollector.path.AllowedPath;
 import eu.andymel.timecollector.path.NodePermissions;
 import eu.andymel.timecollector.path.Path;
+import eu.andymel.timecollector.path.PathNode;
 
 public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILESTONE_TYPE> {
 
@@ -16,16 +18,18 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	/**This path models which milestones are allowed in whic order. The path
 	 * that is taken at runtime can be different but has to be a "part" of this one
 	 * at least if the {@link NodePermissions} are set so. */
-	private final Path<MILESTONE_TYPE, NodePermissions> allowedPath;
+	private final AllowedPath<MILESTONE_TYPE> allowedPath;
 	
 	/** This saves the real path that this time collector went through */
 	private Path<MILESTONE_TYPE, Instant> recordedPath;
 	
-	private TimeCollectorWithPath(Path<MILESTONE_TYPE, NodePermissions> allowedPath){
+	private PathNode<MILESTONE_TYPE, Instant> lastRecordedNode;
+	
+	private TimeCollectorWithPath(AllowedPath<MILESTONE_TYPE> allowedPath){
 		this(Clock.systemDefaultZone(), allowedPath);
 	}
 	
-	public TimeCollectorWithPath(Clock clock, Path<MILESTONE_TYPE, NodePermissions> allowed) {
+	private TimeCollectorWithPath(Clock clock, AllowedPath<MILESTONE_TYPE> allowed) {
 		nn(clock, "'clock' my not be null!");
 		nn(allowed, "'path' my not be null!");
 		
@@ -36,7 +40,8 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	}
 
 	
-	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollector<MILESTONE_TYPE> createWithPath(Path<MILESTONE_TYPE, NodePermissions> path){
+//	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollector<MILESTONE_TYPE> createWithPath(Path<MILESTONE_TYPE, NodePermissions> path){
+	public static <MILESTONE_TYPE> TimeCollector<MILESTONE_TYPE> createWithPath(AllowedPath<MILESTONE_TYPE> path){
 		return new TimeCollectorWithPath<MILESTONE_TYPE>(path);
 	}
 	
@@ -46,18 +51,29 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	@Override
 	public void saveTime(MILESTONE_TYPE m){
 
-		
-		// TODO check if this Milestone is allowed now
-		
+//		// check if it's currently allowed to save a time for the given milestone
+//		if(lastRecordedNode!=null){
+//			lastRecordedNode = allowedPath.checkIfAllRequiredNodesAreSetTill(lastRecordedNode, m);	
+//		} else {
+//			lastRecordedNode = allowedPath.checkIfThisMilestoneCanBeFirst(m);
+//		}
 
+		// save current time for this milestone
 		Instant now = clock.instant();
 		if(recordedPath==null){
+			
+			// throws exception if this milestone is not allowed as first milestone
+			allowedPath.checkPath(null, m); 
+
+			// if the path is ok...
 			recordedPath = new Path<>(m, now);
+			
 		}else{
 			recordedPath.addNode(m, now);
 		}
 		
 	}
+
 
 	/* (non-Javadoc)
 	 * @see eu.andymel.timecollector.TimeCollector#getTime(MILESTONE_TYPE)

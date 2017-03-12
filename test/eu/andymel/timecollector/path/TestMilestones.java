@@ -1,5 +1,5 @@
 package eu.andymel.timecollector.path;
-public enum TestMilestones {
+public enum TestMilestones implements HasId{
 
 	CREATION,
 	BEFORE_HANDLER_CONTEXT,
@@ -22,16 +22,27 @@ public enum TestMilestones {
 			AFTER_DECIDER,
 			
 			BEFORE_DAO_SAVE,
+				// either
 				BEFORE_DB_SAVE_DESICION1,
 				AFTER_DB_SAVE_DESICION1,
 				BEFORE_DB_SAVE_DECISION1_RESULTSET,
 				AFTER_DB_SAVE_DECISION1_RESULTSET,
+				// or
 				BEFORE_DB_SAVE_DESICION2,
 				AFTER_DB_SAVE_DESICION2,
 				BEFORE_DB_SAVE_DECISION2_RESULTSET,
 				AFTER_DB_SAVE_DECISION2_RESULTSET,
+				
 			AFTER_DAO_SAVE,
 		AFTER_HANDLER,
 	AFTER_HANDLER_CONTEXT;
+
+	
+	@Override
+	public String getId() {
+		return name();
+	}
+
+	
 	
 }

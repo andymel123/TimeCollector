@@ -3,6 +3,7 @@ package eu.andymel.timecollector.path;
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -18,14 +19,14 @@ public class AllowedPathBuilder<ID_TYPE> {
 	private static final NodePermissions REQUIRED_AND_NO_MULTISET = NodePermissions.create(true, true);
 	private static final NodePermissions NOT_REQUIRED_BUT_NO_MULTISET = NodePermissions.create(true, true);
 	
-	private final Path<ID_TYPE, NodePermissions> path;
+	private final AllowedPath<ID_TYPE> allowedPath;
 	
 	/** to prevent changes on the path after it has been built */
 	private boolean pathHasBeenBuilt = false;
 	
 	public AllowedPathBuilder(ID_TYPE idOfStartNode, NodePermissions nodePermissions) {
 		nn(idOfStartNode, "'idOfStartNode' is null!");
-		this.path = new Path<>(idOfStartNode, nodePermissions);
+		this.allowedPath = new AllowedPath<ID_TYPE>(idOfStartNode, nodePermissions);
 	}
 
 	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> start(ID_TYPE id){
@@ -47,7 +48,7 @@ public class AllowedPathBuilder<ID_TYPE> {
 		// preconditions
 		checkMutable();
 
-		this.path.addNode(id, nodePermissions);
+		this.allowedPath.addNode(id, nodePermissions);
 		
 		return this;
 	}
@@ -60,14 +61,14 @@ public class AllowedPathBuilder<ID_TYPE> {
 		// preconditions
 		checkMutable();
 		
-		this.path.addParallel(anyOfThoseSubPaths);
+		this.allowedPath.addParallel(anyOfThoseSubPaths);
 		
 		return this;
 		
 	}
 
 
-	public Path<ID_TYPE, NodePermissions> build() {
+	public AllowedPath<ID_TYPE> build() {
 		if(pathHasBeenBuilt){
 			throw new IllegalStateException("You have already build this path! Use the previously returned instance.");
 		}
@@ -89,7 +90,7 @@ public class AllowedPathBuilder<ID_TYPE> {
 		 */
 		
 		pathHasBeenBuilt = true;
-		return path;
+		return allowedPath;
 	}
 
 	private final void checkMutable(){

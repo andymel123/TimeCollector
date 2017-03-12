@@ -3,6 +3,7 @@ package eu.andymel.timecollector.path;
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,8 +19,12 @@ public class Path<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 	private final PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> startNode;
 	private final List<PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> lastNodes = new LinkedList<>();
 	
+	private final HashSet<NODE_ID_TYPE> usedIds = new HashSet<>();
+	
+	
 	private Path(PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> startNode) {
 		this.startNode = startNode;
+		usedIds.add(startNode.getId());
 		this.lastNodes.clear();
 		this.lastNodes.add(startNode);
 	}
@@ -32,8 +37,11 @@ public class Path<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 		return lastNodes;
 	}
 
-	public void addNode(NODE_ID_TYPE id, NODE_PAYLOAD_TYPE nodePermissions) {
+	public PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> addNode(NODE_ID_TYPE id, NODE_PAYLOAD_TYPE nodePermissions) {
+		
+		// preconditions
 		nn(id, "The given id is null!");
+		checkIdNotUsedYet(id);
 		
 		//build new node for this milestone
 		PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> newNode = new PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>(id, nodePermissions);
@@ -48,6 +56,13 @@ public class Path<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 		lastNodes.clear();
 		lastNodes.add(newNode);
 		
+		return newNode;
+	}
+
+	private void checkIdNotUsedYet(NODE_ID_TYPE id) {
+		if(usedIds.contains(id)){
+			throw new IllegalStateException("You try to add the node id '"+id+"' again. Ids have to be unique!");
+		}
 	}
 
 	public void addParallel(List<Path<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> anyOfThoseSubPaths){
@@ -79,7 +94,7 @@ public class Path<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 
 	}
 	
-	private PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> getStartNode() {
+	protected PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> getStartNode() {
 		return startNode;
 	}
 
@@ -88,22 +103,43 @@ public class Path<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 		node.setPayload(p);
 	}
 	public NODE_PAYLOAD_TYPE getPayload(NODE_ID_TYPE id){
+		
+		// preconditions
+		nn(id, "'id' is null!");
+		
+		// shortcut
+		if(id.equals(startNode.getId()))return startNode.getPayload();
+		
+		// otherwise search for the node
 		PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> node = getChildWithId(startNode, id);
+		
+		if(node==null){
+			// no node found with this id
+			return null;
+		}
 		return node.getPayload();
 	}
 
 	private PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> getNode(NODE_ID_TYPE idToSearch){
 		// TODO add hashmap in addition to linked nodes to speed up in big paths
+		if(idToSearch.equals(startNode.getId()))return startNode;
 		return getChildWithId(startNode, idToSearch);
 	}
 	
 	private PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> getChildWithId(PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> root, NODE_ID_TYPE idToSearch) {
-		
-		// preconditions
-		nn(root, "Can't search childs of node thats null!");
 
+		// preconditions
+		nn(root, "'root' is null!");
+		nn(idToSearch, "'idToSearch' is null!");
+		
 		// if the startnode itself is the searched node...return it
-		if(idToSearch.equals(startNode.getId()))return startNode;
+		if(idToSearch.equals(root.getId())){
+			/* root is not a child of itself, returning null would be enough here,
+			 * but I throw an error as I should check that earlier and I want to 
+			 * recognize this as a problem. */
+			throw new IllegalStateException("'"+idToSearch+"' can't be the id of "
+				+ "a child as it's already the id of your given root note!");
+		};
 		
 		// otherwise search recursivly in its childs
 		return root.getChildWithId(idToSearch);
