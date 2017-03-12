@@ -1,15 +1,13 @@
 package eu.andymel.timecollector.path;
 
+import static eu.andymel.timecollector.util.Preconditions.nn;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static eu.andymel.timecollector.util.Preconditions.*;
-
 /**
- * Not immutable as I change it in the builder!
- * 
- * TODO copy and add immutable view on the path when finished
+ * TODO copy and add immutable view on the path when finished to add nodes
  * 
  * @author andymatic
  *
@@ -35,7 +33,7 @@ public class Path<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 	}
 
 	public void addNode(NODE_ID_TYPE id, NODE_PAYLOAD_TYPE nodePermissions) {
-		nn(id, ()->"The given id is null!");
+		nn(id, "The given id is null!");
 		
 		//build new node for this milestone
 		PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> newNode = new PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>(id, nodePermissions);
@@ -55,7 +53,7 @@ public class Path<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 	public void addParallel(List<Path<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> anyOfThoseSubPaths){
 		
 		// preconditions
-		nn(anyOfThoseSubPaths, ()->"addParallel needs paths!");
+		nn(anyOfThoseSubPaths, "addParallel(...) needs paths!");
 		if(anyOfThoseSubPaths.size()<2){
 			throw new IllegalArgumentException("addParallel() needs at least 2 paths!");
 		}
@@ -102,7 +100,7 @@ public class Path<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 	private PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> getChildWithId(PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> root, NODE_ID_TYPE idToSearch) {
 		
 		// preconditions
-		nn(root, ()->"Can't search childs of node thats null!");
+		nn(root, "Can't search childs of node thats null!");
 
 		// if the startnode itself is the searched node...return it
 		if(idToSearch.equals(startNode.getId()))return startNode;

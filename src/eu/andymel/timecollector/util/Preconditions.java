@@ -3,6 +3,10 @@ package eu.andymel.timecollector.util;
 import java.util.Collection;
 import java.util.function.Supplier;
 
+/**
+ * Normally I do a lot of validity checks. So I reduce work by using this short utility methods. 
+ * @author andymatic
+ */
 public class Preconditions {
 
 	private Preconditions(){throw new IllegalStateException("May not be initialized");}

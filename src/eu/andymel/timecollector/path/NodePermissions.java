@@ -1,5 +1,11 @@
 package eu.andymel.timecollector.path;
 
+import eu.andymel.timecollector.TimeCollector;
+
+/**
+ * Used to set permissions for {@link PathNode}s on the allowedPath of my {@link TimeCollector} 
+ * @author andymatic
+ */
 public class NodePermissions {
 
 	/** A payload has to be set on this node before 

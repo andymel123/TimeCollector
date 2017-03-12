@@ -1,8 +1,8 @@
 package eu.andymel.timecollector.path;
+import static eu.andymel.timecollector.util.Preconditions.nn;
+
 import java.util.LinkedList;
 import java.util.List;
-
-import static eu.andymel.timecollector.util.Preconditions.*;
 
 /**
  * A single Node on the path
@@ -56,7 +56,7 @@ class PathNode<ID_TYPE, PAYLOAD_TYPE> {
 	PathNode<ID_TYPE, PAYLOAD_TYPE> getChildWithId(ID_TYPE idToSearch) {
 		
 		// preconditions
-		nn(idToSearch, ()->"Makes no sense to search for a child with id NULL!");
+		nn(idToSearch, "Makes no sense to search for a child with id NULL!");
 		
 //		if(idToSearch.equals(milestone))return this; this is not a child
 		

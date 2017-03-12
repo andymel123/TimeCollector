@@ -10,23 +10,34 @@ import eu.andymel.timecollector.path.Path;
 
 public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILESTONE_TYPE> {
 
-	private final Path<MILESTONE_TYPE, NodePermissions> allowedPath;
+	/** The clock to use to save time stamps */
 	private final Clock clock;
 	
+	/**This path models which milestones are allowed in whic order. The path
+	 * that is taken at runtime can be different but has to be a "part" of this one
+	 * at least if the {@link NodePermissions} are set so. */
+	private final Path<MILESTONE_TYPE, NodePermissions> allowedPath;
+	
+	/** This saves the real path that this time collector went through */
 	private Path<MILESTONE_TYPE, Instant> recordedPath;
 	
-	public TimeCollectorWithPath(Clock clock, Path<MILESTONE_TYPE, NodePermissions> path) {
-		nn(clock, ()->"'clock' my not be null!");
-		nn(path, ()->"'path' my not be null!");
+	private TimeCollectorWithPath(Path<MILESTONE_TYPE, NodePermissions> allowedPath){
+		this(Clock.systemDefaultZone(), allowedPath);
+	}
+	
+	public TimeCollectorWithPath(Clock clock, Path<MILESTONE_TYPE, NodePermissions> allowed) {
+		nn(clock, "'clock' my not be null!");
+		nn(allowed, "'path' my not be null!");
 		
 		this.clock = clock;
 		
 		// TODO copy path!
-		this.allowedPath = path;
+		this.allowedPath = allowed;
 	}
 
-	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollector<MILESTONE_TYPE> createWithPath(Clock clock, Path<MILESTONE_TYPE, NodePermissions> path){
-		return new TimeCollectorWithPath<MILESTONE_TYPE>(clock, path);
+	
+	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollector<MILESTONE_TYPE> createWithPath(Path<MILESTONE_TYPE, NodePermissions> path){
+		return new TimeCollectorWithPath<MILESTONE_TYPE>(path);
 	}
 	
 	/* (non-Javadoc)
@@ -52,8 +63,8 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	 * @see eu.andymel.timecollector.TimeCollector#getTime(MILESTONE_TYPE)
 	 */
 	@Override
-	public void getTime(MILESTONE_TYPE m){
-		this.recordedPath.getPayload(m);
+	public Instant getTime(MILESTONE_TYPE m){
+		return this.recordedPath.getPayload(m);
 	}
 
 }

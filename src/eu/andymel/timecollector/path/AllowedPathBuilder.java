@@ -2,11 +2,11 @@ package eu.andymel.timecollector.path;
 
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
+ *  
  * NOT THREADSAFE!
  * 
  * @author andymatic
@@ -24,7 +24,7 @@ public class AllowedPathBuilder<ID_TYPE> {
 	private boolean pathHasBeenBuilt = false;
 	
 	public AllowedPathBuilder(ID_TYPE idOfStartNode, NodePermissions nodePermissions) {
-		nn(idOfStartNode, ()->"'idOfStartNode' is null!");
+		nn(idOfStartNode, "'idOfStartNode' is null!");
 		this.path = new Path<>(idOfStartNode, nodePermissions);
 	}
 
@@ -52,36 +52,6 @@ public class AllowedPathBuilder<ID_TYPE> {
 		return this;
 	}
 
-//	public PathBuilder<ID_TYPE, PAYLOAD_TYPE> thenEither(ID_TYPE... anyOfThose) {
-//		return thenEither(Arrays.asList(anyOfThose));
-//	}
-//
-//	public PathBuilder<ID_TYPE, PAYLOAD_TYPE> thenEither(List<ID_TYPE> anyOfThose) {
-//		
-//		// preconditions
-//		checkMutable();
-//		ne(anyOfThose, ()->"thenEither needs milestiones!");
-//		
-//		// add all new milestones as next nodes to all last nodes
-//		List<PathNode<ID_TYPE, PathModelNodePayload>> lastNodesOfBuiltPath = path.getLastNodes();
-//		List<PathNode<ID_TYPE, PathModelNodePayload>> newNodes = new ArrayList<>(anyOfThose.size());
-//		for(ID_TYPE m: anyOfThose){
-//			PathNode<ID_TYPE, PathModelNodePayload> newNode = new PathNode<ID_TYPE, PathModelNodePayload>(m, false);
-//			newNodes.add(newNode);
-//			for(PathNode<ID_TYPE, PathModelNodePayload> lastnode: lastNodesOfBuiltPath){
-//				lastnode.addNextNode(newNode);
-//			}
-//		}
-//
-//		// set the lastAddedNodes reference on the new nodes
-//		lastNodesOfBuiltPath.clear();
-//		lastNodesOfBuiltPath.addAll(newNodes);
-//		
-//		return this;
-//	}
-
-	
-	@SuppressWarnings("varargs")
 	public AllowedPathBuilder<ID_TYPE> thenEither(Path<ID_TYPE, NodePermissions>... anyOfThoseSubPaths) {
 		return thenEither(Arrays.asList(anyOfThoseSubPaths));
 	}
