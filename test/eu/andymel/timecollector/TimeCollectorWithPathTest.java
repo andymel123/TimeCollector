@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.path.AllowedPathBuilder;
 import eu.andymel.timecollector.path.TestMilestones;
 
@@ -39,12 +40,12 @@ public class TimeCollectorWithPathTest {
 					
 					.then(BEFORE_DAO_SAVE)
 						.thenEither(
-							AllowedPathBuilder.<TestMilestones>start(BEFORE_DB_SAVE_DESICION1)
+							AllowedPathBuilder.<TestMilestones>startSubpath(BEFORE_DB_SAVE_DESICION1)
 								.then(AFTER_DB_SAVE_DESICION1)
 								.then(BEFORE_DB_SAVE_DECISION1_RESULTSET)
 								.then(AFTER_DB_SAVE_DECISION1_RESULTSET)
 								.build(),
-							AllowedPathBuilder.<TestMilestones>start(BEFORE_DB_SAVE_DESICION2)
+							AllowedPathBuilder.<TestMilestones>startSubpath(BEFORE_DB_SAVE_DESICION2)
 								.then(AFTER_DB_SAVE_DESICION2)
 								.then(BEFORE_DB_SAVE_DECISION2_RESULTSET)
 								.then(AFTER_DB_SAVE_DECISION2_RESULTSET)
@@ -63,16 +64,22 @@ public class TimeCollectorWithPathTest {
 		tc.saveTime(CREATION);
 	}
 
-	@Test (expected=IllegalStateException.class)
+	@Test (expected=MilestoneNotAllowedException.class)
+	public void testWrongFirstMileStone() {
+		tc.saveTime(BEFORE_HANDLER_CONTEXT);
+	}
+
+	@Test (expected=MilestoneNotAllowedException.class)
 	public void testSetMultipleTimes() {
 		tc.saveTime(CREATION);	
 		tc.saveTime(CREATION);
 	}
 
-	@Test (expected=IllegalStateException.class)
-	public void testWrongFirstMileStone() {
-		tc.saveTime(BEFORE_HANDLER_CONTEXT);
-	}
+	
+	/*
+	 * TODO write test with path including a loop of not required nodes...I guess 
+	 * it would make problems with getNextPermissionNodes() at the moment 
+	 */
 
 	
 }
