@@ -46,10 +46,6 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	}
 
 	
-	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollector<MILESTONE_TYPE> createSerial(Class<MILESTONE_TYPE> enumClazz, boolean required, boolean singleSet){
-		return new TimeCollectorWithPath<MILESTONE_TYPE>(AllowedPathsGraph.createSerial(enumClazz, required, singleSet));
-	}
-		
 	public static <MILESTONE_TYPE> TimeCollector<MILESTONE_TYPE> createWithPath(AllowedPathsGraph<MILESTONE_TYPE> path){
 		return new TimeCollectorWithPath<MILESTONE_TYPE>(path);
 	}

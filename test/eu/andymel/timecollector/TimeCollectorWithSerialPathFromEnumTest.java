@@ -18,10 +18,10 @@ public class TimeCollectorWithSerialPathFromEnumTest {
 	
 	@Before
 	public void setup(){
-		tcRS= TimeCollectorWithPath.createSerial(TestMilestones.class, true, true);
-		tcR = TimeCollectorWithPath.createSerial(TestMilestones.class, false, false);
-		tcS = TimeCollectorWithPath.createSerial(TestMilestones.class, false, true);
-		tc 	= TimeCollectorWithPath.createSerial(TestMilestones.class, false, false);
+		tcRS= TimeCollectorSerial.create(TestMilestones.class, true, true);
+		tcR = TimeCollectorSerial.create(TestMilestones.class, false, false);
+		tcS = TimeCollectorSerial.create(TestMilestones.class, false, true);
+		tc 	= TimeCollectorSerial.create(TestMilestones.class, false, false);
 	}
 	
 	@Test
