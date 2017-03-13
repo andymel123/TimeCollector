@@ -18,20 +18,29 @@ public class TimeCollectorSerial<MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> im
 
 	private final Instant[] savedMileStonesTimes;
 	private final boolean ensureOrder;
+	private final boolean allRequired;
 	private final boolean singleSet;
 	private final EnumSet<MILESTONE_TYPE> milestoneSet;
+//	private final MILESTONE_TYPE[] milestones;
 
 	private MILESTONE_TYPE lastMilestone = null;
 	
-	private TimeCollectorSerial(boolean ensureOrder, boolean singleSet, Class<MILESTONE_TYPE> clazz) {
+	private TimeCollectorSerial(boolean ensureOrder, boolean allRequired, boolean singleSet, Class<MILESTONE_TYPE> clazz) {
 		this.ensureOrder = ensureOrder;
+		this.allRequired = allRequired;
+		
+		if(allRequired && !ensureOrder){
+			throw new IllegalArgumentException("AllRequired can only be set if ensureOrder is set as well. Because I can't test at which time all has to be set without knowing an order.");
+		}
+		
 		this.singleSet = singleSet;
 		this.milestoneSet = EnumSet.allOf(clazz);
+//		this.milestones = (MILESTONE_TYPE[]) milestoneSet.toArray(MILESTONE_TYPE[]);
 		this.savedMileStonesTimes = new Instant[milestoneSet.size()];
 	}
 	
-	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollectorSerial<MILESTONE_TYPE> create(Class<MILESTONE_TYPE> enumClazz, boolean ensureOrder, boolean singleSet){
-		return new TimeCollectorSerial<MILESTONE_TYPE>(ensureOrder, singleSet, enumClazz);
+	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollectorSerial<MILESTONE_TYPE> create(Class<MILESTONE_TYPE> enumClazz, boolean ensureOrder, boolean allRequired, boolean singleSet){
+		return new TimeCollectorSerial<MILESTONE_TYPE>(ensureOrder, allRequired, singleSet, enumClazz);
 	}
 
 	/* (non-Javadoc)
@@ -44,14 +53,30 @@ public class TimeCollectorSerial<MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> im
 		nn(m, "'milestone' is null!");
 		int idx = m.ordinal();
 		
-		if(ensureOrder && lastMilestone!=null && idx < lastMilestone.ordinal()){
-			throw new MilestoneNotAllowedException("The later milestone '"+lastMilestone+"' has already been set at "+getTime(lastMilestone)+". You can't set '"+m+"' anymore!");
+		if(ensureOrder){
+			
+			if(lastMilestone!=null && lastMilestone.ordinal()==milestoneSet.size()-1){
+				throw new MilestoneNotAllowedException("The last milestone in your enum '"+lastMilestone+"' has already been set in "+this+". There is no other. So '"+m+"' can't be a milestone after '"+lastMilestone+"'");
+			}
+			
+			if(lastMilestone!=null && idx < lastMilestone.ordinal()){
+				throw new MilestoneNotAllowedException("The later milestone '"+lastMilestone+"' has already been set at "+getTime(lastMilestone)+". You can't set '"+m+"' anymore!");
+			}
+			
+			if(allRequired){
+				if(lastMilestone==null && idx != 0){
+					throw new MilestoneNotAllowedException("This is the first time you call saveTime on "+this+" but '"+m+"' is not the first Milestone in your given enum "+m.getClass().getSimpleName());
+				} else if(lastMilestone!=null && idx != lastMilestone.ordinal()+1) {
+					throw new MilestoneNotAllowedException("Last milestone saved was '"+lastMilestone+"'! '"+m+"' is not the next milestone!");
+				}
+			}
 		}
 		
 		if(singleSet && savedMileStonesTimes[idx] != null){
 			throw new MilestoneNotAllowedException("The milestone '"+m+"' has already been set! Old time was "+savedMileStonesTimes[idx]+".");
 		}else{
 			savedMileStonesTimes[idx] = Instant.now();
+			lastMilestone = m;
 		}
 		
 	}

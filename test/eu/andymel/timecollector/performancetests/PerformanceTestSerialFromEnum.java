@@ -27,7 +27,7 @@ public class PerformanceTestSerialFromEnum {
 		
 		Instant start = Instant.now();
 		for(int i=0; i<amount; i++){
-			TimeCollectorSerial.create(TestMilestones.class, true, true);
+			TimeCollectorSerial.create(TestMilestones.class, true, true, true);
 		}
 		PerformanceTestsUtils.end("TimeCollectorSerial with "+TestMilestones.class.getSimpleName(), amount, start);
 	

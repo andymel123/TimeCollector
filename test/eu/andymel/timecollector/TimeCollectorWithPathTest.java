@@ -1,34 +1,11 @@
 package eu.andymel.timecollector;
 
-import static eu.andymel.timecollector.TestMilestones.AFTER_CALC1;
-import static eu.andymel.timecollector.TestMilestones.AFTER_DAO_GETSTATE;
-import static eu.andymel.timecollector.TestMilestones.AFTER_DAO_SAVE;
-import static eu.andymel.timecollector.TestMilestones.AFTER_DBPOOL;
-import static eu.andymel.timecollector.TestMilestones.AFTER_DB_GETSTATE;
-import static eu.andymel.timecollector.TestMilestones.AFTER_DB_GETSTATE_RESULTSET;
-import static eu.andymel.timecollector.TestMilestones.AFTER_DB_SAVE_DECISION1_RESULTSET;
-import static eu.andymel.timecollector.TestMilestones.AFTER_DB_SAVE_DECISION2_RESULTSET;
-import static eu.andymel.timecollector.TestMilestones.AFTER_DB_SAVE_DESICION1;
-import static eu.andymel.timecollector.TestMilestones.AFTER_DB_SAVE_DESICION2;
-import static eu.andymel.timecollector.TestMilestones.AFTER_DECIDER;
-import static eu.andymel.timecollector.TestMilestones.AFTER_HANDLER;
-import static eu.andymel.timecollector.TestMilestones.AFTER_HANDLER_CONTEXT;
-import static eu.andymel.timecollector.TestMilestones.AFTER_SEARCH_HANDLER;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_CALC1;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_DAO_GETSTATE;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_DAO_SAVE;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_DBPOOL;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_GETSTATE;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_GETSTATE_RESULTSET;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_SAVE_DECISION1_RESULTSET;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_SAVE_DECISION2_RESULTSET;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_SAVE_DESICION1;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_SAVE_DESICION2;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_DECIDER;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_HANDLER;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_HANDLER_CONTEXT;
-import static eu.andymel.timecollector.TestMilestones.BEFORE_SEARCH_HANDLER;
-import static eu.andymel.timecollector.TestMilestones.CREATION;
+import static eu.andymel.timecollector.TestMilestones.*;
+import static org.junit.Assert.*;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +19,36 @@ public class TimeCollectorWithPathTest {
 	
 	@Before
 	public void setup(){
+		
+		/**
+		 * A clock that increases it's "time" by 1 millisecond per call
+		 * to instant(). I don't need to test with real time, I just want to test
+		 * if the timecollector returns the right time in getTime (has to increase 
+		 * by 1 with this clock)
+		 */
+		Clock testClock = new Clock(){
+
+			long count = 0;
+			
+			@Override
+			public ZoneId getZone() {
+				return null;
+			}
+
+			@Override
+			public Clock withZone(ZoneId zone) {
+				return null;
+			}
+
+			@Override
+			public Instant instant() {
+				return Instant.ofEpochMilli(count++);
+			}
+			
+		};
+		
 		tc = TimeCollectorWithPath.createWithPath(
+				testClock,
 				AllowedPathBuilder.<TestMilestones>
 				start(CREATION)
 				.then(BEFORE_HANDLER_CONTEXT)
@@ -88,6 +94,7 @@ public class TimeCollectorWithPathTest {
 	@Test
 	public void testFirstMileStone() {
 		tc.saveTime(CREATION);
+		assertNotNull(tc.getTime(CREATION));
 	}
 
 	@Test
@@ -121,6 +128,33 @@ public class TimeCollectorWithPathTest {
 		tc.saveTime(AFTER_HANDLER);
 		tc.saveTime(AFTER_HANDLER_CONTEXT);
 
+		int count = 0;
+		assertEquals(count++, tc.getTime(CREATION).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_HANDLER_CONTEXT).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_SEARCH_HANDLER).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_SEARCH_HANDLER).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_HANDLER).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_DAO_GETSTATE).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_DBPOOL).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_DBPOOL).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_DB_GETSTATE).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_DB_GETSTATE).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_DB_GETSTATE_RESULTSET).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_DB_GETSTATE_RESULTSET).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_DAO_GETSTATE).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_CALC1).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_CALC1).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_DECIDER).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_DECIDER).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_DAO_SAVE).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_DB_SAVE_DESICION1).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_DB_SAVE_DESICION1).toEpochMilli());
+		assertEquals(count++, tc.getTime(BEFORE_DB_SAVE_DECISION1_RESULTSET).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_DB_SAVE_DECISION1_RESULTSET).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_DAO_SAVE).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_HANDLER).toEpochMilli());
+		assertEquals(count++, tc.getTime(AFTER_HANDLER_CONTEXT).toEpochMilli());
+		
 	}
 
 	@Test (expected=MilestoneNotAllowedException.class)
