@@ -3,7 +3,6 @@ package eu.andymel.timecollector.graphs;
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 /**

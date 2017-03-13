@@ -1,7 +1,34 @@
 package eu.andymel.timecollector;
 
-import static eu.andymel.timecollector.TestMilestones.*;
-import static org.junit.Assert.*;
+import static eu.andymel.timecollector.TestMilestones.AFTER_CALC1;
+import static eu.andymel.timecollector.TestMilestones.AFTER_DAO_GETSTATE;
+import static eu.andymel.timecollector.TestMilestones.AFTER_DAO_SAVE;
+import static eu.andymel.timecollector.TestMilestones.AFTER_DBPOOL;
+import static eu.andymel.timecollector.TestMilestones.AFTER_DB_GETSTATE;
+import static eu.andymel.timecollector.TestMilestones.AFTER_DB_GETSTATE_RESULTSET;
+import static eu.andymel.timecollector.TestMilestones.AFTER_DB_SAVE_DECISION1_RESULTSET;
+import static eu.andymel.timecollector.TestMilestones.AFTER_DB_SAVE_DECISION2_RESULTSET;
+import static eu.andymel.timecollector.TestMilestones.AFTER_DB_SAVE_DESICION1;
+import static eu.andymel.timecollector.TestMilestones.AFTER_DB_SAVE_DESICION2;
+import static eu.andymel.timecollector.TestMilestones.AFTER_DECIDER;
+import static eu.andymel.timecollector.TestMilestones.AFTER_HANDLER;
+import static eu.andymel.timecollector.TestMilestones.AFTER_HANDLER_CONTEXT;
+import static eu.andymel.timecollector.TestMilestones.AFTER_SEARCH_HANDLER;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_CALC1;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_DAO_GETSTATE;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_DAO_SAVE;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_DBPOOL;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_GETSTATE;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_GETSTATE_RESULTSET;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_SAVE_DECISION1_RESULTSET;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_SAVE_DECISION2_RESULTSET;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_SAVE_DESICION1;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_DB_SAVE_DESICION2;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_DECIDER;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_HANDLER;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_HANDLER_CONTEXT;
+import static eu.andymel.timecollector.TestMilestones.BEFORE_SEARCH_HANDLER;
+import static eu.andymel.timecollector.TestMilestones.CREATION;
 
 import org.junit.Before;
 import org.junit.Test;
