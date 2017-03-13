@@ -64,15 +64,162 @@ public class TimeCollectorWithPathTest {
 		tc.saveTime(CREATION);
 	}
 
+	@Test
+	public void testFullPath(){
+		tc.saveTime(CREATION);
+		tc.saveTime(BEFORE_HANDLER_CONTEXT);
+		tc.saveTime(BEFORE_SEARCH_HANDLER);
+		tc.saveTime(AFTER_SEARCH_HANDLER);
+		tc.saveTime(BEFORE_HANDLER);
+			tc.saveTime(BEFORE_DAO_GETSTATE);
+				tc.saveTime(BEFORE_DBPOOL);
+				tc.saveTime(AFTER_DBPOOL);
+				tc.saveTime(BEFORE_DB_GETSTATE);
+				tc.saveTime(AFTER_DB_GETSTATE);
+				tc.saveTime(BEFORE_DB_GETSTATE_RESULTSET);
+				tc.saveTime(AFTER_DB_GETSTATE_RESULTSET);
+			tc.saveTime(AFTER_DAO_GETSTATE);
+			
+			tc.saveTime(BEFORE_CALC1);
+			tc.saveTime(AFTER_CALC1);
+			
+			tc.saveTime(BEFORE_DECIDER);
+			tc.saveTime(AFTER_DECIDER);
+			
+			tc.saveTime(BEFORE_DAO_SAVE);
+				tc.saveTime(BEFORE_DB_SAVE_DESICION1);
+				tc.saveTime(AFTER_DB_SAVE_DESICION1);
+				tc.saveTime(BEFORE_DB_SAVE_DECISION1_RESULTSET);
+				tc.saveTime(AFTER_DB_SAVE_DECISION1_RESULTSET);
+			tc.saveTime(AFTER_DAO_SAVE);
+		tc.saveTime(AFTER_HANDLER);
+		tc.saveTime(AFTER_HANDLER_CONTEXT);
+
+	}
+
+	@Test (expected=MilestoneNotAllowedException.class)
+	public void testFullPathOneMissing(){
+		tc.saveTime(CREATION);
+		tc.saveTime(BEFORE_HANDLER_CONTEXT);
+		tc.saveTime(BEFORE_SEARCH_HANDLER);
+		tc.saveTime(AFTER_SEARCH_HANDLER);
+		tc.saveTime(BEFORE_HANDLER);
+			tc.saveTime(BEFORE_DAO_GETSTATE);
+				tc.saveTime(BEFORE_DBPOOL);
+//				tc.saveTime(AFTER_DBPOOL);
+				tc.saveTime(BEFORE_DB_GETSTATE);
+				tc.saveTime(AFTER_DB_GETSTATE);
+				tc.saveTime(BEFORE_DB_GETSTATE_RESULTSET);
+				tc.saveTime(AFTER_DB_GETSTATE_RESULTSET);
+			tc.saveTime(AFTER_DAO_GETSTATE);
+			
+			tc.saveTime(BEFORE_CALC1);
+			tc.saveTime(AFTER_CALC1);
+			
+			tc.saveTime(BEFORE_DECIDER);
+			tc.saveTime(AFTER_DECIDER);
+			
+			tc.saveTime(BEFORE_DAO_SAVE);
+				tc.saveTime(BEFORE_DB_SAVE_DESICION1);
+				tc.saveTime(AFTER_DB_SAVE_DESICION1);
+				tc.saveTime(BEFORE_DB_SAVE_DECISION1_RESULTSET);
+				tc.saveTime(AFTER_DB_SAVE_DECISION1_RESULTSET);
+			tc.saveTime(AFTER_DAO_SAVE);
+		tc.saveTime(AFTER_HANDLER);
+		tc.saveTime(AFTER_HANDLER_CONTEXT);
+
+	}
+
+	@Test (expected=MilestoneNotAllowedException.class)
+	public void testFullPathOneMissingInSubPath(){
+		tc.saveTime(CREATION);
+		tc.saveTime(BEFORE_HANDLER_CONTEXT);
+		tc.saveTime(BEFORE_SEARCH_HANDLER);
+		tc.saveTime(AFTER_SEARCH_HANDLER);
+		tc.saveTime(BEFORE_HANDLER);
+			tc.saveTime(BEFORE_DAO_GETSTATE);
+				tc.saveTime(BEFORE_DBPOOL);
+				tc.saveTime(AFTER_DBPOOL);
+				tc.saveTime(BEFORE_DB_GETSTATE);
+				tc.saveTime(AFTER_DB_GETSTATE);
+				tc.saveTime(BEFORE_DB_GETSTATE_RESULTSET);
+				tc.saveTime(AFTER_DB_GETSTATE_RESULTSET);
+			tc.saveTime(AFTER_DAO_GETSTATE);
+			
+			tc.saveTime(BEFORE_CALC1);
+			tc.saveTime(AFTER_CALC1);
+			
+			tc.saveTime(BEFORE_DECIDER);
+			tc.saveTime(AFTER_DECIDER);
+			
+			tc.saveTime(BEFORE_DAO_SAVE);
+//				tc.saveTime(BEFORE_DB_SAVE_DESICION1);
+				tc.saveTime(AFTER_DB_SAVE_DESICION1);
+				tc.saveTime(BEFORE_DB_SAVE_DECISION1_RESULTSET);
+				tc.saveTime(AFTER_DB_SAVE_DECISION1_RESULTSET);
+			tc.saveTime(AFTER_DAO_SAVE);
+		tc.saveTime(AFTER_HANDLER);
+		tc.saveTime(AFTER_HANDLER_CONTEXT);
+
+	}
+
+	@Test (expected=MilestoneNotAllowedException.class)
+	public void testBothSubPath(){
+		tc.saveTime(CREATION);
+		tc.saveTime(BEFORE_HANDLER_CONTEXT);
+		tc.saveTime(BEFORE_SEARCH_HANDLER);
+		tc.saveTime(AFTER_SEARCH_HANDLER);
+		tc.saveTime(BEFORE_HANDLER);
+			tc.saveTime(BEFORE_DAO_GETSTATE);
+				tc.saveTime(BEFORE_DBPOOL);
+				tc.saveTime(AFTER_DBPOOL);
+				tc.saveTime(BEFORE_DB_GETSTATE);
+				tc.saveTime(AFTER_DB_GETSTATE);
+				tc.saveTime(BEFORE_DB_GETSTATE_RESULTSET);
+				tc.saveTime(AFTER_DB_GETSTATE_RESULTSET);
+			tc.saveTime(AFTER_DAO_GETSTATE);
+			
+			tc.saveTime(BEFORE_CALC1);
+			tc.saveTime(AFTER_CALC1);
+			
+			tc.saveTime(BEFORE_DECIDER);
+			tc.saveTime(AFTER_DECIDER);
+			
+			tc.saveTime(BEFORE_DAO_SAVE);
+			
+				tc.saveTime(BEFORE_DB_SAVE_DESICION1);
+				tc.saveTime(AFTER_DB_SAVE_DESICION1);
+				tc.saveTime(BEFORE_DB_SAVE_DECISION1_RESULTSET);
+				tc.saveTime(AFTER_DB_SAVE_DECISION1_RESULTSET);
+				
+				// sould not work as the above block and this next block is added with "thenEither"
+				tc.saveTime(BEFORE_DB_SAVE_DESICION2);
+				tc.saveTime(AFTER_DB_SAVE_DESICION2);
+				tc.saveTime(BEFORE_DB_SAVE_DECISION2_RESULTSET);
+				tc.saveTime(AFTER_DB_SAVE_DECISION2_RESULTSET);
+				
+			tc.saveTime(AFTER_DAO_SAVE);
+		tc.saveTime(AFTER_HANDLER);
+		tc.saveTime(AFTER_HANDLER_CONTEXT);
+
+	}
+
+	
 	@Test (expected=MilestoneNotAllowedException.class)
 	public void testWrongFirstMileStone() {
 		tc.saveTime(BEFORE_HANDLER_CONTEXT);
 	}
 
 	@Test (expected=MilestoneNotAllowedException.class)
-	public void testSetMultipleTimes() {
+	public void testSetMultipleTimesStartNode() {
 		tc.saveTime(CREATION);	
 		tc.saveTime(CREATION);
+	}
+	@Test (expected=MilestoneNotAllowedException.class)
+	public void testSetMultipleTimesOtherNode() {
+		tc.saveTime(CREATION);	
+		tc.saveTime(BEFORE_HANDLER_CONTEXT);
+		tc.saveTime(BEFORE_HANDLER_CONTEXT);
 	}
 
 	
