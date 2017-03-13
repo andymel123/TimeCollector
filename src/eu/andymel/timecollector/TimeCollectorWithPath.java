@@ -8,10 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
-import eu.andymel.timecollector.path.AllowedPathsGraph;
-import eu.andymel.timecollector.path.GraphNode;
-import eu.andymel.timecollector.path.NodePermissions;
-import eu.andymel.timecollector.path.Path;
+import eu.andymel.timecollector.graphs.AllowedPathsGraph;
+import eu.andymel.timecollector.graphs.GraphNode;
+import eu.andymel.timecollector.graphs.NodePermissions;
+import eu.andymel.timecollector.graphs.Path;
 
 public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILESTONE_TYPE> {
 

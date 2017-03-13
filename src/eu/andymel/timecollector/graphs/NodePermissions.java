@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.path;
+package eu.andymel.timecollector.graphs;
 
 import eu.andymel.timecollector.TimeCollector;
 

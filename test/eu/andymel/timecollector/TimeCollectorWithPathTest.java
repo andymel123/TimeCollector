@@ -1,14 +1,13 @@
 package eu.andymel.timecollector;
 
-import static eu.andymel.timecollector.path.TestMilestones.*;
+import static eu.andymel.timecollector.TestMilestones.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
-import eu.andymel.timecollector.path.AllowedPathBuilder;
-import eu.andymel.timecollector.path.TestMilestones;
+import eu.andymel.timecollector.graphs.AllowedPathBuilder;
 
 public class TimeCollectorWithPathTest {
 

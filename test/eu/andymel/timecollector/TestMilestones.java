@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.path;
+package eu.andymel.timecollector;
 public enum TestMilestones{
 
 	CREATION,

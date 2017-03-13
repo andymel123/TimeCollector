@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.path;
+package eu.andymel.timecollector.graphs;
 
 import static eu.andymel.timecollector.util.Preconditions.nn;
 

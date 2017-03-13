@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.path;
+package eu.andymel.timecollector.graphs;
 
 public class Path<ID_TYPE, PAYLOAD_TYPE> extends Graph<ID_TYPE, PAYLOAD_TYPE> {
 
