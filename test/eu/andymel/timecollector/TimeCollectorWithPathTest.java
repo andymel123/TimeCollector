@@ -249,6 +249,7 @@ public class TimeCollectorWithPathTest {
 	}
 
 	
+	
 	/*
 	 * TODO write test with path including a loop of not required nodes...I guess 
 	 * it would make problems with getNextPermissionNodes() at the moment 

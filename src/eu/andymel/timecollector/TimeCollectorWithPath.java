@@ -2,12 +2,16 @@ package eu.andymel.timecollector;
 
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
+import java.nio.file.NotDirectoryException;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
+import eu.andymel.timecollector.graphs.AllowedPathBuilder;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
@@ -46,7 +50,10 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	}
 
 	
-//	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollector<MILESTONE_TYPE> createWithPath(Path<MILESTONE_TYPE, NodePermissions> path){
+	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollector<MILESTONE_TYPE> createSerial(Class<MILESTONE_TYPE> enumClazz, boolean required, boolean singleSet){
+		return new TimeCollectorWithPath<MILESTONE_TYPE>(AllowedPathsGraph.createSerial(enumClazz, required, singleSet));
+	}
+		
 	public static <MILESTONE_TYPE> TimeCollector<MILESTONE_TYPE> createWithPath(AllowedPathsGraph<MILESTONE_TYPE> path){
 		return new TimeCollectorWithPath<MILESTONE_TYPE>(path);
 	}
@@ -90,8 +97,8 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 				}catch(Exception e){
 					lastSetMilestone = ">ErrorWhileRetrievingMilestone!<";
 				}
-				throw new MilestoneNotAllowedException("There is no next milestone in the allowed path of "
-						+ "this TimeCollector with the id '"+m+"'. The previosuly set Milestone was '"+lastSetMilestone+"'");
+				throw new MilestoneNotAllowedException("There is no next milestone with the id '"+m+"' in the allowed path of "
+						+ "this TimeCollector. The previosuly set Milestone was '"+lastSetMilestone+"'");
 			}else{
 				/* clear just to recognize if I mistakenly have a reference on 
 				 * this list somewhere else and to prevent MemoryLeaks in that case */
@@ -172,5 +179,7 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 			};
 		}
 	}
+
+
 	
 }
