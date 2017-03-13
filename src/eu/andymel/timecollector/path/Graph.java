@@ -44,11 +44,11 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 	void setFinishLinking(){
 		lastNodes = Collections.unmodifiableList(lastNodes);
 		// set all nodes finished (links between nodes may not be changed anymore)
-		nodes.values().forEach(
-			list -> list.forEach(
-				node->node.setLinkingFinished()
-			)
-		);
+//		nodes.values().forEach(
+//			list -> list.forEach(
+//				node->node.setLinkingFinished()
+//			)
+//		);
 	}
 	
 	// !used in the constructor! (Don't simply change accessibility to override!)

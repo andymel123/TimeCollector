@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.path.AllowedPathBuilder;
 import eu.andymel.timecollector.path.TestMilestones;
 
@@ -63,17 +64,22 @@ public class TimeCollectorWithPathTest {
 		tc.saveTime(CREATION);
 	}
 
-	@Test (expected=IllegalStateException.class)
+	@Test (expected=MilestoneNotAllowedException.class)
 	public void testWrongFirstMileStone() {
 		tc.saveTime(BEFORE_HANDLER_CONTEXT);
 	}
 
-	@Test //(expected=IllegalStateException.class)
+	@Test (expected=MilestoneNotAllowedException.class)
 	public void testSetMultipleTimes() {
 		tc.saveTime(CREATION);	
 		tc.saveTime(CREATION);
 	}
 
+	
+	/*
+	 * TODO write test with path including a loop of not required nodes...I guess 
+	 * it would make problems with getNextPermissionNodes() at the moment 
+	 */
 
 	
 }
