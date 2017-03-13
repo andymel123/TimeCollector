@@ -1,13 +1,12 @@
 package eu.andymel.timecollector.performancetests;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.time.Instant;
 
-import eu.andymel.timecollector.TimeCollector;
+import eu.andymel.timecollector.TimeCollectorSerial;
 import eu.andymel.timecollector.TimeCollectorWithPath;
 
-public class PerformanceTestSerialFromEnumWithPath {
+public class PerformanceTestSerialFromEnum {
 
 	private enum TestMilestones{
 		MS1,
@@ -24,19 +23,25 @@ public class PerformanceTestSerialFromEnumWithPath {
 
 		int amount = 100_000;
 
-// 		wait to start profiler
-//		waitForInput();
 		
-		System.out.println("Building "+amount+" TimeCollectors from enum...");
 		
-		TimeCollector<?>[] result = new TimeCollector[amount];
-
 		Instant start = Instant.now();
 		for(int i=0; i<amount; i++){
-			result[i] = TimeCollectorWithPath.createSerial(TestMilestones.class, true, true);
+			TimeCollectorWithPath.createSerial(TestMilestones.class, true, true);
 		}
+		PerformanceTestsUtils.end("TimeCollectorWithPath.createSerial with "+TestMilestones.class.getSimpleName(), amount, start);
 		
-		PerformanceTestsUtils.end("Build TimeCollector with serial path from enum "+TestMilestones.class, amount, start);
+		
+		
+		start = Instant.now();
+		for(int i=0; i<amount; i++){
+			TimeCollectorSerial.create(TestMilestones.class, true, true);
+		}
+		PerformanceTestsUtils.end("TimeCollectorSerial with "+TestMilestones.class.getSimpleName(), amount, start);
+				
+		
+		
+		
 	}
 
 	private static void waitForInput() {

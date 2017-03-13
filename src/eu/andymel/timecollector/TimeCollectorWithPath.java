@@ -2,16 +2,12 @@ package eu.andymel.timecollector;
 
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
-import java.nio.file.NotDirectoryException;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
-import eu.andymel.timecollector.graphs.AllowedPathBuilder;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
