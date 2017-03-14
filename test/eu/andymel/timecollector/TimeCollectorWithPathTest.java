@@ -19,36 +19,9 @@ public class TimeCollectorWithPathTest {
 	
 	@Before
 	public void setup(){
-		
-		/**
-		 * A clock that increases it's "time" by 1 millisecond per call
-		 * to instant(). I don't need to test with real time, I just want to test
-		 * if the timecollector returns the right time in getTime (has to increase 
-		 * by 1 with this clock)
-		 */
-		Clock testClock = new Clock(){
 
-			long count = 0;
-			
-			@Override
-			public ZoneId getZone() {
-				return null;
-			}
-
-			@Override
-			public Clock withZone(ZoneId zone) {
-				return null;
-			}
-
-			@Override
-			public Instant instant() {
-				return Instant.ofEpochMilli(count++);
-			}
-			
-		};
-		
 		tc = TimeCollectorWithPath.createWithPath(
-				testClock,
+				new TestClock(),
 				AllowedPathsGraph.
 				<TestMilestones>
 				start(CREATION)

@@ -2,6 +2,7 @@ package eu.andymel.timecollector;
 
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.EnumSet;
 
@@ -21,11 +22,16 @@ public class TimeCollectorSerial<MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> im
 	private final boolean allRequired;
 	private final boolean singleSet;
 	private final EnumSet<MILESTONE_TYPE> milestoneSet;
-//	private final MILESTONE_TYPE[] milestones;
-
-	private MILESTONE_TYPE lastMilestone = null;
+	private final Clock clock;
 	
-	private TimeCollectorSerial(boolean ensureOrder, boolean allRequired, boolean singleSet, Class<MILESTONE_TYPE> clazz) {
+	private MILESTONE_TYPE lastMilestone = null;
+
+	private TimeCollectorSerial(Clock clock, boolean ensureOrder, boolean allRequired, boolean singleSet, Class<MILESTONE_TYPE> clazz) {
+		
+		// preconditions
+		nn(clock, "'clock' is null!");
+		
+		this.clock = clock;
 		this.ensureOrder = ensureOrder;
 		this.allRequired = allRequired;
 		
@@ -35,12 +41,14 @@ public class TimeCollectorSerial<MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> im
 		
 		this.singleSet = singleSet;
 		this.milestoneSet = EnumSet.allOf(clazz);
-//		this.milestones = (MILESTONE_TYPE[]) milestoneSet.toArray(MILESTONE_TYPE[]);
 		this.savedMileStonesTimes = new Instant[milestoneSet.size()];
 	}
 	
 	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollectorSerial<MILESTONE_TYPE> create(Class<MILESTONE_TYPE> enumClazz, boolean ensureOrder, boolean allRequired, boolean singleSet){
-		return new TimeCollectorSerial<MILESTONE_TYPE>(ensureOrder, allRequired, singleSet, enumClazz);
+		return new TimeCollectorSerial<MILESTONE_TYPE>(Clock.systemDefaultZone(), ensureOrder, allRequired, singleSet, enumClazz);
+	}
+	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> TimeCollectorSerial<MILESTONE_TYPE> create(Class<MILESTONE_TYPE> enumClazz, Clock clock, boolean ensureOrder, boolean allRequired, boolean singleSet){
+		return new TimeCollectorSerial<MILESTONE_TYPE>(clock, ensureOrder, allRequired, singleSet, enumClazz);
 	}
 
 	/* (non-Javadoc)
@@ -75,7 +83,7 @@ public class TimeCollectorSerial<MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> im
 		if(singleSet && savedMileStonesTimes[idx] != null){
 			throw new MilestoneNotAllowedException("The milestone '"+m+"' has already been set! Old time was "+savedMileStonesTimes[idx]+".");
 		}else{
-			savedMileStonesTimes[idx] = Instant.now();
+			savedMileStonesTimes[idx] = clock.instant();
 			lastMilestone = m;
 		}
 		
