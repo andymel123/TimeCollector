@@ -1,20 +1,12 @@
 package eu.andymel.timecollector.graphs;
 
+import static eu.andymel.timecollector.graphs.NodePermissions.REQUIRED_AND_SINGLESET;
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> {
-	
-	/* > SINGLESET 
-	 * means that the time may only be set once, trying to set the time on the same node again throws an exception
-	 * > REQUIRED 
-	 * means that the time of a node has to be set before a child not can be set */
-	static final NodePermissions NO_CHECKS = NodePermissions.create(false, false);
-	static final NodePermissions NOT_REQUIRED_BUT_SINGLESET = NodePermissions.create(false, true);
-	static final NodePermissions REQUIRED_AND_SINGLESET = NodePermissions.create(true, true);
-
 	
 	AllowedPathsGraph(ID_TYPE idOfStartNode, NodePermissions nodePermissionsOfStartNode, Mutable mutable) {
 		super(

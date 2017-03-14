@@ -45,10 +45,10 @@ public class AllowedPathBuilder<ID_TYPE> {
 
 
 	public AllowedPathBuilder<ID_TYPE> then(ID_TYPE m){
-		return then(m, AllowedPathsGraph.REQUIRED_AND_SINGLESET);
+		return then(m, NodePermissions.REQUIRED_AND_SINGLESET);
 	}
 	public AllowedPathBuilder<ID_TYPE> thenMaybe(ID_TYPE m){
-		return then(m, AllowedPathsGraph.NOT_REQUIRED_BUT_SINGLESET);
+		return then(m, NodePermissions.NOT_REQUIRED_BUT_SINGLESET);
 	}
 	public AllowedPathBuilder<ID_TYPE> then(ID_TYPE id, NodePermissions nodePermissions){
 		

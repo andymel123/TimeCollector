@@ -9,12 +9,12 @@ import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 
 public class TimeCollectorWithSerialPathFromEnumTest {
 
-	TimeCollector<TestMilestones> tc;
-	TimeCollector<TestMilestones> tcS;
-	TimeCollector<TestMilestones> tcE;
-	TimeCollector<TestMilestones> tcEA;
-	TimeCollector<TestMilestones> tcES;
-	TimeCollector<TestMilestones> tcEAS;
+	private TimeCollector<TestMilestones> tc;
+	private TimeCollector<TestMilestones> tcS;
+	private TimeCollector<TestMilestones> tcE;
+	private TimeCollector<TestMilestones> tcEA;
+	private TimeCollector<TestMilestones> tcES;
+	private TimeCollector<TestMilestones> tcEAS;
 	
 	private enum TestMilestones{
 		MS1,MS2,MS3,MS4,MS5
@@ -185,6 +185,7 @@ public class TimeCollectorWithSerialPathFromEnumTest {
 	@Test
 	public void testOtherOrderESFirstMilestone() {
 		tcES.saveTime(TestMilestones.MS2);
+		assertEquals(0, tcES.getTime(TestMilestones.MS2).toEpochMilli());
 	}
 	@Test (expected=MilestoneNotAllowedException.class)
 	public void testOtherOrderES() {
