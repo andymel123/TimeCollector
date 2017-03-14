@@ -4,6 +4,7 @@ import static eu.andymel.timecollector.util.Preconditions.nn;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *  
@@ -23,16 +24,33 @@ public class AllowedPathBuilder<ID_TYPE> {
 	private static final NodePermissions NOT_REQUIRED_BUT_SINGLESET = NodePermissions.create(false, true);
 	private static final NodePermissions REQUIRED_AND_SINGLESET = NodePermissions.create(true, true);
 	
-	private final AllowedPathsGraph<ID_TYPE> allowedPath;
+	private final AllowedPathsGraph<ID_TYPE> allowedGraph;
 	
 	/** to prevent changes on the path after it has been built */
-	private boolean pathHasBeenBuilt = false;
+	private boolean pathIsFinished = false;
 	
 	private final boolean isSubpath;
 	
+	private Mutable mutable = new Mutable() {
+		@Override
+		public boolean isMutable() {
+			// all nodes of the graph and the graph itself can ask this method if changing the graph is allowed.
+			// if this method returns false all nodes and the graph should throw exceptions if something tries to change any edges
+			
+			System.out.println(pathIsFinished + "-"+hashCode());
+			
+			return !pathIsFinished; 
+		}
+	};
+	
 	public AllowedPathBuilder(ID_TYPE idOfStartNode, NodePermissions nodePermissions, boolean isSubPath) {
 		nn(idOfStartNode, "'idOfStartNode' is null!");
-		this.allowedPath = new AllowedPathsGraph<ID_TYPE>(idOfStartNode, nodePermissions);
+
+		this.allowedGraph = new AllowedPathsGraph<ID_TYPE>(
+			idOfStartNode, 
+			nodePermissions,
+			mutable
+		);
 		this.isSubpath = isSubPath;
 	}
 
@@ -43,7 +61,7 @@ public class AllowedPathBuilder<ID_TYPE> {
 		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions, false);
 	}
 
-	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> startSubpath(ID_TYPE id){
+	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> subpath(ID_TYPE id){
 		return startSubpath(id, REQUIRED_AND_SINGLESET);
 	}
 	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> startSubpath(ID_TYPE id, NodePermissions nodePermissions){
@@ -61,28 +79,52 @@ public class AllowedPathBuilder<ID_TYPE> {
 		// preconditions
 		checkMutable();
 
-		this.allowedPath.addNode(id, nodePermissions);
+		this.allowedGraph.addNode(id, nodePermissions);
 		
 		return this;
 	}
 
-	public AllowedPathBuilder<ID_TYPE> thenEither(Graph<ID_TYPE, NodePermissions>... anyOfThoseSubPaths) {
+//	public AllowedPathBuilder<ID_TYPE> thenEither(Graph<ID_TYPE, NodePermissions>... anyOfThoseSubPaths) {
+//		return thenEither(Arrays.asList(anyOfThoseSubPaths));
+//	}
+//	public AllowedPathBuilder<ID_TYPE> thenEither(List<Graph<ID_TYPE, NodePermissions>> anyOfThoseSubPaths) {
+//	
+//	// preconditions
+//	checkMutable();
+//	
+//	this.allowedPath.addParallel(anyOfThoseSubPaths);
+//	
+//	return this;
+//	
+//}
+	
+	public AllowedPathBuilder<ID_TYPE> thenEither(AllowedPathBuilder<ID_TYPE>... anyOfThoseSubPaths) {
 		return thenEither(Arrays.asList(anyOfThoseSubPaths));
 	}
-	public AllowedPathBuilder<ID_TYPE> thenEither(List<Graph<ID_TYPE, NodePermissions>> anyOfThoseSubPaths) {
+	public AllowedPathBuilder<ID_TYPE> thenEither(List<AllowedPathBuilder<ID_TYPE>> builders) {
 		
 		// preconditions
 		checkMutable();
 		
-		this.allowedPath.addParallel(anyOfThoseSubPaths);
+		/* highcheck the "mutable" of all subpath builders, so all
+		 * subpaths listen to my own "mutable" */
+		builders.stream().forEach(b->b.mutable = this.mutable);
+		
+		// get list of sub graphs from builders and add parallel to my main graph
+		this.allowedGraph.addParallel(
+			builders.stream()
+			.map(b->b.allowedGraph)
+			.collect(Collectors.toList())
+		);
 		
 		return this;
 		
 	}
+	
 
 
 	public AllowedPathsGraph<ID_TYPE> build() {
-		if(pathHasBeenBuilt){
+		if(pathIsFinished){
 			throw new IllegalStateException("You have already build this path! Use the previously returned instance.");
 		}
 		
@@ -103,21 +145,27 @@ public class AllowedPathBuilder<ID_TYPE> {
 		 * Or do both, copy and flag  
 		 */
 		
-		pathHasBeenBuilt = true;
-		if(!isSubpath){
-			/* TODO this is not very nice...refactor
-			 * a subpath is linked to the main path after build was called on it...
-			 * so it can't be closed for linking earlier than the 
-			 * build() call of the main path, for now I simply don't call finish 
-			 * on subpaths ... at least not here in build()*/
-			allowedPath.setFinishLinking();
-		}
-		return allowedPath;
+		
+		
+		pathIsFinished = true;
+		
+		System.out.println(" -> "+pathIsFinished + "-"+hashCode());
+		
+//		commented out...instead of this I highcheck the "mutable" of all subpaths I'm adding
+//		if(!isSubpath){
+//			/* TODO this is not very nice...refactor!
+//			 * A subpath is linked to the main path after build was called on it...
+//			 * so it can't be closed for linking earlier than the 
+//			 * build() call of the main path, for now I simply don't call finish 
+//			 * on subpaths ... at least not here in build()*/
+//			allowedGraph.setFinishLinking();
+//		}
+		return allowedGraph;
 	}
 
 	private final void checkMutable(){
-		if(pathHasBeenBuilt){
-			throw new IllegalStateException("Path has already been built! You can not change it threw its builder anymore!");
+		if(!mutable.isMutable()){
+			throw new IllegalStateException("Path has already been built! You can not change it with its builder anymore!");
 		}
 	}
 	

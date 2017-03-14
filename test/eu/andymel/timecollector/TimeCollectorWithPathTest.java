@@ -72,16 +72,14 @@ public class TimeCollectorWithPathTest {
 					
 					.then(BEFORE_DAO_SAVE)
 						.thenEither(
-							AllowedPathBuilder.<TestMilestones>startSubpath(BEFORE_DB_SAVE_DESICION1)
+							AllowedPathBuilder.<TestMilestones>subpath(BEFORE_DB_SAVE_DESICION1)
 								.then(AFTER_DB_SAVE_DESICION1)
 								.then(BEFORE_DB_SAVE_DECISION1_RESULTSET)
-								.then(AFTER_DB_SAVE_DECISION1_RESULTSET)
-								.build(),
-							AllowedPathBuilder.<TestMilestones>startSubpath(BEFORE_DB_SAVE_DESICION2)
+								.then(AFTER_DB_SAVE_DECISION1_RESULTSET),
+							AllowedPathBuilder.<TestMilestones>subpath(BEFORE_DB_SAVE_DESICION2)
 								.then(AFTER_DB_SAVE_DESICION2)
 								.then(BEFORE_DB_SAVE_DECISION2_RESULTSET)
 								.then(AFTER_DB_SAVE_DECISION2_RESULTSET)
-								.build()
 						)
 					.then(AFTER_DAO_SAVE)
 				.then(AFTER_HANDLER)

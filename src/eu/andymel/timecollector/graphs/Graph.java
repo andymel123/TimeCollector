@@ -3,7 +3,6 @@ package eu.andymel.timecollector.graphs;
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,28 +26,31 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 	
 	private final boolean allowMultipleEdges;
 	
+	private final Mutable mutable;
+	
 //	private boolean finishedLinking = false;
 	
-	protected Graph(NODE_ID_TYPE id, NODE_PAYLOAD_TYPE payload, boolean allowMultipleEdges) {
-		this(new GraphNode<>(id, payload), allowMultipleEdges);
+	protected Graph(NODE_ID_TYPE id, NODE_PAYLOAD_TYPE payload, boolean allowMultipleEdges, Mutable mutable) {
+		this(new GraphNode<>(id, payload, mutable), allowMultipleEdges, mutable);
 	}
-	protected Graph(GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> startNode, boolean allowMultipleEdges) {
+	protected Graph(GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> startNode, boolean allowMultipleEdges, Mutable mutable) {
 		this.startNode = startNode;
 		this.allowMultipleEdges = allowMultipleEdges;
+		this.mutable = mutable;
 		addNodeToHashMap(startNode);
 		this.lastNodes.clear();
 		this.lastNodes.add(startNode);
 	}
 
-	void setFinishLinking(){
-		lastNodes = Collections.unmodifiableList(lastNodes);
-		// set all nodes finished (links between nodes may not be changed anymore)
-//		nodes.values().forEach(
-//			list -> list.forEach(
-//				node->node.setLinkingFinished()
-//			)
-//		);
-	}
+//	void setFinishLinking(){
+//		lastNodes = Collections.unmodifiableList(lastNodes);
+//		// set all nodes finished (links between nodes may not be changed anymore)
+////		nodes.values().forEach(
+////			list -> list.forEach(
+////				node->node.setLinkingFinished()
+////			)
+////		);
+//	}
 	
 	// !used in the constructor! (Don't simply change accessibility to override!)
 	private final void addNodeToHashMap(GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> startNode) {
@@ -75,9 +77,10 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 		
 		// preconditions
 		nn(id, "The given id is null!");
+		mutable.check();
 		
 		//build new node for this milestone
-		GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> newNode = new GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>(id, nodePermissions);
+		GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> newNode = new GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>(id, nodePermissions, mutable);
 		
 		// connect the new node with the last nodes
 		for(GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> lastNode: lastNodes){
@@ -96,8 +99,10 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 	}
 
 	public void addParallel(List<Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> anyOfThoseSubPaths){
+//	public void addParallel(List<AllowedPathBuilder<NODE_ID_TYPE>> anyOfThoseSubPaths){
 		
 		// preconditions
+		mutable.check();
 		nn(anyOfThoseSubPaths, "addParallel(...) needs paths!");
 		if(anyOfThoseSubPaths.size()<2){
 			throw new IllegalArgumentException("addParallel() needs at least 2 paths!");
@@ -107,6 +112,8 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 		
 		// add subpathes to last nodes of current path
 		for(Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> subPath: anyOfThoseSubPaths){
+//		for(AllowedPathBuilder<NODE_ID_TYPE> builder: anyOfThoseSubPaths){
+//			Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> subPath = builder.a
 			GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> firstOfSubPath = subPath.getStartNode();
 			List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> lastNodesOfSubPath = subPath.getLastNodes();
 			newNodes.addAll(lastNodesOfSubPath);
@@ -129,6 +136,13 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 	}
 
 	public void setPayload(NODE_ID_TYPE id, NODE_PAYLOAD_TYPE p){
+		
+		/* first I just wanted to check mutablility for adding edge to other nodes...not for the payload.
+		 * But for the allowedGraph the payload is set when the node is added I think.
+		 * And the recorded path is always mutable, so I should be able to check here as well?! 
+		 * So lets try */
+		mutable.check();
+		
 		List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> allNodesWithThisId = getAllNodesWIthId(id);
 		if(allNodesWithThisId==null || allNodesWithThisId.size()!=1){
 			throw new IllegalStateException("Not exactly one node found for id '"+id+"'!Think about what to do with the payload. "+allNodesWithThisId);
@@ -179,16 +193,5 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 //		return Collections.unmodifiableList(nodes.get(nodeId)); its not public so save some performance
 		return nodes.get(nodeId);
 	}
-
-	private void buildSubPathsWithAllParents(
-		Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> subPath, 
-		List<Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> allSubPaths
-	){
-		
-		
-		
-	}
-
-	
 	
 }

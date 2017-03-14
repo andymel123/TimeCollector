@@ -22,7 +22,9 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 	private final List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> immutableViewOnPrevNodes = Collections.unmodifiableList(prevNodes);
 	private final List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> immutableViewOnNextNodes = Collections.unmodifiableList(nextNodes);
 	
-//	commented out as it seems like I can't ensure striong separation between building and getting nodes...as I need to get nodex to link different paths (subpaths->mainpath)
+	private final Mutable mutable;
+	
+//	commented out as it seems like I can't ensure striong separation between building and getting nodes...as I need to get nodes to link different paths (subpaths->mainpath)
 //	/**
 //	 * if true no prev or next nodes may be added anymore. Only after linking is finished
 //	 * getPrevNodes and getNextNodes may be called. Those return an unmodifiable view on
@@ -45,14 +47,16 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 //		}
 //	}
 
-	GraphNode(ID_TYPE id, PAYLOAD_TYPE payload) {
+	GraphNode(ID_TYPE id, PAYLOAD_TYPE payload, Mutable mutable) {
 		
 		// preconditions
 		nn(id, "'id' is null!");
 		nn(payload, "'payload' is null!");
+		nn(mutable, "'mutable' is null!");
 		
 		this.id = id;
 		this.payload= payload;
+		this.mutable = mutable;
 		
 	}
 
@@ -65,6 +69,8 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 //		if(finishedLinking){
 //			throw new IllegalStateException("This node has already been finished linking!");
 //		}
+		mutable.check();
+		
 		nextNodes.add(n);
 	}
 	
@@ -72,6 +78,7 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 //		if(finishedLinking){
 //			throw new IllegalStateException("This node has already been finished linking!");
 //		}
+		mutable.check();
 		prevNodes.add(n);
 	}
 
@@ -117,6 +124,11 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 			throw new IllegalArgumentException("You can't set null as payload!");
 		}
 		this.payload = payload;
+	}
+
+
+	public Mutable getMutable() {
+		return this.mutable;
 	}
 	
 

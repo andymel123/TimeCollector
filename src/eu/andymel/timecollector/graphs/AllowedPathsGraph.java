@@ -9,11 +9,12 @@ import java.util.List;
 
 public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> {
 	
-	public AllowedPathsGraph(ID_TYPE idOfStartNode, NodePermissions nodePermissionsOfStartNode) {
+	public AllowedPathsGraph(ID_TYPE idOfStartNode, NodePermissions nodePermissionsOfStartNode, Mutable mutable) {
 		super(
 			idOfStartNode, 
 			nodePermissionsOfStartNode, 
-			true // allow multiedges, circles,...
+			true, // allow multiedges, circles,...
+			mutable
 		);
 	}
 
@@ -144,7 +145,8 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		return new GraphNode<>(
 			// TODO ensure both are immutable or copy them
 			startNode.getId(), 
-			startNode.getPayload() 
+			startNode.getPayload(),
+			startNode.getMutable()
 		);
 	}
 	
