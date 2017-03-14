@@ -13,7 +13,7 @@ import org.junit.Test;
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 
-public class TimeCollectorWithPathTest {
+public class TimeCollectorWithLongPathTest {
 
 	private TimeCollector<TestMilestones> tc; 
 	
