@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
-import eu.andymel.timecollector.graphs.AllowedPathBuilder;
+import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 
 public class TimeCollectorWithPathTest {
 
@@ -49,7 +49,8 @@ public class TimeCollectorWithPathTest {
 		
 		tc = TimeCollectorWithPath.createWithPath(
 				testClock,
-				AllowedPathBuilder.<TestMilestones>
+				AllowedPathsGraph.
+				<TestMilestones>
 				start(CREATION)
 				.then(BEFORE_HANDLER_CONTEXT)
 				.then(BEFORE_SEARCH_HANDLER)
@@ -72,11 +73,11 @@ public class TimeCollectorWithPathTest {
 					
 					.then(BEFORE_DAO_SAVE)
 						.thenEither(
-							AllowedPathBuilder.<TestMilestones>subpath(BEFORE_DB_SAVE_DESICION1)
+							AllowedPathsGraph.<TestMilestones>subpath(BEFORE_DB_SAVE_DESICION1)
 								.then(AFTER_DB_SAVE_DESICION1)
 								.then(BEFORE_DB_SAVE_DECISION1_RESULTSET)
 								.then(AFTER_DB_SAVE_DECISION1_RESULTSET),
-							AllowedPathBuilder.<TestMilestones>subpath(BEFORE_DB_SAVE_DESICION2)
+							AllowedPathsGraph.<TestMilestones>subpath(BEFORE_DB_SAVE_DESICION2)
 								.then(AFTER_DB_SAVE_DESICION2)
 								.then(BEFORE_DB_SAVE_DECISION2_RESULTSET)
 								.then(AFTER_DB_SAVE_DECISION2_RESULTSET)

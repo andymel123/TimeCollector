@@ -16,14 +16,6 @@ import java.util.stream.Collectors;
  */
 public class AllowedPathBuilder<ID_TYPE> {
 
-	/* > SINGLESET 
-	 * means that the time may only be set once, trying to set the time on the same node again throws an exception
-	 * > REQUIRED 
-	 * means that the time of a node has to be set before a child not can be set */
-	private static final NodePermissions NO_CHECKS = NodePermissions.create(false, false);
-	private static final NodePermissions NOT_REQUIRED_BUT_SINGLESET = NodePermissions.create(false, true);
-	private static final NodePermissions REQUIRED_AND_SINGLESET = NodePermissions.create(true, true);
-	
 	private final AllowedPathsGraph<ID_TYPE> allowedGraph;
 	
 	/** to prevent changes on the path after it has been built */
@@ -36,14 +28,11 @@ public class AllowedPathBuilder<ID_TYPE> {
 		public boolean isMutable() {
 			// all nodes of the graph and the graph itself can ask this method if changing the graph is allowed.
 			// if this method returns false all nodes and the graph should throw exceptions if something tries to change any edges
-			
-			System.out.println(pathIsFinished + "-"+hashCode());
-			
 			return !pathIsFinished; 
 		}
 	};
 	
-	public AllowedPathBuilder(ID_TYPE idOfStartNode, NodePermissions nodePermissions, boolean isSubPath) {
+	AllowedPathBuilder(ID_TYPE idOfStartNode, NodePermissions nodePermissions, boolean isSubPath) {
 		nn(idOfStartNode, "'idOfStartNode' is null!");
 
 		this.allowedGraph = new AllowedPathsGraph<ID_TYPE>(
@@ -54,25 +43,12 @@ public class AllowedPathBuilder<ID_TYPE> {
 		this.isSubpath = isSubPath;
 	}
 
-	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> start(ID_TYPE id){
-		return start(id, REQUIRED_AND_SINGLESET);
-	}
-	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> start(ID_TYPE id, NodePermissions nodePermissions){
-		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions, false);
-	}
-
-	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> subpath(ID_TYPE id){
-		return startSubpath(id, REQUIRED_AND_SINGLESET);
-	}
-	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> startSubpath(ID_TYPE id, NodePermissions nodePermissions){
-		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions, true);
-	}
 
 	public AllowedPathBuilder<ID_TYPE> then(ID_TYPE m){
-		return then(m, REQUIRED_AND_SINGLESET);
+		return then(m, AllowedPathsGraph.REQUIRED_AND_SINGLESET);
 	}
 	public AllowedPathBuilder<ID_TYPE> thenMaybe(ID_TYPE m){
-		return then(m, NOT_REQUIRED_BUT_SINGLESET);
+		return then(m, AllowedPathsGraph.NOT_REQUIRED_BUT_SINGLESET);
 	}
 	public AllowedPathBuilder<ID_TYPE> then(ID_TYPE id, NodePermissions nodePermissions){
 		
@@ -148,8 +124,6 @@ public class AllowedPathBuilder<ID_TYPE> {
 		
 		
 		pathIsFinished = true;
-		
-		System.out.println(" -> "+pathIsFinished + "-"+hashCode());
 		
 //		commented out...instead of this I highcheck the "mutable" of all subpaths I'm adding
 //		if(!isSubpath){

@@ -2,14 +2,21 @@ package eu.andymel.timecollector.graphs;
 
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
-import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> {
 	
-	public AllowedPathsGraph(ID_TYPE idOfStartNode, NodePermissions nodePermissionsOfStartNode, Mutable mutable) {
+	/* > SINGLESET 
+	 * means that the time may only be set once, trying to set the time on the same node again throws an exception
+	 * > REQUIRED 
+	 * means that the time of a node has to be set before a child not can be set */
+	static final NodePermissions NO_CHECKS = NodePermissions.create(false, false);
+	static final NodePermissions NOT_REQUIRED_BUT_SINGLESET = NodePermissions.create(false, true);
+	static final NodePermissions REQUIRED_AND_SINGLESET = NodePermissions.create(true, true);
+
+	
+	AllowedPathsGraph(ID_TYPE idOfStartNode, NodePermissions nodePermissionsOfStartNode, Mutable mutable) {
 		super(
 			idOfStartNode, 
 			nodePermissionsOfStartNode, 
@@ -18,36 +25,49 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		);
 	}
 
-	
-	/**
-	 * Creats a serial graph from an enum, first to last enum entry
-	 * 
-	 * @param enumClazz the enum to create the path from
-	 * @param required if true the payload of a node has to be set before the payload of the next node can be set
-	 * @param singleSet if true the payload of a node can only be set once, the next time throws an exception
-	 * 
-	 * @return the serial {@link AllowedPathsGraph}
-	 */
-	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> AllowedPathsGraph<MILESTONE_TYPE> createSerial(Class<MILESTONE_TYPE> enumClazz, boolean required, boolean singleSet) {
-		nn(enumClazz, "You need to provide an enum to get the serial path from!");
-		
-		EnumSet<MILESTONE_TYPE> milestones = EnumSet.allOf(enumClazz);
-		Iterator<MILESTONE_TYPE> it = milestones.iterator();
-		if(!it.hasNext()){
-			throw new IllegalArgumentException("It makes no sense to build a TimeCollector with a serial path from an Enum thats empty!");
-		}
-		
-		NodePermissions permissions = NodePermissions.create(required, singleSet);
-		
-		MILESTONE_TYPE firstMilestone = it.next();
-		AllowedPathBuilder<MILESTONE_TYPE> pathBuilder = AllowedPathBuilder.start(firstMilestone, permissions);
-		
-		while(it.hasNext()){
-			pathBuilder.then(it.next(), permissions);
-		}
-		
-		return pathBuilder.build();
+	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> start(ID_TYPE id){
+		return start(id, REQUIRED_AND_SINGLESET);
 	}
+	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> start(ID_TYPE id, NodePermissions nodePermissions){
+		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions, false);
+	}
+	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> subpath(ID_TYPE id){
+		return subpath(id, REQUIRED_AND_SINGLESET);
+	}
+	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> subpath(ID_TYPE id, NodePermissions nodePermissions){
+		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions, true);
+	}
+
+	
+//	/**
+//	 * Creats a serial graph from an enum, first to last enum entry
+//	 * 
+//	 * @param enumClazz the enum to create the path from
+//	 * @param required if true the payload of a node has to be set before the payload of the next node can be set
+//	 * @param singleSet if true the payload of a node can only be set once, the next time throws an exception
+//	 * 
+//	 * @return the serial {@link AllowedPathsGraph}
+//	 */
+//	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> AllowedPathsGraph<MILESTONE_TYPE> createSerial(Class<MILESTONE_TYPE> enumClazz, boolean required, boolean singleSet) {
+//		nn(enumClazz, "You need to provide an enum to get the serial path from!");
+//		
+//		EnumSet<MILESTONE_TYPE> milestones = EnumSet.allOf(enumClazz);
+//		Iterator<MILESTONE_TYPE> it = milestones.iterator();
+//		if(!it.hasNext()){
+//			throw new IllegalArgumentException("It makes no sense to build a TimeCollector with a serial path from an Enum thats empty!");
+//		}
+//		
+//		NodePermissions permissions = NodePermissions.create(required, singleSet);
+//		
+//		MILESTONE_TYPE firstMilestone = it.next();
+//		AllowedPathBuilder<MILESTONE_TYPE> pathBuilder = AllowedPathBuilder.start(firstMilestone, permissions);
+//		
+//		while(it.hasNext()){
+//			pathBuilder.then(it.next(), permissions);
+//		}
+//		
+//		return pathBuilder.build();
+//	}
 	
 	
 	
