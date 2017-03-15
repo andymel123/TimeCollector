@@ -98,8 +98,8 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 
 		simpleMutable.setImmutable();
 		
-		throw new IllegalStateException("TODO I need an instance of AllowedPathsGraph");
-//		return null;
+//		throw new IllegalStateException("TODO I need an instance of AllowedPathsGraph");
+		return new AllowedPathsGraph<>(startNode, simpleMutable);
 	}
 
 }

@@ -18,7 +18,13 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 			mutable
 		);
 	}
-
+	AllowedPathsGraph(PermissionNode<ID_TYPE> startNode, Mutable mutable) {
+		super(
+			startNode,
+			true, // allow multiedges, circles,...
+			mutable
+		);
+	}
 	
 	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> start(ID_TYPE id){
 		return start(id, REQUIRED_AND_SINGLESET);
