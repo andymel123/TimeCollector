@@ -17,4 +17,8 @@ public class SimpleMutable implements Mutable{
 		this.mutable = false;
 	}
 	
+	@Override
+	public String toString() {
+		return mutable?"mutable":"immutable";
+	}
 }

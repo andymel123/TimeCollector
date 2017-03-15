@@ -25,10 +25,11 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		nn(startNode, "'startNode' is null!");
 		if(otherNodes!=null){
 			this.startNode = startNode;
+
+			// HashSet should ensure that no node is in there more than once
 			this.nodes = new HashSet<>(otherNodes.length+1);	// +1 for startNode
 			this.nodes.add(startNode); // first has to be the satrtNode!
 			this.nodes.addAll(Arrays.asList(otherNodes));
-			
 			this.nodes.forEach(n->n.setMutable(simpleMutable));
 			
 			this.edges = new LinkedList<>();
@@ -50,7 +51,12 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 			throw new IllegalStateException("The second node you provided ws not found! You have to use the "+PermissionNode.class.getSimpleName()+" instances that you provided in the "+AllowedPathsGraph.class.getSimpleName()+".nodes() method!");
 		}
 		
-		edges.add(new Edge<PermissionNode<ID_TYPE>>(node1, node2));
+		Edge<PermissionNode<ID_TYPE>> newEdge = new Edge<PermissionNode<ID_TYPE>>(node1, node2);
+		int idx = edges.indexOf(newEdge);
+		if(idx!=-1){
+			throw new IllegalStateException("There is already an edge like the one you want to add at index "+idx+" of your edges! Edge: '"+newEdge+"'");
+		}
+		edges.add(newEdge);
 		
 		return this;
 	}
@@ -100,6 +106,22 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		
 //		throw new IllegalStateException("TODO I need an instance of AllowedPathsGraph");
 		return new AllowedPathsGraph<>(startNode, simpleMutable);
+	}
+
+	public AllowedPathBuilderNodesAndEdges<ID_TYPE> serial(PermissionNode<ID_TYPE>... nodes) {
+		
+		// preconditiions
+		nn(nodes, "You need to provide nodes for this call!");
+		
+		Iterator<PermissionNode<ID_TYPE>> it = Arrays.asList(nodes).iterator();
+		if(!it.hasNext())return this;
+		PermissionNode<ID_TYPE> node1 = it.next();
+		while(it.hasNext()){
+			PermissionNode<ID_TYPE> node2 = it.next();
+			edge(node1, node2);
+			node1 = node2;
+		}
+		return this;
 	}
 
 }

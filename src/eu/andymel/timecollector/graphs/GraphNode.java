@@ -113,6 +113,54 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 	public Mutable getMutable() {
 		return this.mutable;
 	}
-	
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((nextNodes == null) ? 0 : nextNodes.hashCode());
+		result = prime * result + ((payload == null) ? 0 : payload.hashCode());
+		result = prime * result + ((prevNodes == null) ? 0 : prevNodes.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GraphNode other = (GraphNode) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (nextNodes == null) {
+			if (other.nextNodes != null)
+				return false;
+		} else if (!nextNodes.equals(other.nextNodes))
+			return false;
+		if (payload == null) {
+			if (other.payload != null)
+				return false;
+		} else if (!payload.equals(other.payload))
+			return false;
+		if (prevNodes == null) {
+			if (other.prevNodes != null)
+				return false;
+		} else if (!prevNodes.equals(other.prevNodes))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+" [" + id + ", " + payload.getClass().getSimpleName() + ", " + mutable + "]";
+	}
+	
+	
 }

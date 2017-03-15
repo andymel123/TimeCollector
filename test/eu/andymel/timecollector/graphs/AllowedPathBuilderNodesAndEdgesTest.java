@@ -16,7 +16,6 @@ public class AllowedPathBuilderNodesAndEdgesTest {
 		MS1,MS2,MS3,MS4,MS5
 	}
 	
-//	private AllowedPathsGraph<TestMilestones> path;
 	private TimeCollector<TestMilestones> tcEAS;
 	
 	@Before
@@ -33,10 +32,8 @@ public class AllowedPathBuilderNodesAndEdgesTest {
 			AllowedPathsGraph.
 			<TestMilestones>
 			nodes(p1,p2,p3,p4,p5)
-			.edge(p1, p2)
-			.edge(p2, p3)
-			.edge(p3, p4)
-			.edge(p4, p5)
+			.serial(p1,p2,p3,p4,p5)
+//			.edge(p4, p2) TODO does not work yet
 			.build()
 		);
 	}
