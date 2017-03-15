@@ -22,37 +22,13 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 	private final List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> immutableViewOnPrevNodes = Collections.unmodifiableList(prevNodes);
 	private final List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> immutableViewOnNextNodes = Collections.unmodifiableList(nextNodes);
 	
-	private final Mutable mutable;
+	private Mutable mutable;
 	
-//	commented out as it seems like I can't ensure striong separation between building and getting nodes...as I need to get nodes to link different paths (subpaths->mainpath)
-//	/**
-//	 * if true no prev or next nodes may be added anymore. Only after linking is finished
-//	 * getPrevNodes and getNextNodes may be called. Those return an unmodifiable view on
-//	 * those lists of neighbor nodes
-//	 */
-//	private boolean finishedLinking = false;
-//	
-//	/** after you have called this no other nodes can be added as 
-//	 * previous or next nodes */
-//	void setLinkingFinished(){
-//		this.finishedLinking = true;
-//		
-//		/* I throw away the modifiable view on the data to ensure I don't 
-//		 * change them anymore */
-//		if(prevNodes!=null){
-//			prevNodes = Collections.unmodifiableList(prevNodes);	
-//		}
-//		if(nextNodes!=null){
-//			nextNodes = Collections.unmodifiableList(nextNodes);	
-//		}
-//	}
-
 	GraphNode(ID_TYPE id, PAYLOAD_TYPE payload, Mutable mutable) {
 		
 		// preconditions
 		nn(id, "'id' is null!");
 		nn(payload, "'payload' is null!");
-		nn(mutable, "'mutable' is null!");
 		
 		this.id = id;
 		this.payload= payload;
@@ -60,25 +36,32 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 		
 	}
 
-
+	GraphNode(ID_TYPE id, PAYLOAD_TYPE payload) {
+		this(id, payload, null);
+	}
+	
+	void setMutable(Mutable mutable) {
+		this.mutable = mutable;
+	}
+	
 	public ID_TYPE getId() {
 		return id;
 	}
 	
 	void addNextNode(GraphNode<ID_TYPE, PAYLOAD_TYPE> n){
-//		if(finishedLinking){
-//			throw new IllegalStateException("This node has already been finished linking!");
-//		}
-		mutable.check();
-		
+		checkMutable();
 		nextNodes.add(n);
 	}
 	
-	void addPrevNode(GraphNode<ID_TYPE, PAYLOAD_TYPE> n){
-//		if(finishedLinking){
-//			throw new IllegalStateException("This node has already been finished linking!");
-//		}
+	private void checkMutable() {
+		if(mutable==null){
+			throw new IllegalStateException("When you try to change a node a Mutable instance has to be in place!");
+		}
 		mutable.check();
+	}
+
+	void addPrevNode(GraphNode<ID_TYPE, PAYLOAD_TYPE> n){
+		checkMutable();
 		prevNodes.add(n);
 	}
 

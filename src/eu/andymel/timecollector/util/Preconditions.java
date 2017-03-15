@@ -49,7 +49,7 @@ public class Preconditions {
 	 * @throws IllegalStateException if collection is empty
 	 * @throws NullPointerException if collection is null
 	 */
-	public void ne(Collection<?> c, String s) throws IllegalStateException, NullPointerException{
+	public final static void ne(Collection<?> c, String s) throws IllegalStateException, NullPointerException{
 		nn(c, s);
 		if(c.size()==0){
 			throw new IllegalStateException(s);
@@ -67,7 +67,7 @@ public class Preconditions {
 	 * @throws IllegalStateException if collection is empty
 	 * @throws NullPointerException if collection is null
 	 */
-	public void ne(Collection<?> c, Supplier<String> s) throws IllegalStateException, NullPointerException{
+	public final static void ne(Collection<?> c, Supplier<String> s) throws IllegalStateException, NullPointerException{
 		nn(c, s);
 		if(c.size()==0){
 			throw new IllegalStateException(s.get());

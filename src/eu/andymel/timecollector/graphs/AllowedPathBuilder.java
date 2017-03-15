@@ -19,18 +19,11 @@ public class AllowedPathBuilder<ID_TYPE> {
 	private final AllowedPathsGraph<ID_TYPE> allowedGraph;
 	
 	/** to prevent changes on the path after it has been built */
-	private boolean pathIsFinished = false;
+//	private boolean pathIsFinished = false;
 	
 	private final boolean isSubpath;
 	
-	private Mutable mutable = new Mutable() {
-		@Override
-		public boolean isMutable() {
-			// all nodes of the graph and the graph itself can ask this method if changing the graph is allowed.
-			// if this method returns false all nodes and the graph should throw exceptions if something tries to change any edges
-			return !pathIsFinished; 
-		}
-	};
+	private SimpleMutable simpleMutable = new SimpleMutable(true);
 	
 	AllowedPathBuilder(ID_TYPE idOfStartNode, NodePermissions nodePermissions, boolean isSubPath) {
 		nn(idOfStartNode, "'idOfStartNode' is null!");
@@ -38,7 +31,7 @@ public class AllowedPathBuilder<ID_TYPE> {
 		this.allowedGraph = new AllowedPathsGraph<ID_TYPE>(
 			idOfStartNode, 
 			nodePermissions,
-			mutable
+			simpleMutable
 		);
 		this.isSubpath = isSubPath;
 	}
@@ -84,7 +77,7 @@ public class AllowedPathBuilder<ID_TYPE> {
 		
 		/* highcheck the "mutable" of all subpath builders, so all
 		 * subpaths listen to my own "mutable" */
-		builders.stream().forEach(b->b.mutable = this.mutable);
+		builders.stream().forEach(b->b.simpleMutable = this.simpleMutable);
 		
 		// get list of sub graphs from builders and add parallel to my main graph
 		this.allowedGraph.addParallel(
@@ -100,7 +93,7 @@ public class AllowedPathBuilder<ID_TYPE> {
 
 
 	public AllowedPathsGraph<ID_TYPE> build() {
-		if(pathIsFinished){
+		if(!simpleMutable.isMutable()){
 			throw new IllegalStateException("You have already build this path! Use the previously returned instance.");
 		}
 		
@@ -123,7 +116,7 @@ public class AllowedPathBuilder<ID_TYPE> {
 		
 		
 		
-		pathIsFinished = true;
+		simpleMutable.setImmutable();
 		
 //		commented out...instead of this I highcheck the "mutable" of all subpaths I'm adding
 //		if(!isSubpath){
@@ -138,7 +131,7 @@ public class AllowedPathBuilder<ID_TYPE> {
 	}
 
 	private final void checkMutable(){
-		if(!mutable.isMutable()){
+		if(!simpleMutable.isMutable()){
 			throw new IllegalStateException("Path has already been built! You can not change it with its builder anymore!");
 		}
 	}

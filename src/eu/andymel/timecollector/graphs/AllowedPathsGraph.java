@@ -3,6 +3,8 @@ package eu.andymel.timecollector.graphs;
 import static eu.andymel.timecollector.graphs.NodePermissions.REQUIRED_AND_SINGLESET;
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,6 +19,7 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		);
 	}
 
+	
 	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> start(ID_TYPE id){
 		return start(id, REQUIRED_AND_SINGLESET);
 	}
@@ -30,6 +33,13 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions, true);
 	}
 
+	
+	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilderNodesAndEdges<ID_TYPE> nodes(PermissionNode<ID_TYPE> startNode, PermissionNode<ID_TYPE>... otherNodes){
+		return new AllowedPathBuilderNodesAndEdges<ID_TYPE>(startNode, otherNodes);
+	}
+	
+	
+	
 	
 //	/**
 //	 * Creats a serial graph from an enum, first to last enum entry
