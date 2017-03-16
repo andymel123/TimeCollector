@@ -28,16 +28,18 @@ public class AllowedPathBuilderNodesAndEdgesTest {
 		PermissionNode<TestMilestones> p5 = PermissionNode.create(TestMilestones.MS5, NodePermissions.REQUIRED_AND_SINGLESET);
 		PermissionNode<TestMilestones> p6 = PermissionNode.create(TestMilestones.MS6, NodePermissions.REQUIRED_AND_SINGLESET);
 		
-		tcEAS = TimeCollectorWithPath.<TestMilestones>createWithPath(
-			new TestClock(),
-			AllowedPathsGraph.
+		AllowedPathsGraph<TestMilestones> path = AllowedPathsGraph.
 			<TestMilestones>
 			nodes(p1,p2,p3,p4,p5,p6)
 			.path(p1,p2,p3,p4,p6)
-			.path(p4, p2) // jump back (because of a retry for example)
+//			.path(p4, p2) // jump back (because of a retry for example)
 			.path(p3, p5, p6) // alternative path to the p3,p4,p5 path
-			.build()
-		);
+			.build();
+
+//		path.forEach(System.out::println);
+		
+		tcEAS = TimeCollectorWithPath.<TestMilestones>createWithPath(new TestClock(), path);
+		
 	}
 
 	@Test
