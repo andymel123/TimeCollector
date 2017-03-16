@@ -32,7 +32,7 @@ public class AllowedPathBuilderNodesAndEdgesTest {
 			AllowedPathsGraph.
 			<TestMilestones>
 			nodes(p1,p2,p3,p4,p5)
-			.serial(p1,p2,p3,p4,p5)
+			.path(p1,p2,p3,p4,p5)
 //			.edge(p4, p2) TODO does not work yet
 			.build()
 		);

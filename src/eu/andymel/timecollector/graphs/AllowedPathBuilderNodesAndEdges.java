@@ -14,11 +14,13 @@ import java.util.stream.Collectors;
 
 public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 
-	private PermissionNode<ID_TYPE> startNode;
-	private Set<PermissionNode<ID_TYPE>> nodes;
-	private List<Edge<PermissionNode<ID_TYPE>>> edges;
-	private SimpleMutable simpleMutable = new SimpleMutable(true);
+	private static final boolean THROW_ERROR_IF_EDGE_IS_ADDED_MULTIPLE_TIMES = false;
 	
+	private final PermissionNode<ID_TYPE> startNode;
+	private final Set<PermissionNode<ID_TYPE>> nodes;
+	private final List<Edge<PermissionNode<ID_TYPE>>> edges;
+	private final SimpleMutable simpleMutable = new SimpleMutable(true);
+	 
 	AllowedPathBuilderNodesAndEdges(PermissionNode<ID_TYPE> startNode, PermissionNode<ID_TYPE>... otherNodes) {
 		
 		// preconditions
@@ -52,9 +54,12 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		}
 		
 		Edge<PermissionNode<ID_TYPE>> newEdge = new Edge<PermissionNode<ID_TYPE>>(node1, node2);
-		int idx = edges.indexOf(newEdge);
-		if(idx!=-1){
-			throw new IllegalStateException("There is already an edge like the one you want to add at index "+idx+" of your edges! Edge: '"+newEdge+"'");
+		
+		if(THROW_ERROR_IF_EDGE_IS_ADDED_MULTIPLE_TIMES){
+			int idx = edges.indexOf(newEdge);
+			if(idx!=-1){
+				throw new IllegalStateException("There is already an edge like the one you want to add at index "+idx+" of your "+edges.size()+" edges! Edge: '"+newEdge+"'");
+			}
 		}
 		edges.add(newEdge);
 		
@@ -108,7 +113,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		return new AllowedPathsGraph<>(startNode, simpleMutable);
 	}
 
-	public AllowedPathBuilderNodesAndEdges<ID_TYPE> serial(PermissionNode<ID_TYPE>... nodes) {
+	public AllowedPathBuilderNodesAndEdges<ID_TYPE> path(PermissionNode<ID_TYPE>... nodes) {
 		
 		// preconditiions
 		nn(nodes, "You need to provide nodes for this call!");
