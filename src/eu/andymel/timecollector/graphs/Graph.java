@@ -4,9 +4,13 @@ import static eu.andymel.timecollector.util.Preconditions.nn;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO copy and add immutable view on the path when finished to add nodes
@@ -17,6 +21,8 @@ import java.util.function.Consumer;
  */
 public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 
+	Logger LOG = LoggerFactory.getLogger(Graph.class); 
+	
 	private final GraphNode<ID_TYPE, PAYLOAD_TYPE> startNode;
 	
 	// TODO I don't need this lastNodes list anymore after finished building...so maybe move to builder
@@ -74,14 +80,14 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 		return lastNodes;
 	}
 
-	public GraphNode<ID_TYPE, PAYLOAD_TYPE> addNode(ID_TYPE id, PAYLOAD_TYPE nodePermissions) {
+	public GraphNode<ID_TYPE, PAYLOAD_TYPE> addNode(ID_TYPE id, PAYLOAD_TYPE payload) {
 		
 		// preconditions
 		nn(id, "The given id is null!");
 		mutable.check();
 		
 		//build new node for this milestone
-		GraphNode<ID_TYPE, PAYLOAD_TYPE> newNode = new GraphNode<ID_TYPE, PAYLOAD_TYPE>(id, nodePermissions, mutable);
+		GraphNode<ID_TYPE, PAYLOAD_TYPE> newNode = new GraphNode<ID_TYPE, PAYLOAD_TYPE>(id, payload, mutable);
 		
 		// connect the new node with the last nodes
 		for(GraphNode<ID_TYPE, PAYLOAD_TYPE> lastNode: lastNodes){
@@ -194,10 +200,54 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 //	}
 
 	
+	/**
+	 * calls single threaded
+	 * @param consumer
+	 */
+	void forEach(Consumer<GraphNode<ID_TYPE, PAYLOAD_TYPE>> consumer){
+		forEachChild(getStartNode(), consumer, new HashSet<>());
+	}
+	
+	private void forEachChild(GraphNode<ID_TYPE, PAYLOAD_TYPE> rootOfSearch, Consumer<GraphNode<ID_TYPE, PAYLOAD_TYPE>> consumer, HashSet<GraphNode<ID_TYPE, PAYLOAD_TYPE>> alreadyDone){
+		
+		GraphNode<ID_TYPE, PAYLOAD_TYPE> node = rootOfSearch;
+
+		while(true){
+
+			// preconditions
+			nn(node, "'node' is null!");
+			
+			if(alreadyDone.contains(node)){
+				// this node was visited earlier
+				LOG.trace(node+" was visited easlier.");
+				return;
+			}else{
+				consumer.accept(node);
+				alreadyDone.add(node);
+			}
+			
+			List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> permissionChildren = node.getNextNodes(); 
+			if(permissionChildren==null){
+				// end of path
+				break;
+			}
+			
+			if(permissionChildren.size()==1){
+				node = permissionChildren.get(0);
+				continue;
+			}
+			
+			for(GraphNode<ID_TYPE, PAYLOAD_TYPE> child: permissionChildren){
+				forEachChild(child, consumer, alreadyDone);
+			}
+			
+			break;
+		}
+		
+	};
 	
 	
 	protected List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> getAllNodesWIthId(ID_TYPE nodeId) {
-//		return Collections.unmodifiableList(nodes.get(nodeId)); its not public so save some performance
 		return nodes.get(nodeId);
 	}
 	
