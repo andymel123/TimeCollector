@@ -6,23 +6,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * TODO copy and add immutable view on the path when finished to add nodes
  * 
  * @author andymatic
  *
- * @param <NODE_ID_TYPE>
+ * @param <ID_TYPE>
  */
-public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
+public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 
-	private final GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> startNode;
+	private final GraphNode<ID_TYPE, PAYLOAD_TYPE> startNode;
 	
 	// TODO I don't need this lastNodes list anymore after finished building...so maybe move to builder
-	private List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> lastNodes = new LinkedList<>();
+	private List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> lastNodes = new LinkedList<>();
 
 	/** To find all nodes fast by hash. */
-	protected final HashMap<NODE_ID_TYPE, List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>>> nodes = new HashMap<>();
+	protected final HashMap<ID_TYPE, List<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> nodes = new HashMap<>();
 	
 	private final boolean allowMultipleEdges;
 	
@@ -30,10 +31,10 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 	
 //	private boolean finishedLinking = false;
 	
-	protected Graph(NODE_ID_TYPE id, NODE_PAYLOAD_TYPE payload, boolean allowMultipleEdges, Mutable mutable) {
+	protected Graph(ID_TYPE id, PAYLOAD_TYPE payload, boolean allowMultipleEdges, Mutable mutable) {
 		this(new GraphNode<>(id, payload, mutable), allowMultipleEdges, mutable);
 	}
-	protected Graph(GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> startNode, boolean allowMultipleEdges, Mutable mutable) {
+	protected Graph(GraphNode<ID_TYPE, PAYLOAD_TYPE> startNode, boolean allowMultipleEdges, Mutable mutable) {
 		this.startNode = startNode;
 		this.allowMultipleEdges = allowMultipleEdges;
 		this.mutable = mutable;
@@ -53,9 +54,9 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 //	}
 	
 	// !used in the constructor! (Don't simply change accessibility to override!)
-	private final void addNodeToHashMap(GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> startNode) {
-		NODE_ID_TYPE id = startNode.getId();
-		List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> listOfNodesWithThisId = nodes.get(id);
+	private final void addNodeToHashMap(GraphNode<ID_TYPE, PAYLOAD_TYPE> startNode) {
+		ID_TYPE id = startNode.getId();
+		List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> listOfNodesWithThisId = nodes.get(id);
 		if(listOfNodesWithThisId==null){
 			listOfNodesWithThisId = new LinkedList<>();
 			nodes.put(id, listOfNodesWithThisId);
@@ -69,21 +70,21 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 	}
 
 
-	private List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> getLastNodes() {
+	private List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> getLastNodes() {
 		return lastNodes;
 	}
 
-	public GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> addNode(NODE_ID_TYPE id, NODE_PAYLOAD_TYPE nodePermissions) {
+	public GraphNode<ID_TYPE, PAYLOAD_TYPE> addNode(ID_TYPE id, PAYLOAD_TYPE nodePermissions) {
 		
 		// preconditions
 		nn(id, "The given id is null!");
 		mutable.check();
 		
 		//build new node for this milestone
-		GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> newNode = new GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>(id, nodePermissions, mutable);
+		GraphNode<ID_TYPE, PAYLOAD_TYPE> newNode = new GraphNode<ID_TYPE, PAYLOAD_TYPE>(id, nodePermissions, mutable);
 		
 		// connect the new node with the last nodes
-		for(GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> lastNode: lastNodes){
+		for(GraphNode<ID_TYPE, PAYLOAD_TYPE> lastNode: lastNodes){
 			lastNode.addNextNode(newNode);
 			newNode.addPrevNode(lastNode);
 		}
@@ -98,7 +99,7 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 		return newNode;
 	}
 
-	public void addParallel(List<Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> anyOfThoseSubPaths){
+	public void addParallel(List<Graph<ID_TYPE, PAYLOAD_TYPE>> anyOfThoseSubPaths){
 //	public void addParallel(List<AllowedPathBuilder<NODE_ID_TYPE>> anyOfThoseSubPaths){
 		
 		// preconditions
@@ -108,17 +109,17 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 			throw new IllegalArgumentException("addParallel() needs at least 2 paths!");
 		}
 		
-		List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> newNodes = new ArrayList<>(anyOfThoseSubPaths.size());
+		List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> newNodes = new ArrayList<>(anyOfThoseSubPaths.size());
 		
 		// add subpathes to last nodes of current path
-		for(Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> subPath: anyOfThoseSubPaths){
+		for(Graph<ID_TYPE, PAYLOAD_TYPE> subPath: anyOfThoseSubPaths){
 //		for(AllowedPathBuilder<NODE_ID_TYPE> builder: anyOfThoseSubPaths){
 //			Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> subPath = builder.a
-			GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> firstOfSubPath = subPath.getStartNode();
-			List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> lastNodesOfSubPath = subPath.getLastNodes();
+			GraphNode<ID_TYPE, PAYLOAD_TYPE> firstOfSubPath = subPath.getStartNode();
+			List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> lastNodesOfSubPath = subPath.getLastNodes();
 			newNodes.addAll(lastNodesOfSubPath);
 			
-			for(GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> lastNode: lastNodes){
+			for(GraphNode<ID_TYPE, PAYLOAD_TYPE> lastNode: lastNodes){
 				lastNode.addNextNode(firstOfSubPath);
 				firstOfSubPath.addPrevNode(lastNode);
 			}
@@ -131,11 +132,11 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 
 	}
 	
-	protected GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> getStartNode() {
+	protected GraphNode<ID_TYPE, PAYLOAD_TYPE> getStartNode() {
 		return startNode;
 	}
 
-	public void setPayload(NODE_ID_TYPE id, NODE_PAYLOAD_TYPE p){
+	public void setPayload(ID_TYPE id, PAYLOAD_TYPE p){
 		
 		/* first I just wanted to check mutablility for adding edge to other nodes...not for the payload.
 		 * But for the allowedGraph the payload is set when the node is added I think.
@@ -143,27 +144,27 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 		 * So lets try */
 		mutable.check();
 		
-		List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> allNodesWithThisId = getAllNodesWIthId(id);
+		List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> allNodesWithThisId = getAllNodesWIthId(id);
 		if(allNodesWithThisId==null || allNodesWithThisId.size()!=1){
 			throw new IllegalStateException("Not exactly one node found for id '"+id+"'!Think about what to do with the payload. "+allNodesWithThisId);
 		}
-		GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> node = allNodesWithThisId.get(0);
+		GraphNode<ID_TYPE, PAYLOAD_TYPE> node = allNodesWithThisId.get(0);
 		node.setPayload(p);
 	}
-	public NODE_PAYLOAD_TYPE getPayload(NODE_ID_TYPE id){
+	public PAYLOAD_TYPE getPayload(ID_TYPE id){
 		
 		// preconditions
 		nn(id, "'id' is null!");
 		
 		// search for the node
-		List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> allNodesWithThisId = getAllNodesWIthId(id);
+		List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> allNodesWithThisId = getAllNodesWIthId(id);
 		if(allNodesWithThisId==null || allNodesWithThisId.size()==0){
 			throw new IllegalStateException("Can't return payload for '"+id+"'! No node found with this id!");
 		}
 		if(allNodesWithThisId.size()>1){
 			throw new IllegalStateException("Found "+allNodesWithThisId.size()+" nodes for id '"+id+"'! Don't know which payload to return!");
 		}
-		GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> node = allNodesWithThisId.get(0);
+		GraphNode<ID_TYPE, PAYLOAD_TYPE> node = allNodesWithThisId.get(0);
 		
 		if(node==null){
 			// no node found with this id
@@ -192,7 +193,10 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 //		
 //	}
 
-	protected List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> getAllNodesWIthId(NODE_ID_TYPE nodeId) {
+	
+	
+	
+	protected List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> getAllNodesWIthId(ID_TYPE nodeId) {
 //		return Collections.unmodifiableList(nodes.get(nodeId)); its not public so save some performance
 		return nodes.get(nodeId);
 	}
