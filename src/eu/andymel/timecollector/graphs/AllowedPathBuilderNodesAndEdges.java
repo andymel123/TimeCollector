@@ -78,12 +78,19 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		while(itNodes.hasNext()){
 			PermissionNode<ID_TYPE> node1 = itNodes.next();
 			Iterator<Edge<PermissionNode<ID_TYPE>>> itEdges = copyOfEdges.iterator();
+			boolean nodeRemoved = false;
 			while(itEdges.hasNext()){
 				Edge<PermissionNode<ID_TYPE>> edge = itEdges.next();
 				PermissionNode<ID_TYPE> node2 = edge.getNode2();
 				if(edge.getNode1()==node1){
 					itEdges.remove();
-					itNodes.remove();
+					if(!nodeRemoved){
+						/* multiple edges can be removed for this node1, the node
+						 * itself can only be removed once, the next time it.remove()
+						 * would throw an IllegalStateException() */
+						itNodes.remove();
+						nodeRemoved = true;
+					}
 					node1.addNextNode(node2);
 					node2.addPrevNode(node1);
 				}

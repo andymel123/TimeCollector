@@ -157,8 +157,11 @@ public class Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> {
 		
 		// search for the node
 		List<GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE>> allNodesWithThisId = getAllNodesWIthId(id);
-		if(allNodesWithThisId==null || allNodesWithThisId.size()!=1){
-			throw new IllegalStateException("Not exactly one node found for id '"+id+"'! Think about what to do with the payload. "+allNodesWithThisId);
+		if(allNodesWithThisId==null || allNodesWithThisId.size()==0){
+			throw new IllegalStateException("Can't return payload for '"+id+"'! No node found with this id!");
+		}
+		if(allNodesWithThisId.size()>1){
+			throw new IllegalStateException("Found "+allNodesWithThisId.size()+" nodes for id '"+id+"'! Don't know which payload to return!");
 		}
 		GraphNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> node = allNodesWithThisId.get(0);
 		
