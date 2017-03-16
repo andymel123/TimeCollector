@@ -30,13 +30,15 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		return start(id, REQUIRED_AND_SINGLESET);
 	}
 	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> start(ID_TYPE id, NodePermissions nodePermissions){
-		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions, false);
+		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions);
 	}
+
+	// I removed the only difference for subpaths but I leave this separate factory methods in my API, maybe there will be differences again in the future
 	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> subpath(ID_TYPE id){
 		return subpath(id, REQUIRED_AND_SINGLESET);
 	}
 	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> subpath(ID_TYPE id, NodePermissions nodePermissions){
-		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions, true);
+		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions);
 	}
 
 	

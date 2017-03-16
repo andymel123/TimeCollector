@@ -18,14 +18,10 @@ public class AllowedPathBuilder<ID_TYPE> {
 
 	private final AllowedPathsGraph<ID_TYPE> allowedGraph;
 	
-	/** to prevent changes on the path after it has been built */
-//	private boolean pathIsFinished = false;
-	
-	private final boolean isSubpath;
-	
+	// can't be final as I reset it for subpaths (the mutable of the main path is used for all subpaths)
 	private SimpleMutable simpleMutable = new SimpleMutable(true);
 	
-	AllowedPathBuilder(ID_TYPE idOfStartNode, NodePermissions nodePermissions, boolean isSubPath) {
+	AllowedPathBuilder(ID_TYPE idOfStartNode, NodePermissions nodePermissions) {
 		nn(idOfStartNode, "'idOfStartNode' is null!");
 
 		this.allowedGraph = new AllowedPathsGraph<ID_TYPE>(
@@ -33,7 +29,6 @@ public class AllowedPathBuilder<ID_TYPE> {
 			nodePermissions,
 			simpleMutable
 		);
-		this.isSubpath = isSubPath;
 	}
 
 
