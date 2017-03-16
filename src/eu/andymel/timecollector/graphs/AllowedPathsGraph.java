@@ -69,6 +69,12 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 			GraphNode<ID_TYPE, NodePermissions> copyOfNode = copyNode(n);
 			baseList.add(copyOfNode);
 
+			if(n==startNode){
+				// do I need one path with just the startnode?
+				results.add(baseList);
+				continue;
+			}
+			
 			// get all paths from startNode up until this node as lists of nodes (reversed from searched node to startnode)
 			getAllReversedListsOfNodesToStartNode(baseList, copyOfNode, results);
 
@@ -88,16 +94,12 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		
 		nn(currentFirstNode, "'currentFirstNode' is null!");
 		
-		GraphNode<ID_TYPE, NodePermissions> allowedGraphsStartNode = getStartNode();
-		if(currentFirstNode==allowedGraphsStartNode){
-			// do I need one path with just the startnode?
-			return;
-		}
-		
 		/* as long as there is just one paret node I can iterate instead of something
 		 * recursive to prevent stack overflow in graphs that are very deep */
 		List<GraphNode<ID_TYPE, NodePermissions>> parents = currentFirstNode.getPrevNodes();
 		if(parents==null){
+			/* if the currentFirstNode is the startNode we should have handled that earlier
+			 * all other nodes need to have parents */
 			throw new IllegalStateException("No parents for node with id '"+currentFirstNode.getId()+"'");
 		}
 		
@@ -319,6 +321,5 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 //	public PathNode<ID_TYPE, Instant> checkIfThisMilestoneCanBeFirst(ID_TYPE m) {
 //		return null;
 //	}
-
-
+	
 }
