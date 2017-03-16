@@ -47,41 +47,6 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 	}
 	
 	
-	
-	
-//	/**
-//	 * Creats a serial graph from an enum, first to last enum entry
-//	 * 
-//	 * @param enumClazz the enum to create the path from
-//	 * @param required if true the payload of a node has to be set before the payload of the next node can be set
-//	 * @param singleSet if true the payload of a node can only be set once, the next time throws an exception
-//	 * 
-//	 * @return the serial {@link AllowedPathsGraph}
-//	 */
-//	public static <MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> AllowedPathsGraph<MILESTONE_TYPE> createSerial(Class<MILESTONE_TYPE> enumClazz, boolean required, boolean singleSet) {
-//		nn(enumClazz, "You need to provide an enum to get the serial path from!");
-//		
-//		EnumSet<MILESTONE_TYPE> milestones = EnumSet.allOf(enumClazz);
-//		Iterator<MILESTONE_TYPE> it = milestones.iterator();
-//		if(!it.hasNext()){
-//			throw new IllegalArgumentException("It makes no sense to build a TimeCollector with a serial path from an Enum thats empty!");
-//		}
-//		
-//		NodePermissions permissions = NodePermissions.create(required, singleSet);
-//		
-//		MILESTONE_TYPE firstMilestone = it.next();
-//		AllowedPathBuilder<MILESTONE_TYPE> pathBuilder = AllowedPathBuilder.start(firstMilestone, permissions);
-//		
-//		while(it.hasNext()){
-//			pathBuilder.then(it.next(), permissions);
-//		}
-//		
-//		return pathBuilder.build();
-//	}
-	
-	
-	
-	
 	@Override
 	public GraphNode<ID_TYPE, NodePermissions> getStartNode() {
 		return super.getStartNode();
