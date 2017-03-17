@@ -38,7 +38,7 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 //	private boolean finishedLinking = false;
 	
 	protected Graph(ID_TYPE id, PAYLOAD_TYPE payload, boolean allowMultipleEdges, Mutable mutable) {
-		this(new GraphNode<>(id, payload, mutable), allowMultipleEdges, mutable);
+		this(new GraphNode<>(id, payload, mutable, allowMultipleEdges), allowMultipleEdges, mutable);
 	}
 	protected Graph(GraphNode<ID_TYPE, PAYLOAD_TYPE> startNode, boolean allowMultipleEdges, Mutable mutable) {
 		this.startNode = startNode;
@@ -87,7 +87,7 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 		mutable.check();
 		
 		//build new node for this milestone
-		GraphNode<ID_TYPE, PAYLOAD_TYPE> newNode = new GraphNode<ID_TYPE, PAYLOAD_TYPE>(id, payload, mutable);
+		GraphNode<ID_TYPE, PAYLOAD_TYPE> newNode = new GraphNode<ID_TYPE, PAYLOAD_TYPE>(id, payload, mutable, allowMultipleEdges);
 		
 		// connect the new node with the last nodes
 		for(GraphNode<ID_TYPE, PAYLOAD_TYPE> lastNode: lastNodes){

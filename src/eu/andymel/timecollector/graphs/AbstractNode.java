@@ -7,8 +7,10 @@ public abstract class AbstractNode<ID_TYPE, PAYLOAD_TYPE> {
 	private final ID_TYPE id;
 	private PAYLOAD_TYPE payload;
 	private Mutable mutable;
+	private final boolean allowMultipleEdges;
 	
-	protected AbstractNode(ID_TYPE id, PAYLOAD_TYPE payload, Mutable mutable) {
+	
+	protected AbstractNode(ID_TYPE id, PAYLOAD_TYPE payload, Mutable mutable, boolean allowMultipleEdges) {
 		// preconditions
 		nn(id, "'id' is null!");
 		nn(payload, "'payload' is null!");
@@ -16,9 +18,10 @@ public abstract class AbstractNode<ID_TYPE, PAYLOAD_TYPE> {
 		this.id = id;
 		this.payload= payload;
 		this.mutable = mutable;
+		this.allowMultipleEdges = allowMultipleEdges;
 	}
-	public AbstractNode(ID_TYPE id, PAYLOAD_TYPE payload) {
-		this(id, payload, null);
+	public AbstractNode(ID_TYPE id, PAYLOAD_TYPE payload, boolean multiEdges) {
+		this(id, payload, null, multiEdges);
 	}
 	
 	abstract void addNextNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e);
@@ -46,7 +49,9 @@ public abstract class AbstractNode<ID_TYPE, PAYLOAD_TYPE> {
 	public Mutable getMutable() {
 		return this.mutable;
 	}
-	
+	public boolean isMutltiEdges() {
+		return allowMultipleEdges;
+	}
 	
 	protected void checkMutable() {
 		if(mutable==null){

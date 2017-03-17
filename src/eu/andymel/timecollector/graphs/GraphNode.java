@@ -19,12 +19,13 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> extends AbstractNode<ID_TYPE, PAYL
 	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnPrevNodes = Collections.unmodifiableList(prevNodes);
 	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnNextNodes = Collections.unmodifiableList(nextNodes);
 	
-	GraphNode(ID_TYPE id, PAYLOAD_TYPE payload, Mutable mutable) {
-		super(id, payload, mutable);
+	
+	GraphNode(ID_TYPE id, PAYLOAD_TYPE payload, Mutable mutable, boolean mutltiEdges) {
+		super(id, payload, mutable, mutltiEdges);
 	}
 
-	GraphNode(ID_TYPE id, PAYLOAD_TYPE payload) {
-		super(id, payload);
+	GraphNode(ID_TYPE id, PAYLOAD_TYPE payload, boolean mutltiEdges) {
+		super(id, payload, mutltiEdges);
 	}
 	
 	void addNextNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
@@ -80,7 +81,8 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> extends AbstractNode<ID_TYPE, PAYL
 			// TODO ensure immutable or copy them
 			this.getId(), 
 			this.getPayload(),
-			this.getMutable()
+			this.getMutable(),
+			this.isMutltiEdges()
 		);
 	}
 	
