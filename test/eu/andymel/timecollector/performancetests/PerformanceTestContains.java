@@ -1,13 +1,11 @@
-package eu.andymel.timecollector.graphs;
+package eu.andymel.timecollector.performancetests;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
+import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.graphs.PermissionNode;
-import eu.andymel.timecollector.performancetests.PerformanceTestsUtils;
 
 public class PerformanceTestContains {
 
@@ -20,7 +18,7 @@ public class PerformanceTestContains {
 		// fill a list and an array
 		List<PermissionNode<e>> list = new ArrayList<>(amount);
 		for(int i=0;i <amount; i++){
-			list.add(new PermissionNode(e.a, NodePermissions.NO_CHECKS));
+			list.add(PermissionNode.create(e.a, NodePermissions.NO_CHECKS));
 		}
 		PermissionNode<?>[] array = list.toArray(new PermissionNode[amount]);
 		

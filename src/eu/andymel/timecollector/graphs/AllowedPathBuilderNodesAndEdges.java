@@ -1,10 +1,9 @@
 package eu.andymel.timecollector.graphs;
 
-import static eu.andymel.timecollector.util.Preconditions.*;
+import static eu.andymel.timecollector.util.Preconditions.nn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -41,7 +40,17 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		}
 	}
 	
+	
+	public AllowedPathBuilderNodesAndEdges<ID_TYPE> edgeWithMax(int max, PermissionNode<ID_TYPE> node1, PermissionNode<ID_TYPE> node2) {
+		return edge(node1, node2, EdgePermissions.max(max));
+	}
+
 	public AllowedPathBuilderNodesAndEdges<ID_TYPE> edge(PermissionNode<ID_TYPE> node1, PermissionNode<ID_TYPE> node2){
+		return edge(node1, node2, null);
+	}
+		
+
+	public AllowedPathBuilderNodesAndEdges<ID_TYPE> edge(PermissionNode<ID_TYPE> node1, PermissionNode<ID_TYPE> node2, EdgePermissions edgePermissions){
 		
 		// preconditions
 		nn(node1, "'node1' is null!");
@@ -53,7 +62,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 			throw new IllegalStateException("The second node you provided ws not found! You have to use the "+PermissionNode.class.getSimpleName()+" instances that you provided in the "+AllowedPathsGraph.class.getSimpleName()+".nodes() method!");
 		}
 		
-		Edge<PermissionNode<ID_TYPE>> newEdge = new Edge<PermissionNode<ID_TYPE>>(node1, node2);
+		Edge<PermissionNode<ID_TYPE>> newEdge = Edge.create(node1, node2, edgePermissions);
 		
 		if(THROW_ERROR_IF_EDGE_IS_ADDED_MULTIPLE_TIMES){
 			int idx = edges.indexOf(newEdge);
@@ -81,8 +90,8 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 			boolean nodeRemoved = false;
 			while(itEdges.hasNext()){
 				Edge<PermissionNode<ID_TYPE>> edge = itEdges.next();
-				PermissionNode<ID_TYPE> node2 = edge.getNode2();
-				if(edge.getNode1()==node1){
+				PermissionNode<ID_TYPE> node2 = edge.getChildNode();
+				if(edge.getParentNode()==node1){
 					itEdges.remove();
 					if(!nodeRemoved){
 						/* multiple edges can be removed for this node1, the node
@@ -91,8 +100,11 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 						itNodes.remove();
 						nodeRemoved = true;
 					}
-					node1.addNextNode(node2);
-					node2.addPrevNode(node1);
+					/* Put in the same instance of edge because the only mutable things
+					 * in the edge are the nodes itself, and those I need to be the same instance */
+					Edge<GraphNode<ID_TYPE, NodePermissions>> copyOfEdge = Edge.create(node1, node2, edge.getEdgePermissions());
+					node1.addNextNode(copyOfEdge);
+					node2.addPrevNode(copyOfEdge);
 				}
 			}
 		}
@@ -105,7 +117,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 			 * check if it has ingoing edges (it is used)*/
 			itNodes = copyOfNodes.iterator();
 			while(itNodes.hasNext()){
-				if(itNodes.next().getPrevNodes().size()>0)itNodes.remove();
+				if(itNodes.next().getEdgesToParents().size()>0)itNodes.remove();
 			}
 			
 			if(copyOfNodes.size()>0){

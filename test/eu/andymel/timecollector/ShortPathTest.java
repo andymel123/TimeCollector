@@ -1,7 +1,10 @@
 package eu.andymel.timecollector;
 
-import static org.junit.Assert.*;
-import static eu.andymel.timecollector.graphs.NodePermissions.*;
+import static eu.andymel.timecollector.graphs.NodePermissions.NOT_REQUIRED_BUT_SINGLESET;
+import static eu.andymel.timecollector.graphs.NodePermissions.NO_CHECKS;
+import static eu.andymel.timecollector.graphs.NodePermissions.REQUIRED_AND_SINGLESET;
+import static eu.andymel.timecollector.graphs.NodePermissions.REQUIRED_MULTISET;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +13,7 @@ import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 
 
-public class TimeCollectorWithShortPathTest {
+public class ShortPathTest {
 
 	private enum TestMilestones{
 		MS1,MS2,MS3,MS4,MS5

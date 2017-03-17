@@ -1,33 +1,50 @@
 package eu.andymel.timecollector.graphs;
 
-import static eu.andymel.timecollector.util.Preconditions.*;
+import static eu.andymel.timecollector.util.Preconditions.nn;
 
-class Edge<Node_Type> {
+public class Edge<Node_Type> {
 
-	private final Node_Type node1;
-	private final Node_Type node2;
+	private final Node_Type from;
+	private final Node_Type to;
+	private final EdgePermissions edgePermissions;
 	
-	public Edge(Node_Type node1, Node_Type node2) {
+	private Edge(Node_Type node1, Node_Type node2, EdgePermissions edgePermissions) {
 		nn(node1, "'node1' is null");
 		nn(node2, "'node2' is null");
-		this.node1 = node1;
-		this.node2 = node2;
+		this.from = node1;
+		this.to = node2;
+		this.edgePermissions = edgePermissions;
 	}
 
-	Node_Type getNode1() {
-		return node1;
+	static <Node_Type> Edge<Node_Type> create(Node_Type node1, Node_Type node2){
+		return create(node1, node2, null);
+	}
+	static <Node_Type> Edge<Node_Type> create(Node_Type node1, Node_Type node2, EdgePermissions edgePermissions){
+		return new Edge<Node_Type>(node1, node2, edgePermissions);
 	}
 	
-	Node_Type getNode2() {
-		return node2;
+	public Node_Type getParentNode() {
+		return from;
+	}
+	
+	public Node_Type getChildNode() {
+		return to;
 	}
 
+	/** @return the {@link EdgePermissions} for this {@link Edge} (can be <code>null</code> if there are no) */
+	public EdgePermissions getEdgePermissions() {
+		return edgePermissions;
+	}
+	
+
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((node1 == null) ? 0 : node1.hashCode());
-		result = prime * result + ((node2 == null) ? 0 : node2.hashCode());
+		result = prime * result + ((edgePermissions == null) ? 0 : edgePermissions.hashCode());
+		result = prime * result + ((from == null) ? 0 : from.hashCode());
+		result = prime * result + ((to == null) ? 0 : to.hashCode());
 		return result;
 	}
 
@@ -40,22 +57,27 @@ class Edge<Node_Type> {
 		if (getClass() != obj.getClass())
 			return false;
 		Edge other = (Edge) obj;
-		if (node1 == null) {
-			if (other.node1 != null)
+		if (edgePermissions == null) {
+			if (other.edgePermissions != null)
 				return false;
-		} else if (!node1.equals(other.node1))
+		} else if (!edgePermissions.equals(other.edgePermissions))
 			return false;
-		if (node2 == null) {
-			if (other.node2 != null)
+		if (from == null) {
+			if (other.from != null)
 				return false;
-		} else if (!node2.equals(other.node2))
+		} else if (!from.equals(other.from))
+			return false;
+		if (to == null) {
+			if (other.to != null)
+				return false;
+		} else if (!to.equals(other.to))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+" [node1=" + node1 + ", node2=" + node2 + "]";
+		return getClass().getSimpleName()+" [node1=" + from + ", node2=" + to + "]";
 	}
 	
 	

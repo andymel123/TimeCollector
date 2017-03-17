@@ -16,11 +16,11 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 	private final ID_TYPE id;
 
 	private PAYLOAD_TYPE payload;
-	private final List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> prevNodes = new LinkedList<>();
-	private final List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> nextNodes = new LinkedList<>();
+	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> prevNodes = new LinkedList<>();
+	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> nextNodes = new LinkedList<>();
 	
-	private final List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> immutableViewOnPrevNodes = Collections.unmodifiableList(prevNodes);
-	private final List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> immutableViewOnNextNodes = Collections.unmodifiableList(nextNodes);
+	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnPrevNodes = Collections.unmodifiableList(prevNodes);
+	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnNextNodes = Collections.unmodifiableList(nextNodes);
 	
 	private Mutable mutable;
 	
@@ -48,9 +48,9 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 		return id;
 	}
 	
-	void addNextNode(GraphNode<ID_TYPE, PAYLOAD_TYPE> n){
+	void addNextNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
 		checkMutable();
-		nextNodes.add(n);
+		nextNodes.add(e);
 	}
 	
 	private void checkMutable() {
@@ -60,22 +60,22 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 		mutable.check();
 	}
 
-	void addPrevNode(GraphNode<ID_TYPE, PAYLOAD_TYPE> n){
+	void addPrevNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
 		checkMutable();
-		prevNodes.add(n);
+		prevNodes.add(e);
 	}
 
-	List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> getNextNodesEditable() {
+	List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> getNextNodesEditable() {
 		return nextNodes;
 	}
-	List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> getPrevNodesEditable() {
+	List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> getPrevNodesEditable() {
 		return prevNodes;
 	}
 
-	public List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> getNextNodes() {
+	public List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> getEdgesToChildren() {
 		return immutableViewOnNextNodes;
 	}
-	public List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> getPrevNodes() {
+	public List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> getEdgesToParents() {
 		return immutableViewOnPrevNodes;
 	}
 
@@ -89,7 +89,8 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 		
 		if(nextNodes==null)return null;
 		
-		for(GraphNode<ID_TYPE, PAYLOAD_TYPE> childNode: nextNodes){
+		for(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edgeToChildNode: nextNodes){
+			GraphNode<ID_TYPE, PAYLOAD_TYPE> childNode = edgeToChildNode.getChildNode();
 			if(idToSearch.equals(childNode.getId()))return childNode;
 			GraphNode<ID_TYPE, PAYLOAD_TYPE> found = childNode.getChildWithId(idToSearch);
 			if(found!=null)return found;

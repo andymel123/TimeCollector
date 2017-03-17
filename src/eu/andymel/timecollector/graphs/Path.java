@@ -22,4 +22,14 @@ public class Path<ID_TYPE, PAYLOAD_TYPE> extends Graph<ID_TYPE, PAYLOAD_TYPE> {
 	}
 	
 	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(getClass().getSimpleName())
+		.append('[');
+		forEach(n -> sb.append(n.getId()).append(' '));
+		sb.append(']');
+		return sb.toString();
+	}
+	
 }

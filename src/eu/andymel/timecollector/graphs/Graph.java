@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author andymatic
  *
- * @param <ID_TYPE>
+ * @param <ID_TYPE> The type of the id object (milestone)
  */
 public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 
@@ -91,8 +91,11 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 		
 		// connect the new node with the last nodes
 		for(GraphNode<ID_TYPE, PAYLOAD_TYPE> lastNode: lastNodes){
-			lastNode.addNextNode(newNode);
-			newNode.addPrevNode(lastNode);
+			/* Put in the same instance of edge because the only mutable things
+			 * in the edge are the nodes itself, and those I need to be the same instance */
+			Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edge = Edge.create(lastNode, newNode);
+			lastNode.addNextNode(edge);
+			newNode.addPrevNode(edge);
 		}
 		
 		// set the lastAddedNodes reference on the new node
@@ -126,8 +129,11 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 			newNodes.addAll(lastNodesOfSubPath);
 			
 			for(GraphNode<ID_TYPE, PAYLOAD_TYPE> lastNode: lastNodes){
-				lastNode.addNextNode(firstOfSubPath);
-				firstOfSubPath.addPrevNode(lastNode);
+				/* Put in the same instance of edge because the only mutable things
+				 * in the edge are the nodes itself, and those I need to be the same instance */
+				Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edge = Edge.create(lastNode, firstOfSubPath);
+				lastNode.addNextNode(edge);
+				firstOfSubPath.addPrevNode(edge);
 			}
 		}
 		
@@ -226,19 +232,19 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 				alreadyDone.add(node);
 			}
 			
-			List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> permissionChildren = node.getNextNodes(); 
-			if(permissionChildren==null){
+			List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> edgesToChildren = node.getEdgesToChildren(); 
+			if(edgesToChildren==null){
 				// end of path
 				break;
 			}
 			
-			if(permissionChildren.size()==1){
-				node = permissionChildren.get(0);
+			if(edgesToChildren.size()==1){
+				node = edgesToChildren.get(0).getChildNode();
 				continue;
 			}
 			
-			for(GraphNode<ID_TYPE, PAYLOAD_TYPE> child: permissionChildren){
-				forEachChild(child, consumer, alreadyDone);
+			for(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edgeToChild: edgesToChildren){
+				forEachChild(edgeToChild.getChildNode(), consumer, alreadyDone);
 			}
 			
 			break;

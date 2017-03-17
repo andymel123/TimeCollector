@@ -1,13 +1,13 @@
 package eu.andymel.timecollector;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 
-public class TimeCollectorWithSerialPathFromEnumTest {
+public class SerialPathFromEnumTest {
 
 	private TimeCollector<TestMilestones> tc;
 	private TimeCollector<TestMilestones> tcS;

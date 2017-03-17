@@ -1,22 +1,23 @@
-package eu.andymel.timecollector.graphs;
+package eu.andymel.timecollector;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.andymel.timecollector.TestClock;
-import eu.andymel.timecollector.TimeCollector;
-import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
+import eu.andymel.timecollector.graphs.AllowedPathsGraph;
+import eu.andymel.timecollector.graphs.NodePermissions;
+import eu.andymel.timecollector.graphs.PermissionNode;
 
-public class AllowedPathBuilderNodesAndEdgesTest {
+public class NodesAndEdgesTest {
 
 	private enum TestMilestones{
 		MS1,MS2,MS3,MS4,MS5,MS6
 	}
 	
 	private TimeCollector<TestMilestones> tcEAS;
+	private TimeCollector<TestMilestones> tcEASMax3;
 	
 	@Before
 	public void setup(){
@@ -32,16 +33,61 @@ public class AllowedPathBuilderNodesAndEdgesTest {
 			<TestMilestones>
 			nodes(p1,p2,p3,p4,p5,p6)
 			.path(p1,p2,p3,p4,p6)
-//			.path(p4, p2) // jump back (because of a retry for example)
 			.path(p3, p5, p6) // alternative path to the p3,p4,p5 path
+			.path(p4, p2) // jump back (because of a retry for example)
 			.build();
+
+		// the same graph but the jump back from p4 to p2 may only be done once
+		AllowedPathsGraph<TestMilestones> pathMax3 = AllowedPathsGraph.
+				<TestMilestones>
+				nodes(p1,p2,p3,p4,p5,p6)
+				.path(p1,p2,p3,p4,p6)
+				.path(p3, p5, p6) // alternative path to the p3,p4,p5 path
+				.edgeWithMax(3, p4, p2) // jump back (max retry 3)
+				.build();
 
 //		path.forEach(System.out::println);
 		
 		tcEAS = TimeCollectorWithPath.<TestMilestones>createWithPath(new TestClock(), path);
-		
+		tcEASMax3 = TimeCollectorWithPath.<TestMilestones>createWithPath(new TestClock(), pathMax3);
 	}
 
+	@Test
+	public void testEASMax3_1() {
+		tcEAS.saveTime(TestMilestones.MS1);
+		tcEAS.saveTime(TestMilestones.MS2);
+		tcEAS.saveTime(TestMilestones.MS3);
+		tcEAS.saveTime(TestMilestones.MS4);
+
+		// first retry
+		tcEAS.saveTime(TestMilestones.MS2);
+		tcEAS.saveTime(TestMilestones.MS3);
+		tcEAS.saveTime(TestMilestones.MS4);
+
+		// second retry
+		tcEAS.saveTime(TestMilestones.MS2);
+		tcEAS.saveTime(TestMilestones.MS3);	// I tryed to check if saveTime on your milestone 'MS3' is allowed but I killed the search for allowed nodes in your path after not finding all possible next nodes in 100 recursions!
+		tcEAS.saveTime(TestMilestones.MS4);
+
+		// third retry
+		tcEAS.saveTime(TestMilestones.MS2);
+		tcEAS.saveTime(TestMilestones.MS3);
+		tcEAS.saveTime(TestMilestones.MS4);
+
+		// forth retry
+		tcEAS.saveTime(TestMilestones.MS2);
+		tcEAS.saveTime(TestMilestones.MS3);
+		tcEAS.saveTime(TestMilestones.MS4);
+		tcEAS.saveTime(TestMilestones.MS6);
+		
+		int count = 0;
+		assertEquals(count++, tcEAS.getTime(TestMilestones.MS1).toEpochMilli());
+		assertEquals(count++, tcEAS.getTime(TestMilestones.MS2).toEpochMilli());
+		assertEquals(count++, tcEAS.getTime(TestMilestones.MS3).toEpochMilli());
+		assertEquals(count++, tcEAS.getTime(TestMilestones.MS4).toEpochMilli());
+		assertEquals(count++, tcEAS.getTime(TestMilestones.MS6).toEpochMilli());
+	}
+	
 	@Test
 	public void testNormalEAS() {
 		tcEAS.saveTime(TestMilestones.MS1);

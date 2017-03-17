@@ -3,10 +3,13 @@ package eu.andymel.timecollector.graphs;
 import static eu.andymel.timecollector.graphs.NodePermissions.REQUIRED_AND_SINGLESET;
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import eu.andymel.timecollector.util.RecursionSavetyCounter;
 
 public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> {
 	
@@ -89,14 +92,13 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 	}
 
 	
-	
 	private void getAllReversedListsOfNodesToStartNode(List<GraphNode<ID_TYPE, NodePermissions>> baseReversedList, GraphNode<ID_TYPE, NodePermissions> currentFirstNode, List<List<GraphNode<ID_TYPE, NodePermissions>>> results) {
 		
 		nn(currentFirstNode, "'currentFirstNode' is null!");
 		
 		/* as long as there is just one paret node I can iterate instead of something
 		 * recursive to prevent stack overflow in graphs that are very deep */
-		List<GraphNode<ID_TYPE, NodePermissions>> parents = currentFirstNode.getPrevNodes();
+		List<Edge<GraphNode<ID_TYPE, NodePermissions>>> parents = currentFirstNode.getEdgesToParents();
 		if(parents==null){
 			/* if the currentFirstNode is the startNode we should have handled that earlier
 			 * all other nodes need to have parents */
@@ -104,7 +106,7 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		}
 		
 		while(parents.size()==1){
-			GraphNode<ID_TYPE, NodePermissions> singleParent = parents.get(0);
+			GraphNode<ID_TYPE, NodePermissions> singleParent = parents.get(0).getParentNode();
 			baseReversedList.add(copyNode(singleParent));
 			
 			if(singleParent == getStartNode()){
@@ -112,12 +114,13 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 				results.add(baseReversedList);
 				return;
 			} else {
-				parents = singleParent.getPrevNodes();
+				parents = singleParent.getEdgesToParents();
 			}
 		}
 
 		// if mutliple parents...use recursive approach
-		for(GraphNode<ID_TYPE, NodePermissions> parent: parents){
+		for(Edge<GraphNode<ID_TYPE, NodePermissions>> edgeToParent: parents){
+			GraphNode<ID_TYPE, NodePermissions> parent = edgeToParent.getParentNode();
 			List<GraphNode<ID_TYPE, NodePermissions>> copyOfReversedList = copyNodeList(baseReversedList);
 			copyOfReversedList.add(copyNode(parent));
 			getAllReversedListsOfNodesToStartNode(copyOfReversedList, parent, results);

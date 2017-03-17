@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * 
  * @author andymatic
  *
- * @param <ID_TYPE>
+ * @param <ID_TYPE> The type of the id object (milestone)
  */
 public class AllowedPathBuilder<ID_TYPE> {
 
