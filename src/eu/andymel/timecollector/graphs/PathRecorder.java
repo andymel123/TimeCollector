@@ -106,8 +106,9 @@ public class PathRecorder<MILESTONE_TYPE, PAYLOAD_TYPE>{
 	}
 
 	
-	private Path<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE> copyPath(Path<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE> possiblePath) {
-		GraphNode<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE> nodeToCopy = possiblePath.getStartNode();
+	private Path<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE> copyPath(Path<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE> pathToCopy) {
+		
+		GraphNode<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE> nodeToCopy = pathToCopy.getStartNode();
 		GraphNode<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE> node = nodeToCopy.copy();
 		Path<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE> newPath = new Path<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE>(node);
 		
@@ -131,6 +132,7 @@ public class PathRecorder<MILESTONE_TYPE, PAYLOAD_TYPE>{
 				Edge<GraphNode<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE>> e = Edge.create(node, newNode);
 				node.addNextNode(e);
 				newNode.addPrevNode(e);
+				node = newNode;
 			}
 		}
 		return newPath;

@@ -7,6 +7,11 @@ public interface Mutable {
 		public boolean isMutable() {
 			return true;
 		}
+		
+		@Override
+		public String toString(){
+			return "mutable";
+		};
 	};
 	
 	boolean isMutable();

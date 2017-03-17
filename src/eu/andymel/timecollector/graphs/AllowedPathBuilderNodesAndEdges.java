@@ -29,10 +29,15 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 
 			// HashSet should ensure that no node is in there more than once
 			this.nodes = new HashSet<>(otherNodes.length+1);	// +1 for startNode
+// commented out the copy because I copy alot of stuff only to be able to reuse nodes for different allowedGraphs
+// I guess its ok, that I have to build new nodes per allowed graph...it's unlikely that I have a lot of different allowed graphs that need the same nodes
+//			this.nodes.add(startNode.copy()); // first has to be the satrtNode!
+//			for(PermissionNode<ID_TYPE> n:otherNodes){
+//				this.nodes.add(n.copy());	
+//			}
 			this.nodes.add(startNode); // first has to be the satrtNode!
 			this.nodes.addAll(Arrays.asList(otherNodes));
 			this.nodes.forEach(n->n.setMutable(simpleMutable));
-			
 			this.edges = new LinkedList<>();
 		}else{
 			// TODO just one node was provided...exception? special case?
@@ -110,7 +115,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		}
 		
 		if(copyOfEdges.size()>0){
-			throw new IllegalStateException(copyOfEdges.size()+" edges seem to be not used in the graph!");
+			throw new IllegalStateException(copyOfEdges.size()+" edges seem to be not used in the graph! "+Arrays.toString(copyOfEdges.toArray()));
 		}
 		if(copyOfNodes.size()>0){
 			/* if a node was no node1 in an edge (has no outgoing edges) it is still in this list

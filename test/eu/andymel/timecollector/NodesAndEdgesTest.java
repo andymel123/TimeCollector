@@ -1,13 +1,19 @@
 package eu.andymel.timecollector;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.time.Instant;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
+import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
+import eu.andymel.timecollector.graphs.Path;
 import eu.andymel.timecollector.graphs.PermissionNode;
 
 public class NodesAndEdgesTest {
@@ -16,8 +22,8 @@ public class NodesAndEdgesTest {
 		MS1,MS2,MS3,MS4,MS5,MS6
 	}
 	
-	private TimeCollector<TestMilestones> tcEAS;
-	private TimeCollector<TestMilestones> tcEASMax3;
+	private TimeCollectorWithPath<TestMilestones> tcEAS;
+	private TimeCollectorWithPath<TestMilestones> tcEASMax3;
 	
 	@Before
 	public void setup(){
@@ -37,19 +43,19 @@ public class NodesAndEdgesTest {
 			.path(p4, p2) // jump back (because of a retry for example)
 			.build();
 
-		// the same graph but the jump back from p4 to p2 may only be done once
-		AllowedPathsGraph<TestMilestones> pathMax3 = AllowedPathsGraph.
-				<TestMilestones>
-				nodes(p1,p2,p3,p4,p5,p6)
-				.path(p1,p2,p3,p4,p6)
-				.path(p3, p5, p6) // alternative path to the p3,p4,p5 path
-				.edgeWithMax(3, p4, p2) // jump back (max retry 3)
-				.build();
+//		// the same graph but the jump back from p4 to p2 may only be done once
+//		AllowedPathsGraph<TestMilestones> pathMax3 = AllowedPathsGraph.
+//				<TestMilestones>
+//				nodes(p1,p2,p3,p4,p5,p6)
+//				.path(p1,p2,p3,p4,p6)
+//				.path(p3, p5, p6) // alternative path to the p3,p4,p5 path
+//				.edgeWithMax(3, p4, p2) // jump back (max retry 3)
+//				.build();
 
 //		path.forEach(System.out::println);
 		
 		tcEAS = TimeCollectorWithPath.<TestMilestones>createWithPath(new TestClock(), path);
-		tcEASMax3 = TimeCollectorWithPath.<TestMilestones>createWithPath(new TestClock(), pathMax3);
+//		tcEASMax3 = TimeCollectorWithPath.<TestMilestones>createWithPath(new TestClock(), pathMax3);
 	}
 
 	@Test
@@ -96,12 +102,18 @@ public class NodesAndEdgesTest {
 		tcEAS.saveTime(TestMilestones.MS4);
 		tcEAS.saveTime(TestMilestones.MS6);
 		
-		int count = 0;
-		assertEquals(count++, tcEAS.getTime(TestMilestones.MS1).toEpochMilli());
-		assertEquals(count++, tcEAS.getTime(TestMilestones.MS2).toEpochMilli());
-		assertEquals(count++, tcEAS.getTime(TestMilestones.MS3).toEpochMilli());
-		assertEquals(count++, tcEAS.getTime(TestMilestones.MS4).toEpochMilli());
-		assertEquals(count++, tcEAS.getTime(TestMilestones.MS6).toEpochMilli());
+		List<Path<GraphNode<TestMilestones, NodePermissions>, Instant>> recordedPaths =  tcEAS.getRecordedPaths();
+		assertNotNull(recordedPaths);
+		assertEquals(1, recordedPaths.size());
+		Path<GraphNode<TestMilestones, NodePermissions>, Instant> recPath = recordedPaths.get(0);
+		System.out.println(recPath.toString());
+		
+//		int count = 0;
+//		assertEquals(count++, tcEAS.getTime(TestMilestones.MS1).toEpochMilli());
+//		assertEquals(count++, tcEAS.getTime(TestMilestones.MS2).toEpochMilli());
+//		assertEquals(count++, tcEAS.getTime(TestMilestones.MS3).toEpochMilli());
+//		assertEquals(count++, tcEAS.getTime(TestMilestones.MS4).toEpochMilli());
+//		assertEquals(count++, tcEAS.getTime(TestMilestones.MS6).toEpochMilli());
 	}
 	
 	@Test (expected=IllegalStateException.class)

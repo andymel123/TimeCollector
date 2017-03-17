@@ -10,5 +10,13 @@ public class PermissionNode<ID_TYPE> extends GraphNode<ID_TYPE, NodePermissions>
 		return new PermissionNode<ID_TYPE>(id, payload);
 	}
 	
+	@Override
+	public String toString() {
+		return "PNode["+getId()+", "+hashCode()+"]";
+	}
 	
+	@Override
+	public PermissionNode<ID_TYPE> copy() {
+		return new PermissionNode<ID_TYPE>(getId(), getPayload());
+	}
 }

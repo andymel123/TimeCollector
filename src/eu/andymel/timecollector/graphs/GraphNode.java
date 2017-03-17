@@ -1,6 +1,7 @@
 package eu.andymel.timecollector.graphs;
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,12 +31,18 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> extends AbstractNode<ID_TYPE, PAYL
 	
 	void addNextNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
 		checkMutable();
+		if(!isAllowMutltipleEdges() && nextNodes.size()>0){
+			throw new IllegalStateException("This Node does not allow to add more than one child! Current child: "+Arrays.toString(nextNodes.toArray())+". You want to add "+e);
+		}
 		nextNodes.add(e);
 	}
 	
 
 	void addPrevNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
 		checkMutable();
+		if(!isAllowMutltipleEdges() && prevNodes.size()>0){
+			throw new IllegalStateException("This Node does not allow to add more than one parent! Current parent: "+Arrays.toString(prevNodes.toArray())+". You want to add "+e);
+		}
 		prevNodes.add(e);
 	}
 
@@ -77,13 +84,20 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> extends AbstractNode<ID_TYPE, PAYL
 	 * @return the new instance with the copied data
 	 */
 	GraphNode<ID_TYPE, PAYLOAD_TYPE> copy() {
-		return new GraphNode<>(
-			// TODO ensure immutable or copy them
-			this.getId(), 
-			this.getPayload(),
-			this.getMutable(),
-			this.isMutltiEdges()
-		);
+		GraphNode<ID_TYPE, PAYLOAD_TYPE> n = new GraphNode<>(
+				// TODO ensure immutable or copy them
+				this.getId(), 
+				this.getPayload(),
+				this.getMutable(),
+				this.isAllowMutltipleEdges()
+			);
+		if(!n.equals(this)){
+			throw new IllegalStateException("?");
+		}
+		if(n==this){
+			throw new IllegalStateException("????");
+		}
+		return n; 
 	}
 	
 

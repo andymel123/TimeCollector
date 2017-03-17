@@ -1,5 +1,7 @@
 package eu.andymel.timecollector.graphs;
 
+import static eu.andymel.timecollector.util.Preconditions.nn;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +26,28 @@ public class Path<ID_TYPE, PAYLOAD_TYPE> extends Graph<ID_TYPE, PAYLOAD_TYPE> {
 			false, // no circles or multi edges allowed
 			mutable
 		);
+	}
+	
+	
+	public GraphNode<ID_TYPE, PAYLOAD_TYPE> addNode(ID_TYPE id, PAYLOAD_TYPE payload) {
+		
+		// preconditions
+		nn(id, "The given id is null!");
+		checkMutable();
+		
+		//build new node for this milestone
+		GraphNode<ID_TYPE, PAYLOAD_TYPE> newNode = new GraphNode<ID_TYPE, PAYLOAD_TYPE>(id, payload, getMutable(), false);
+		
+		// connect the new node with the last node
+		GraphNode<ID_TYPE, PAYLOAD_TYPE> lastNode = getLastNode();
+		
+		/* Put in the same instance of edge because the only mutable things
+		 * in the edge are the nodes itself, and those I need to be the same instance */
+		Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edge = Edge.create(lastNode, newNode);
+		lastNode.addNextNode(edge);
+		newNode.addPrevNode(edge);
+		
+		return newNode;
 	}
 	
 	public GraphNode<ID_TYPE, PAYLOAD_TYPE> getLastNode(){
@@ -52,7 +76,8 @@ public class Path<ID_TYPE, PAYLOAD_TYPE> extends Graph<ID_TYPE, PAYLOAD_TYPE> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(getClass().getSimpleName())
-		.append('[');
+		.append('[').append(hashCode()).append(", ");
+		
 		forEach(n -> sb.append(n.getId()).append(' '));
 		sb.append(']');
 		return sb.toString();

@@ -43,7 +43,9 @@ public class AllowedPathBuilder<ID_TYPE> {
 		// preconditions
 		checkMutable();
 
-		this.allowedGraph.addNode(id, nodePermissions);
+//		commented out: as graphs are more complex now I have to rethink what addNode in general should mean
+//		or I find another API
+//		this.allowedGraph.addNode(id, nodePermissions);
 		
 		return this;
 	}

@@ -80,39 +80,51 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 		return lastNodes;
 	}
 
-	public GraphNode<ID_TYPE, PAYLOAD_TYPE> addNode(ID_TYPE id, PAYLOAD_TYPE payload) {
-		
-		// preconditions
-		nn(id, "The given id is null!");
-		mutable.check();
-		
-		//build new node for this milestone
-		GraphNode<ID_TYPE, PAYLOAD_TYPE> newNode = new GraphNode<ID_TYPE, PAYLOAD_TYPE>(id, payload, mutable, allowMultipleEdges);
-		
-		// connect the new node with the last nodes
-		for(GraphNode<ID_TYPE, PAYLOAD_TYPE> lastNode: lastNodes){
-			/* Put in the same instance of edge because the only mutable things
-			 * in the edge are the nodes itself, and those I need to be the same instance */
-			Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edge = Edge.create(lastNode, newNode);
-			lastNode.addNextNode(edge);
-			newNode.addPrevNode(edge);
-		}
-		
-		// set the lastAddedNodes reference on the new node
-		lastNodes.clear();
-		lastNodes.add(newNode);
-		
-		// add to hashSet to find fast
-		addNodeToHashMap(newNode);
-		
-		return newNode;
+//	@Deprecated
+//	/**
+//	 * @Deprecated as addNode without a clue at which end of a possibly complex graph
+//	 * to add the node makes no sense in the generic way as I mean graphs now
+//	 * @param id
+//	 * @param payload
+//	 * @return
+//	 */
+//	public GraphNode<ID_TYPE, PAYLOAD_TYPE> addNode(ID_TYPE id, PAYLOAD_TYPE payload) {
+//		
+//		// preconditions
+//		nn(id, "The given id is null!");
+//		mutable.check();
+//		
+//		//build new node for this milestone
+//		GraphNode<ID_TYPE, PAYLOAD_TYPE> newNode = new GraphNode<ID_TYPE, PAYLOAD_TYPE>(id, payload, mutable, allowMultipleEdges);
+//		
+//		// connect the new node with the last nodes
+//		for(GraphNode<ID_TYPE, PAYLOAD_TYPE> lastNode: lastNodes){
+//			/* Put in the same instance of edge because the only mutable things
+//			 * in the edge are the nodes itself, and those I need to be the same instance */
+//			Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edge = Edge.create(lastNode, newNode);
+//			lastNode.addNextNode(edge);
+//			newNode.addPrevNode(edge);
+//		}
+//		
+//		// set the lastAddedNodes reference on the new node
+//		lastNodes.clear();
+//		lastNodes.add(newNode);
+//		
+//		// add to hashSet to find fast
+//		addNodeToHashMap(newNode);
+//		
+//		return newNode;
+//	}
+	
+	public Mutable getMutable() {
+		return mutable;
 	}
 
 	public void addParallel(List<Graph<ID_TYPE, PAYLOAD_TYPE>> anyOfThoseSubPaths){
 //	public void addParallel(List<AllowedPathBuilder<NODE_ID_TYPE>> anyOfThoseSubPaths){
 		
 		// preconditions
-		mutable.check();
+		checkMutable();
 		nn(anyOfThoseSubPaths, "addParallel(...) needs paths!");
 		if(anyOfThoseSubPaths.size()<2){
 			throw new IllegalArgumentException("addParallel() needs at least 2 paths!");
@@ -144,6 +156,9 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 
 	}
 	
+	protected void checkMutable() {
+		mutable.check();
+	}
 	protected GraphNode<ID_TYPE, PAYLOAD_TYPE> getStartNode() {
 		return startNode;
 	}
@@ -154,7 +169,7 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 		 * But for the allowedGraph the payload is set when the node is added I think.
 		 * And the recorded path is always mutable, so I should be able to check here as well?! 
 		 * So lets try */
-		mutable.check();
+		checkMutable();
 		
 		List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> allNodesWithThisId = getAllNodesWIthId(id);
 		if(allNodesWithThisId==null || allNodesWithThisId.size()!=1){
