@@ -92,7 +92,7 @@ public class TimeCollectorSerial<MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> im
 	/* (non-Javadoc)
 	 * @see eu.andymel.timecollector.TimeCollector#getTime(MILESTONE_TYPE)
 	 */
-	@Override
+//	@Override
 	public synchronized Instant getTime(MILESTONE_TYPE milestone) {
 		return savedMileStonesTimes[milestone.ordinal()];
 	}

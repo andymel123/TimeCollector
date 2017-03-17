@@ -3,11 +3,17 @@ package eu.andymel.timecollector;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.time.Instant;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
+import eu.andymel.timecollector.graphs.GraphNode;
+import eu.andymel.timecollector.graphs.NodePermissions;
+import eu.andymel.timecollector.graphs.Path;
 
 public class LongPathTest {
 
@@ -51,7 +57,7 @@ public class LongPathTest {
 
 	}
 	
-	private TimeCollector<TestMilestones> tc; 
+	private TimeCollectorWithPath<TestMilestones> tc; 
 	
 	@Before
 	public void setup(){
@@ -102,7 +108,9 @@ public class LongPathTest {
 	@Test
 	public void testFirstMileStone() {
 		tc.saveTime(TestMilestones.CREATION);
-		assertNotNull(tc.getTime(TestMilestones.CREATION));
+		List<Path<GraphNode<TestMilestones, NodePermissions>, Instant>> recordedPaths =  tc.getRecordedPaths();
+		assertNotNull(recordedPaths);
+		assertEquals(1, recordedPaths.size());
 	}
 
 	@Test
@@ -136,32 +144,36 @@ public class LongPathTest {
 		tc.saveTime(TestMilestones.AFTER_HANDLER);
 		tc.saveTime(TestMilestones.AFTER_HANDLER_CONTEXT);
 
-		int count = 0;
-		assertEquals(count++, tc.getTime(TestMilestones.CREATION).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_HANDLER_CONTEXT).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_SEARCH_HANDLER).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_SEARCH_HANDLER).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_HANDLER).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DAO_GETSTATE).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DBPOOL).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DBPOOL).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DB_GETSTATE).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DB_GETSTATE).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DB_GETSTATE_RESULTSET).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DB_GETSTATE_RESULTSET).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DAO_GETSTATE).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_CALC1).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_CALC1).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DECIDER).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DECIDER).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DAO_SAVE).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DB_SAVE_DESICION1).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DB_SAVE_DESICION1).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DB_SAVE_DECISION1_RESULTSET).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DB_SAVE_DECISION1_RESULTSET).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DAO_SAVE).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_HANDLER).toEpochMilli());
-		assertEquals(count++, tc.getTime(TestMilestones.AFTER_HANDLER_CONTEXT).toEpochMilli());
+		List<Path<GraphNode<TestMilestones, NodePermissions>, Instant>> recordedPaths =  tc.getRecordedPaths();
+		assertNotNull(recordedPaths);
+		assertEquals(25, recordedPaths.size());
+		
+//		int count = 0;
+//		assertEquals(count++, tc.getTime(TestMilestones.CREATION).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_HANDLER_CONTEXT).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_SEARCH_HANDLER).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_SEARCH_HANDLER).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_HANDLER).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DAO_GETSTATE).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DBPOOL).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DBPOOL).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DB_GETSTATE).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DB_GETSTATE).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DB_GETSTATE_RESULTSET).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DB_GETSTATE_RESULTSET).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DAO_GETSTATE).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_CALC1).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_CALC1).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DECIDER).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DECIDER).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DAO_SAVE).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DB_SAVE_DESICION1).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DB_SAVE_DESICION1).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.BEFORE_DB_SAVE_DECISION1_RESULTSET).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DB_SAVE_DECISION1_RESULTSET).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_DAO_SAVE).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_HANDLER).toEpochMilli());
+//		assertEquals(count++, tc.getTime(TestMilestones.AFTER_HANDLER_CONTEXT).toEpochMilli());
 		
 	}
 

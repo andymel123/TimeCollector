@@ -9,12 +9,12 @@ import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 
 public class SerialPathFromEnumTest {
 
-	private TimeCollector<TestMilestones> tc;
-	private TimeCollector<TestMilestones> tcS;
-	private TimeCollector<TestMilestones> tcE;
-	private TimeCollector<TestMilestones> tcEA;
-	private TimeCollector<TestMilestones> tcES;
-	private TimeCollector<TestMilestones> tcEAS;
+	private TimeCollectorSerial<TestMilestones> tc;
+	private TimeCollectorSerial<TestMilestones> tcS;
+	private TimeCollectorSerial<TestMilestones> tcE;
+	private TimeCollectorSerial<TestMilestones> tcEA;
+	private TimeCollectorSerial<TestMilestones> tcES;
+	private TimeCollectorSerial<TestMilestones> tcEAS;
 	
 	private enum TestMilestones{
 		MS1,MS2,MS3,MS4,MS5

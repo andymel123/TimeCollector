@@ -11,41 +11,20 @@ import java.util.List;
  * @author andymatic
  *
  */
-public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
+public class GraphNode<ID_TYPE, PAYLOAD_TYPE> extends AbstractNode<ID_TYPE, PAYLOAD_TYPE>{
 
-	private final ID_TYPE id;
-
-	private PAYLOAD_TYPE payload;
 	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> prevNodes = new LinkedList<>();
 	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> nextNodes = new LinkedList<>();
 	
 	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnPrevNodes = Collections.unmodifiableList(prevNodes);
 	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnNextNodes = Collections.unmodifiableList(nextNodes);
 	
-	private Mutable mutable;
-	
 	GraphNode(ID_TYPE id, PAYLOAD_TYPE payload, Mutable mutable) {
-		
-		// preconditions
-		nn(id, "'id' is null!");
-		nn(payload, "'payload' is null!");
-		
-		this.id = id;
-		this.payload= payload;
-		this.mutable = mutable;
-		
+		super(id, payload, mutable);
 	}
 
 	GraphNode(ID_TYPE id, PAYLOAD_TYPE payload) {
-		this(id, payload, null);
-	}
-	
-	void setMutable(Mutable mutable) {
-		this.mutable = mutable;
-	}
-	
-	public ID_TYPE getId() {
-		return id;
+		super(id, payload);
 	}
 	
 	void addNextNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
@@ -53,12 +32,6 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 		nextNodes.add(e);
 	}
 	
-	private void checkMutable() {
-		if(mutable==null){
-			throw new IllegalStateException("When you try to change a node a Mutable instance has to be in place!");
-		}
-		mutable.check();
-	}
 
 	void addPrevNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
 		checkMutable();
@@ -98,59 +71,23 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> {
 		return null;
 	}
 	
-	public PAYLOAD_TYPE getPayload() {
-		return payload;
+	/**
+	 * Does not copy the edges but only the node itself (id, payload, {@link EdgePermissions})!
+	 * @return the new instance with the copied data
+	 */
+	GraphNode<ID_TYPE, PAYLOAD_TYPE> copy() {
+		return new GraphNode<>(
+			// TODO ensure immutable or copy them
+			this.getId(), 
+			this.getPayload(),
+			this.getMutable()
+		);
 	}
 	
-	
-	void setPayload(PAYLOAD_TYPE payload) {
-		if(payload==null){
-			throw new IllegalArgumentException("You can't set null as payload!");
-		}
-		this.payload = payload;
-	}
-
-
-	public Mutable getMutable() {
-		return this.mutable;
-	}
-
-
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((payload == null) ? 0 : payload.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		GraphNode other = (GraphNode) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (payload == null) {
-			if (other.payload != null)
-				return false;
-		} else if (!payload.equals(other.payload))
-			return false;
-		return true;
-	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+" [" + id + ", " + payload.getClass().getSimpleName() + ", " + mutable + "]";
+		return getClass().getSimpleName()+" [" + getId() + ", " + getPayload().getClass().getSimpleName() + ", " + getMutable() + "]";
 	}
 	
 	

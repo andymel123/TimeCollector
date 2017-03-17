@@ -24,6 +24,6 @@ public interface TimeCollector<MILESTONE_TYPE> {
 	 * @param m the milestone to get the time for 
 	 * @return the {@link Instant} that was saved when {@link TimeCollector#saveTime(m)} was called for this milestone
 	 */
-	Instant getTime(MILESTONE_TYPE m);
+//	Instant getTime(MILESTONE_TYPE m);
 
 }

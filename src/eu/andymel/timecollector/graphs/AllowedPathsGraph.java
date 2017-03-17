@@ -69,7 +69,7 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 			
 			// start with the node we search
 			List<GraphNode<ID_TYPE, NodePermissions>> baseList = new LinkedList<>();
-			GraphNode<ID_TYPE, NodePermissions> copyOfNode = copyNode(n);
+			GraphNode<ID_TYPE, NodePermissions> copyOfNode = n.copy();
 			baseList.add(copyOfNode);
 
 			if(n==startNode){
@@ -107,7 +107,7 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		
 		while(parents.size()==1){
 			GraphNode<ID_TYPE, NodePermissions> singleParent = parents.get(0).getParentNode();
-			baseReversedList.add(copyNode(singleParent));
+			baseReversedList.add(singleParent.copy());
 			
 			if(singleParent == getStartNode()){
 				// path finished
@@ -122,7 +122,7 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		for(Edge<GraphNode<ID_TYPE, NodePermissions>> edgeToParent: parents){
 			GraphNode<ID_TYPE, NodePermissions> parent = edgeToParent.getParentNode();
 			List<GraphNode<ID_TYPE, NodePermissions>> copyOfReversedList = copyNodeList(baseReversedList);
-			copyOfReversedList.add(copyNode(parent));
+			copyOfReversedList.add(parent.copy());
 			getAllReversedListsOfNodesToStartNode(copyOfReversedList, parent, results);
 		}
 		
@@ -131,7 +131,7 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 	private List<GraphNode<ID_TYPE, NodePermissions>> copyNodeList(List<GraphNode<ID_TYPE, NodePermissions>> baseReversedList) {
 		List<GraphNode<ID_TYPE, NodePermissions>> copy = new LinkedList<>();
 		for(GraphNode<ID_TYPE, NodePermissions> n: baseReversedList){
-			copy.add(copyNode(n));
+			copy.add(n.copy());
 		}
 		return copy;
 	}
@@ -141,14 +141,7 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 //		return null;
 	}
 
-	private GraphNode<ID_TYPE, NodePermissions> copyNode(GraphNode<ID_TYPE, NodePermissions> startNode) {
-		return new GraphNode<>(
-			// TODO ensure both are immutable or copy them
-			startNode.getId(), 
-			startNode.getPayload(),
-			startNode.getMutable()
-		);
-	}
+	
 	
 	
 

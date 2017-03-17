@@ -2,20 +2,18 @@ package eu.andymel.timecollector.graphs;
 
 class EdgePermissions {
 
-	/* I put it to -1 because maybe someone wants to use it to 
-	 * prevent passing an edge totally with setting it to 0 */
-	private int max = -1; 
+	private final int max; 
 	
-	private EdgePermissions() {}
+	private EdgePermissions(int max) {
+		if(max < 0){
+			throw new IllegalArgumentException("max needs to be >= 0! You gave me "+max+"!");
+		}
+		this.max = max;
+	}
 	
 	public static EdgePermissions max(int max) {
-		EdgePermissions ep = new EdgePermissions();
-		ep.setMax(max);
+		EdgePermissions ep = new EdgePermissions(max);
 		return ep;
-	}
-
-	private void setMax(int max) {
-		this.max = max;
 	}
 
 	/**
