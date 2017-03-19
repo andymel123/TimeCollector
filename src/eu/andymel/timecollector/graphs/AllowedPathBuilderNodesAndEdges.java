@@ -20,7 +20,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 	private final List<Edge<PermissionNode<ID_TYPE>>> edges;
 	private final SimpleMutable simpleMutable = new SimpleMutable(true);
 	 
-	AllowedPathBuilderNodesAndEdges(PermissionNode<ID_TYPE> startNode, PermissionNode<ID_TYPE>... otherNodes) {
+	AllowedPathBuilderNodesAndEdges(PermissionNode<ID_TYPE> startNode, List<PermissionNode<ID_TYPE>> otherNodes) {
 		
 		// preconditions
 		nn(startNode, "'startNode' is null!");
@@ -28,7 +28,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 			this.startNode = startNode;
 
 			// HashSet should ensure that no node is in there more than once
-			this.nodes = new HashSet<>(otherNodes.length+1);	// +1 for startNode
+			this.nodes = new HashSet<>(otherNodes.size()+1);	// +1 for startNode
 // commented out the copy because I copy alot of stuff only to be able to reuse nodes for different allowedGraphs
 // I guess its ok, that I have to build new nodes per allowed graph...it's unlikely that I have a lot of different allowed graphs that need the same nodes
 //			this.nodes.add(startNode.copy()); // first has to be the satrtNode!
@@ -36,7 +36,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 //				this.nodes.add(n.copy());	
 //			}
 			this.nodes.add(startNode); // first has to be the satrtNode!
-			this.nodes.addAll(Arrays.asList(otherNodes));
+			this.nodes.addAll(otherNodes);
 			this.nodes.forEach(n->n.setMutable(simpleMutable));
 			this.edges = new LinkedList<>();
 		}else{

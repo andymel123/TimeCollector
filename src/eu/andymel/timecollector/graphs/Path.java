@@ -72,6 +72,14 @@ public class Path<ID_TYPE, PAYLOAD_TYPE> extends Graph<ID_TYPE, PAYLOAD_TYPE> {
 		
 	}
 	
+	public int getLength(){
+		// TODO not nice
+		int[] count = new int[1];
+		count[0] = 0;
+		forEach((n)->count[0]++);
+		return count[0];
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

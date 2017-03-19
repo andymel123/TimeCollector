@@ -3,6 +3,8 @@ package eu.andymel.timecollector.graphs;
 import static eu.andymel.timecollector.graphs.NodePermissions.REQUIRED_AND_SINGLESET;
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -46,8 +48,17 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 
 	
 	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilderNodesAndEdges<ID_TYPE> nodes(PermissionNode<ID_TYPE> startNode, PermissionNode<ID_TYPE>... otherNodes){
-		return new AllowedPathBuilderNodesAndEdges<ID_TYPE>(startNode, otherNodes);
+		return new AllowedPathBuilderNodesAndEdges<ID_TYPE>(startNode, Arrays.asList(otherNodes));
 	}
+//	commented out: I have to know the nodes outside because I need the instances to build the edges with .path(...) 
+//	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilderNodesAndEdges<ID_TYPE> nodes(ID_TYPE startMilestone, ID_TYPE... otherMilestones){
+//		PermissionNode<ID_TYPE> startNode = PermissionNode.create(startMilestone, NodePermissions.REQUIRED_AND_SINGLESET);
+//		List<PermissionNode<ID_TYPE>> otherNodes = new LinkedList<>();
+//		for(ID_TYPE m: otherMilestones){
+//			otherNodes.add(PermissionNode.create(m, NodePermissions.REQUIRED_AND_SINGLESET));
+//		}
+//		return new AllowedPathBuilderNodesAndEdges<ID_TYPE>(startNode, otherNodes);
+//	}
 	
 	
 	@Override

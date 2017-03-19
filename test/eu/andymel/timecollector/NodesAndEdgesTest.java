@@ -86,12 +86,7 @@ public class NodesAndEdgesTest {
 		tcEAS.saveTime(TestMilestones.MS4);
 		tcEAS.saveTime(TestMilestones.MS6);
 		
-		int count = 0;
-		assertEquals(count++, tcEAS.getTime(TestMilestones.MS1).toEpochMilli());
-		assertEquals(count++, tcEAS.getTime(TestMilestones.MS2).toEpochMilli());
-		assertEquals(count++, tcEAS.getTime(TestMilestones.MS3).toEpochMilli());
-		assertEquals(count++, tcEAS.getTime(TestMilestones.MS4).toEpochMilli());
-		assertEquals(count++, tcEAS.getTime(TestMilestones.MS6).toEpochMilli());
+		checkReCPathLength(tcEAS, 17);
 	}
 	
 	@Test
@@ -102,24 +97,30 @@ public class NodesAndEdgesTest {
 		tcEAS.saveTime(TestMilestones.MS4);
 		tcEAS.saveTime(TestMilestones.MS6);
 		
-		List<Path<GraphNode<TestMilestones, NodePermissions>, Instant>> recordedPaths =  tcEAS.getRecordedPaths();
+		checkReCPathLength(tcEAS, 5);	
+	}
+	
+	@Test
+	public void testRecPathLength1() {
+		tcEAS.saveTime(TestMilestones.MS1);
+		checkReCPathLength(tcEAS, 1);
+		
+		tcEAS.saveTime(TestMilestones.MS2);
+		checkReCPathLength(tcEAS, 2);
+
+		tcEAS.saveTime(TestMilestones.MS3);
+		checkReCPathLength(tcEAS, 3);
+
+	}
+
+
+	
+	private static void checkReCPathLength(TimeCollectorWithPath<TestMilestones> tc, int expectedLength) {
+		List<Path<GraphNode<TestMilestones, NodePermissions>, Instant>> recordedPaths =  tc.getRecordedPaths();
 		assertNotNull(recordedPaths);
 		assertEquals(1, recordedPaths.size());
 		Path<GraphNode<TestMilestones, NodePermissions>, Instant> recPath = recordedPaths.get(0);
-		System.out.println(recPath.toString());
-		
-//		int count = 0;
-//		assertEquals(count++, tcEAS.getTime(TestMilestones.MS1).toEpochMilli());
-//		assertEquals(count++, tcEAS.getTime(TestMilestones.MS2).toEpochMilli());
-//		assertEquals(count++, tcEAS.getTime(TestMilestones.MS3).toEpochMilli());
-//		assertEquals(count++, tcEAS.getTime(TestMilestones.MS4).toEpochMilli());
-//		assertEquals(count++, tcEAS.getTime(TestMilestones.MS6).toEpochMilli());
-	}
-	
-	@Test (expected=IllegalStateException.class)
-	public void testGetTimeFromWrongMilestoneEAS() {
-		tcEAS.saveTime(TestMilestones.MS1);
-		tcEAS.getTime(TestMilestones.MS2);
+		assertEquals(expectedLength, recPath.getLength());
 	}
 
 	@Test (expected=MilestoneNotAllowedException.class)
