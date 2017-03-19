@@ -31,20 +31,20 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		);
 	}
 	
-	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> start(ID_TYPE id){
-		return start(id, REQUIRED_AND_SINGLESET);
-	}
-	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> start(ID_TYPE id, NodePermissions nodePermissions){
-		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions);
-	}
+//	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> start(ID_TYPE id){
+//		return start(id, REQUIRED_AND_SINGLESET);
+//	}
+//	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> start(ID_TYPE id, NodePermissions nodePermissions){
+//		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions);
+//	}
 
-	// I removed the only difference for subpaths but I leave this separate factory methods in my API, maybe there will be differences again in the future
-	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> subpath(ID_TYPE id){
-		return subpath(id, REQUIRED_AND_SINGLESET);
-	}
-	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> subpath(ID_TYPE id, NodePermissions nodePermissions){
-		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions);
-	}
+//	// I removed the only difference for subpaths but I leave this separate factory methods in my API, maybe there will be differences again in the future
+//	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilder<ID_TYPE> subpath(ID_TYPE id){
+//		return subpath(id, REQUIRED_AND_SINGLESET);
+//	}
+//	public final static <ID_TYPE extends Enum<ID_TYPE>>AllowedPathBuilder<ID_TYPE> subpath(ID_TYPE id, NodePermissions nodePermissions){
+//		return new AllowedPathBuilder<ID_TYPE>(id, nodePermissions);
+//	}
 
 	
 	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilderNodesAndEdges<ID_TYPE> nodes(PermissionNode<ID_TYPE> startNode, PermissionNode<ID_TYPE>... otherNodes){
@@ -103,6 +103,19 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 	}
 
 	
+	boolean checkForCircularConnections(){
+		
+		forEachRootOfACircle((rootOfCircle) -> {
+			/* 
+			 * 1.) get all paths to itself
+			 * 2.) heck paths for edge permissions that ensure termination
+			 */
+		});
+		
+		return false;
+	}
+
+	
 	private void getAllReversedListsOfNodesToStartNode(List<GraphNode<ID_TYPE, NodePermissions>> baseReversedList, GraphNode<ID_TYPE, NodePermissions> currentFirstNode, List<List<GraphNode<ID_TYPE, NodePermissions>>> results) {
 		
 		nn(currentFirstNode, "'currentFirstNode' is null!");
@@ -156,177 +169,6 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 	
 	
 
-//	/**
-//	 * Checks if this {@link AllowedPathsGraph} allows the given node id to be added to the given path
-//	 * 
-//	 * @param pathToBeChecked the path that the node should be added to 
-//	 * @param nodeId the id of the node that should be added to the path
-//	 * 
-//	 * @throws IllegalStateException if the given node id may not be added to the given path 
-//	 */
-//	public void isNodeAllowedToSetNext(Path<ID_TYPE, ?> pathToBeChecked, ID_TYPE nodeId) {
-//		
-//		// preconditions
-//		nn(nodeId, "'nodeId' is null!");
-//		
-//		if(pathToBeChecked==null){
-//			// check if the given node may be the first node in the path 
-//			GraphNode<ID_TYPE, NodePermissions> startNode = getStartNode();
-//			
-//			// easy wins
-//			if(nodeId.equals(startNode.getId())){
-//				// it's the startNode, so it is allowed for sure as start
-//				return;
-//			} else if(startNode.getPayload().isRequired()){
-//				// if the startNode is required but the given node is not the start node...fail
-//				throw new IllegalStateException("You try to set '"+nodeId+"' as the first node on your recorded path but the required startNode would be '"+startNode.getId()+"'");
-//			}
-//			
-//			/* 
-//			 * get through children
-//			 * if node is found...returned
-//			 * if not 
-//			 * 	repeat with the same with the children that are >NOT required< or >required AND set<
-//			 * 	if there are no...throw exception as no valid path found
-//			 */
-//			
-//		}else{
-//
-//			GraphNode<ID_TYPE, ?> checkedNode = pathToBeChecked.getStartNode();
-//			GraphNode<ID_TYPE, NodePermissions> permissionNode = this.getStartNode();
-//
-//			while(true){
-//
-//				// preconditions
-//				nn(checkedNode, "'checkedNode' is null!");
-//				nn(permissionNode, "'permissionNode' is null!");
-//				
-//				if(!checkedNode.getId().equals(permissionNode.getId())){
-//					
-//				}
-//
-//				
-//				// check required
-//				if(permissionNode.getPayload().isRequired() && checkedNode.getPayload()==null){
-//					return false;
-//				}
-//
-//				
-//				// get children for going on recursively
-//				if(checkedNode.getNextNodes()==null){
-//					break;
-//					// normal for end of path?!
-////					throw new IllegalStateException("No child!");
-//				}else if(checkedNode.getNextNodes().size()!=1){
-//					throw new IllegalStateException("A path node needs exactly one child but checkedNode '"+checkedNode.getId()+"' has "+checkedNode.getNextNodes().size()+"!");
-//				}
-//				List<GraphNode<ID_TYPE, NodePermissions>> permissionChildren = permissionNode.getNextNodes(); 
-//				if(permissionChildren==null){
-//					break;
-//					// normal for end of path?!
-////					throw new IllegalStateException("No child!");
-//				}else if(permissionChildren.size()!=1){
-//					throw new IllegalStateException("A path node needs exactly on child but permissionNode '"+permissionNode.getId()+"' has "+permissionChildren.size()+"!");
-//				}
-//				GraphNode<ID_TYPE, ?> child = checkedNode.getNextNodes().get(0);
-//				GraphNode<ID_TYPE, NodePermissions> permissionChild = permissionChildren.get(0);
-//
-//				checkedNode = child;
-//				permissionNode = permissionChild;
-//				
-//			}
-//			
-//			
-////			// TODO
-////			// check allowedPath with the pathToBeChecked...should be more perormant as getting all possible paths before!?
-////		
-////			// search an allowed path
-////
-////			/* 1) get all allowed paths from startNode to any of the nodes with this nodeId
-////			 * 2) get through all those subpaths and check if all required nodes have already been set
-////			 * 3) if one is found...return
-////			 * 		otherwise exception */
-////			
-////			// 1 TODO add required... flag to only return paths were all required nodes are already set
-////			List<Path<ID_TYPE, NodePermissions>> allPathsToThisNode = getAllPathsFromStartToAllNodesWithId(nodeId);
-////			
-////			for(Path<ID_TYPE, NodePermissions> allowedPath: allPathsToThisNode){
-////				if(allRequiredNodesAreSet(pathToBeChecked, allowedPath)){
-////					// finding one is enough
-////					return;
-////				}
-////			}
-////			
-////			throw new IllegalStateException("Not allowed to set node '"+nodeId+"' in "+pathToBeChecked+" now!");
-//			
-//		}	
-//		
-//	}
 
-//	private boolean allRequiredNodesAreSet(Path<ID_TYPE, ?> pathToBeChecked, Path<ID_TYPE, NodePermissions> allowedPath) {
-//		
-//		GraphNode<ID_TYPE, ?> checkedNode = pathToBeChecked.getStartNode();
-//		GraphNode<ID_TYPE, NodePermissions> permissionNode = allowedPath.getStartNode();
-//
-//		while(true){
-//
-//			// preconditions
-//			nn(checkedNode, "'checkedNode' is null!");
-//			nn(permissionNode, "'permissionNode' is null!");
-//			if(!checkedNode.getId().equals(permissionNode.getId())){
-//				throw new IllegalStateException("Can't get permissions for node with id '"+checkedNode.getId()+"' from a permission node with id '"+permissionNode.getId()+"'. Have to be equal!");
-//			}
-//
-//			
-//			// check required
-//			if(permissionNode.getPayload().isRequired() && checkedNode.getPayload()==null){
-//				return false;
-//			}
-//
-//			
-//			// get children for going on recursively
-//			if(checkedNode.getNextNodes()==null){
-//				break;
-//				// normal for end of path?!
-////				throw new IllegalStateException("No child!");
-//			}else if(checkedNode.getNextNodes().size()!=1){
-//				throw new IllegalStateException("A path node needs exactly one child but checkedNode '"+checkedNode.getId()+"' has "+checkedNode.getNextNodes().size()+"!");
-//			}
-//			List<GraphNode<ID_TYPE, NodePermissions>> permissionChildren = permissionNode.getNextNodes(); 
-//			if(permissionChildren==null){
-//				break;
-//				// normal for end of path?!
-////				throw new IllegalStateException("No child!");
-//			}else if(permissionChildren.size()!=1){
-//				throw new IllegalStateException("A path node needs exactly on child but permissionNode '"+permissionNode.getId()+"' has "+permissionChildren.size()+"!");
-//			}
-//			GraphNode<ID_TYPE, ?> child = checkedNode.getNextNodes().get(0);
-//			GraphNode<ID_TYPE, NodePermissions> permissionChild = permissionChildren.get(0);
-//
-//			checkedNode = child;
-//			permissionNode = permissionChild;
-//			
-//		}
-//		
-//		return true;
-//	}
-
-
-	
-	
-//	/**
-//	 * @param nodeToStartSearch the given id is searched in the child nodes of this node 
-//	 * @param idOfNodeToEndSearch the id of the node to search. All nodes between the start node and this node have to have the payload set
-//	 * 
-//	 * @return the node instance with the id where to end the search
-//	 * @throws IllegalStateException if any node that needs to be set in between is not set yet
-//	 */
-//	public PathNode<ID_TYPE, Instant> checkIfAllRequiredNodesAreSetTill(PathNode<ID_TYPE, Instant> nodeToStartSearch, ID_TYPE idOfNodeToEndSearch) {
-//		return null;
-//	}
-//
-//	public PathNode<ID_TYPE, Instant> checkIfThisMilestoneCanBeFirst(ID_TYPE m) {
-//		return null;
-//	}
 	
 }

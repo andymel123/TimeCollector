@@ -113,7 +113,7 @@ public class PathRecorder<MILESTONE_TYPE, PAYLOAD_TYPE>{
 		Path<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE> newPath = new Path<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE>(node);
 		
 		int max = 1000;
-		RecursionSavetyCounter savetyCounter = new RecursionSavetyCounter(max, "Seems like this path runs in circles. After going through "+max+" nodes I still found no end!");
+		RecursionSavetyCounter savetyCounter = RecursionSavetyCounter.create(max, "Seems like this path runs in circles. After going through "+max+" nodes I still found no end!");
 		
 		while(true){
 			savetyCounter.inc();

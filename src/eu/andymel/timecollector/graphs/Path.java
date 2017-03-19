@@ -54,7 +54,7 @@ public class Path<ID_TYPE, PAYLOAD_TYPE> extends Graph<ID_TYPE, PAYLOAD_TYPE> {
 		// TODO override add methods and remember
 		GraphNode<ID_TYPE, PAYLOAD_TYPE> node = getStartNode();
 		int max = 1000;
-		RecursionSavetyCounter savetyCounter = new RecursionSavetyCounter(max, "Seems like this path runs in circles. After going through "+max+" nodes I still found no end!");
+		RecursionSavetyCounter savetyCounter = RecursionSavetyCounter.create(max, "Seems like this path runs in circles. After going through "+max+" nodes I still found no end!");
 		while(true){
 			savetyCounter.inc();
 			List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> edges = node.getEdgesToChildren();

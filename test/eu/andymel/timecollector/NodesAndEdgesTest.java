@@ -1,5 +1,6 @@
 package eu.andymel.timecollector;
 
+import static eu.andymel.timecollector.PathTestUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -8,6 +9,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
@@ -18,6 +21,9 @@ import eu.andymel.timecollector.graphs.PermissionNode;
 
 public class NodesAndEdgesTest {
 
+	// simple logger level set with -Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG
+	private static final Logger LOG = LoggerFactory.getLogger(NodesAndEdgesTest.class);
+	
 	private enum TestMilestones{
 		MS1,MS2,MS3,MS4,MS5,MS6
 	}
@@ -43,14 +49,23 @@ public class NodesAndEdgesTest {
 			.path(p4, p2) // jump back (because of a retry for example)
 			.build();
 
-//		// the same graph but the jump back from p4 to p2 may only be done once
-//		AllowedPathsGraph<TestMilestones> pathMax3 = AllowedPathsGraph.
-//				<TestMilestones>
-//				nodes(p1,p2,p3,p4,p5,p6)
-//				.path(p1,p2,p3,p4,p6)
-//				.path(p3, p5, p6) // alternative path to the p3,p4,p5 path
-//				.edgeWithMax(3, p4, p2) // jump back (max retry 3)
-//				.build();
+		
+		PermissionNode<TestMilestones> p01 = PermissionNode.create(TestMilestones.MS1, NodePermissions.REQUIRED_AND_SINGLESET);
+		PermissionNode<TestMilestones> p02 = PermissionNode.create(TestMilestones.MS2, NodePermissions.REQUIRED_AND_SINGLESET);
+		PermissionNode<TestMilestones> p03 = PermissionNode.create(TestMilestones.MS3, NodePermissions.REQUIRED_AND_SINGLESET);
+		PermissionNode<TestMilestones> p04 = PermissionNode.create(TestMilestones.MS4, NodePermissions.REQUIRED_AND_SINGLESET);
+		PermissionNode<TestMilestones> p05 = PermissionNode.create(TestMilestones.MS5, NodePermissions.REQUIRED_AND_SINGLESET);
+		PermissionNode<TestMilestones> p06 = PermissionNode.create(TestMilestones.MS6, NodePermissions.REQUIRED_AND_SINGLESET);
+
+		
+		// the same graph but the jump back from p4 to p2 may only be done once
+		AllowedPathsGraph<TestMilestones> pathMax3 = AllowedPathsGraph.
+				<TestMilestones>
+				nodes(p01,p02,p03,p04,p05,p06)
+				.path(p01,p02,p03,p04,p06)
+				.path(p03, p05, p06) // alternative path to the p3,p4,p5 path
+				.edgeWithMax(3, p04, p02) // jump back (max retry 3)
+				.build();
 
 //		path.forEach(System.out::println);
 		
@@ -86,7 +101,7 @@ public class NodesAndEdgesTest {
 		tcEAS.saveTime(TestMilestones.MS4);
 		tcEAS.saveTime(TestMilestones.MS6);
 		
-		checkReCPathLength(tcEAS, 17);
+		checkRecPathLength(tcEAS, 17);
 	}
 	
 	@Test
@@ -97,31 +112,29 @@ public class NodesAndEdgesTest {
 		tcEAS.saveTime(TestMilestones.MS4);
 		tcEAS.saveTime(TestMilestones.MS6);
 		
-		checkReCPathLength(tcEAS, 5);	
+		checkRecPathLength(tcEAS, 5);	
 	}
 	
 	@Test
 	public void testRecPathLength1() {
+		
+		LOG.info("info");
+		LOG.trace("Ttrace");
+		LOG.debug("Tdebug");
+		
 		tcEAS.saveTime(TestMilestones.MS1);
-		checkReCPathLength(tcEAS, 1);
+		checkRecPathLength(tcEAS, 1);
 		
 		tcEAS.saveTime(TestMilestones.MS2);
-		checkReCPathLength(tcEAS, 2);
+		checkRecPathLength(tcEAS, 2);
 
 		tcEAS.saveTime(TestMilestones.MS3);
-		checkReCPathLength(tcEAS, 3);
+		checkRecPathLength(tcEAS, 3);
 
 	}
 
 
 	
-	private static void checkReCPathLength(TimeCollectorWithPath<TestMilestones> tc, int expectedLength) {
-		List<Path<GraphNode<TestMilestones, NodePermissions>, Instant>> recordedPaths =  tc.getRecordedPaths();
-		assertNotNull(recordedPaths);
-		assertEquals(1, recordedPaths.size());
-		Path<GraphNode<TestMilestones, NodePermissions>, Instant> recPath = recordedPaths.get(0);
-		assertEquals(expectedLength, recPath.getLength());
-	}
 
 	@Test (expected=MilestoneNotAllowedException.class)
 	public void testWrongPathEAS() {

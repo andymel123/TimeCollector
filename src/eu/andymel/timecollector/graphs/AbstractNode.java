@@ -55,7 +55,7 @@ public abstract class AbstractNode<ID_TYPE, PAYLOAD_TYPE> {
 	
 	protected void checkMutable() {
 		if(mutable==null){
-			throw new IllegalStateException("When you try to change a node a Mutable instance has to be in place!");
+			throw new IllegalStateException("When you try to change a node a Mutable instance has to be in place! Node: "+this);
 		}
 		mutable.check();
 	}

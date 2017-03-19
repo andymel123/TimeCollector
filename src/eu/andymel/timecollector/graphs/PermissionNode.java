@@ -2,12 +2,18 @@ package eu.andymel.timecollector.graphs;
 
 public class PermissionNode<ID_TYPE> extends GraphNode<ID_TYPE, NodePermissions> {
 
-	PermissionNode(ID_TYPE id, NodePermissions payload) {
-		super(id, payload, true);
+	PermissionNode(ID_TYPE id, NodePermissions payload, Mutable mutable) {
+		super(id, payload, mutable, true);
 	}
 
+	public static <ID_TYPE> PermissionNode<ID_TYPE> create(ID_TYPE id, NodePermissions payload, Mutable mutable){
+		return new PermissionNode<ID_TYPE>(id, payload, mutable);
+	}
 	public static <ID_TYPE> PermissionNode<ID_TYPE> create(ID_TYPE id, NodePermissions payload){
-		return new PermissionNode<ID_TYPE>(id, payload);
+		return create(id, payload, null);
+	}
+	public static <ID_TYPE> PermissionNode<ID_TYPE> create(ID_TYPE id){
+		return create(id, NodePermissions.REQUIRED_AND_SINGLESET);
 	}
 	
 	@Override
@@ -17,6 +23,7 @@ public class PermissionNode<ID_TYPE> extends GraphNode<ID_TYPE, NodePermissions>
 	
 	@Override
 	public PermissionNode<ID_TYPE> copy() {
-		return new PermissionNode<ID_TYPE>(getId(), getPayload());
+		return new PermissionNode<ID_TYPE>(getId(), getPayload(), getMutable());
 	}
+
 }

@@ -226,10 +226,14 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 	 * @param consumer
 	 */
 	void forEach(Consumer<GraphNode<ID_TYPE, PAYLOAD_TYPE>> consumer){
-		forEachChild(getStartNode(), consumer, new HashSet<>());
+		forEachChild(getStartNode(), consumer, new HashSet<>(), false);
 	}
-	
-	private void forEachChild(GraphNode<ID_TYPE, PAYLOAD_TYPE> rootOfSearch, Consumer<GraphNode<ID_TYPE, PAYLOAD_TYPE>> consumer, HashSet<GraphNode<ID_TYPE, PAYLOAD_TYPE>> alreadyDone){
+
+	void forEachRootOfACircle(Consumer<GraphNode<ID_TYPE, PAYLOAD_TYPE>> consumer){
+		forEachChild(getStartNode(), consumer, new HashSet<>(), true);
+	}
+
+	private void forEachChild(GraphNode<ID_TYPE, PAYLOAD_TYPE> rootOfSearch, Consumer<GraphNode<ID_TYPE, PAYLOAD_TYPE>> consumer, HashSet<GraphNode<ID_TYPE, PAYLOAD_TYPE>> alreadyDone, boolean onlyCallConsumerForRootOfCircles){
 		
 		GraphNode<ID_TYPE, PAYLOAD_TYPE> node = rootOfSearch;
 
@@ -240,10 +244,16 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 			
 			if(alreadyDone.contains(node)){
 				// this node was visited earlier
-				LOG.trace(node+" was visited easlier.");
+				if(onlyCallConsumerForRootOfCircles){
+					consumer.accept(node);
+				}
+				/* return, as the path to the children of this node has 
+				 * also been done if this node has already been visited */
 				return;
 			}else{
-				consumer.accept(node);
+				if(!onlyCallConsumerForRootOfCircles){
+					consumer.accept(node);
+				}
 				alreadyDone.add(node);
 			}
 			
@@ -259,7 +269,7 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 			}
 			
 			for(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edgeToChild: edgesToChildren){
-				forEachChild(edgeToChild.getChildNode(), consumer, alreadyDone);
+				forEachChild(edgeToChild.getChildNode(), consumer, alreadyDone, onlyCallConsumerForRootOfCircles);
 			}
 			
 			break;
