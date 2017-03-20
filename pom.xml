@@ -3,8 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>eu.andymel.timecollector</groupId>
-	<artifactId>timecollector-core</artifactId>
+	<artifactId>timecollector-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
 
 	<name>TimeCollector</name>
 
@@ -18,13 +20,23 @@
 		</developer>
 	</developers>
 
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<modules>
+		<module>timecollector-core</module>
+	</modules>
+
 	<properties>
 	    <maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
 
 	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>test</testSourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -85,7 +97,6 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 		    <groupId>org.slf4j</groupId>
