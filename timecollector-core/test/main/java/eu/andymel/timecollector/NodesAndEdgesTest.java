@@ -118,10 +118,6 @@ public class NodesAndEdgesTest {
 	@Test
 	public void testRecPathLength1() {
 		
-		LOG.info("info");
-		LOG.trace("Ttrace");
-		LOG.debug("Tdebug");
-		
 		tcEAS.saveTime(TestMilestones.MS1);
 		checkRecPathLength(tcEAS, 1);
 		

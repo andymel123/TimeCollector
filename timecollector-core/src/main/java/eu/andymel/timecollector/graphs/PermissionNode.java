@@ -2,7 +2,7 @@ package eu.andymel.timecollector.graphs;
 
 public class PermissionNode<ID_TYPE> extends GraphNode<ID_TYPE, NodePermissions> {
 
-	PermissionNode(ID_TYPE id, NodePermissions payload, Mutable mutable) {
+	private PermissionNode(ID_TYPE id, NodePermissions payload, Mutable mutable) {
 		super(id, payload, mutable, true);
 	}
 

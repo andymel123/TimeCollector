@@ -2,7 +2,9 @@ package eu.andymel.timecollector.graphs;
 
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
+import java.time.Instant;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import eu.andymel.timecollector.util.RecursionSavetyCounter;
@@ -89,6 +91,31 @@ public class Path<ID_TYPE, PAYLOAD_TYPE> extends Graph<ID_TYPE, PAYLOAD_TYPE> {
 		forEach(n -> sb.append(n.getId()).append(' '));
 		sb.append(']');
 		return sb.toString();
+	}
+	public Iterator<GraphNode<ID_TYPE, PAYLOAD_TYPE>> iterator() {
+		return new Iterator<GraphNode<ID_TYPE,PAYLOAD_TYPE>>() {
+
+			GraphNode<ID_TYPE, PAYLOAD_TYPE> next = getStartNode();
+			
+			@Override
+			public boolean hasNext() {
+				return next!=null;
+			}
+
+			@Override
+			public GraphNode<ID_TYPE, PAYLOAD_TYPE> next() {
+				GraphNode<ID_TYPE, PAYLOAD_TYPE> n = next;
+				List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> edgesToChildren = n.getEdgesToChildren();
+				if(edgesToChildren == null || edgesToChildren.size()==0){
+					next = null;
+				}else if(edgesToChildren.size()>1){
+					throw new IllegalArgumentException("A node in a Path may not have more than one child but "+n+" has "+ edgesToChildren.size()+" children!");
+				}else{
+					next = edgesToChildren.get(0).getChildNode();
+				}
+				return n;
+			}
+		};
 	}
 	
 }

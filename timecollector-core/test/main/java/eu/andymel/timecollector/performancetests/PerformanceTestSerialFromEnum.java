@@ -2,8 +2,14 @@ package eu.andymel.timecollector.performancetests;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.concurrent.TimeUnit;
 
+import eu.andymel.timecollector.TestTimeCollectorProvider;
 import eu.andymel.timecollector.TimeCollectorSerial;
+import eu.andymel.timecollector.TimeCollectorWithPath;
+import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
+import eu.andymel.timecollector.report.TextualPathAnalyzer;
+import eu.andymel.timecollector.util.NanoClock;
 
 public class PerformanceTestSerialFromEnum {
 
@@ -22,8 +28,7 @@ public class PerformanceTestSerialFromEnum {
 
 		waitForInput();
 		
-		int amount = 100_000_000;
-
+		int amount = 10_000_000;
 		
 		Instant start = Instant.now();
 		for(int i=0; i<amount; i++){
@@ -35,14 +40,19 @@ public class PerformanceTestSerialFromEnum {
 	}
 
 	private static void waitForInput() {
-		System.out.print("Press Enter");
+		o("Press Enter");
 		
 		try {
 			System.in.read();
+			o("...");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(0);
 		}
 	}
 
+	
+	private static final void o(Object o){
+		System.out.println(o);
+	}
 }

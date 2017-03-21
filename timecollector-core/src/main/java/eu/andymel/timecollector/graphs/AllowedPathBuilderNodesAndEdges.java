@@ -51,7 +51,6 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		int[] count = new int[1]; count[0]=0;
 		this.nodes.forEach(n->{
 			n.setMutable(simpleMutable);
-			LOG.info("Set Mutable on "+n);
 			count[0]++;
 		});
 		if(count[0]!=nodes.size()){

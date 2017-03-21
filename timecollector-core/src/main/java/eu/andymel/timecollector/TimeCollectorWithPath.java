@@ -48,6 +48,9 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 		pathRecorder.savePayload(m, now);
 	}
 
+	/**
+	 * @return all possible paths (if there are multiple paths in the allowedGrap that fit)
+	 */
 	public List<Path<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>> getRecordedPaths() {
 		return this.pathRecorder.getRecordedPaths();
 	}
