@@ -1,5 +1,6 @@
 package eu.andymel.timecollector.performancetests;
 
+import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.*;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
@@ -39,20 +40,4 @@ public class PerformanceTestSerialFromEnum {
 		
 	}
 
-	private static void waitForInput() {
-		o("Press Enter");
-		
-		try {
-			System.in.read();
-			o("...");
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(0);
-		}
-	}
-
-	
-	private static final void o(Object o){
-		System.out.println(o);
-	}
 }

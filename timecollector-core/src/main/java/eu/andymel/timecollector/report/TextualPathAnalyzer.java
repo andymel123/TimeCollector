@@ -74,9 +74,11 @@ public class TextualPathAnalyzer<ID_TYPE> implements Analyzer<ID_TYPE, TimeColle
 	public String toString(TimeUnit unit) {
 		
 		StringBuilder sb = new StringBuilder("");
-		
+		String headerTimeSpan = "TimeSpan (Unit: "+unit+")";
+		maxTimeSpanNameLength = Math.max(maxTimeSpanNameLength, headerTimeSpan.length());
+
 		String formatString = 	"%"+(maxTimeSpanNameLength+2)+"s %10d %10d %10d";
-		sb.append(String.format("%"+(maxTimeSpanNameLength+2)+"s %10s %10s %10s", "TimeSpan", "min", "avg", "max")).append('\n');
+		sb.append(String.format("%"+(maxTimeSpanNameLength+2)+"s %10s %10s %10s", headerTimeSpan, "min", "avg", "max")).append('\n');
 		timesPerSpan.forEach((timeSpanName, calc)->{
 			sb.append(
 				String.format(formatString, 
