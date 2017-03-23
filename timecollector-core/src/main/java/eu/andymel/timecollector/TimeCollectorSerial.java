@@ -59,8 +59,8 @@ public class TimeCollectorSerial<MILESTONE_TYPE extends Enum<MILESTONE_TYPE>> im
 
 		// ***** preconditions *****
 		nn(m, "'milestone' is null!");
-		int idx = m.ordinal();
 		
+		int idx = m.ordinal();
 		if(ensureOrder){
 			
 			if(lastMilestone!=null && lastMilestone.ordinal()==milestoneSet.size()-1){

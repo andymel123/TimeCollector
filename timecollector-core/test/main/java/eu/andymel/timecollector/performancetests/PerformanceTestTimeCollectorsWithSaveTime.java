@@ -1,6 +1,8 @@
 package eu.andymel.timecollector.performancetests;
 
-import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.waitForInput;
+
+
+import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.*;
 
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
@@ -79,7 +81,5 @@ public class PerformanceTestTimeCollectorsWithSaveTime {
 		
 	}
 	
-	private static final void o(Object o){
-		System.out.println(o);
-	}
+	
 }
