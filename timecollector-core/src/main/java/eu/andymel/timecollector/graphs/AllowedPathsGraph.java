@@ -34,43 +34,6 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		return super.getStartNode();
 	}
 	
-	public List<Path<ID_TYPE, NodePermissions>> getAllPathsFromStartToAllNodesWithId(ID_TYPE id) {
-
-		List<Path<ID_TYPE, NodePermissions>> allPaths = new LinkedList<>();
-		
-		List<GraphNode<ID_TYPE, NodePermissions>> allNodesWithId = getAllNodesWIthId(id);
-		
-		GraphNode<ID_TYPE, NodePermissions> startNode = getStartNode();
-
-		List<List<GraphNode<ID_TYPE, NodePermissions>>> results = new LinkedList<>();
-
-		for(GraphNode<ID_TYPE, NodePermissions> n: allNodesWithId){
-			
-			// start with the node we search
-			List<GraphNode<ID_TYPE, NodePermissions>> baseList = new LinkedList<>();
-			GraphNode<ID_TYPE, NodePermissions> copyOfNode = n.copy();
-			baseList.add(copyOfNode);
-
-			if(n==startNode){
-				// do I need one path with just the startnode?
-				results.add(baseList);
-				continue;
-			}
-			
-			// get all paths from startNode up until this node as lists of nodes (reversed from searched node to startnode)
-			getAllReversedListsOfNodesToStartNode(baseList, copyOfNode, results);
-
-		}
-		
-		// transform all those reversed lists to real paths
-		for(List<GraphNode<ID_TYPE, NodePermissions>> revList: results){
-			allPaths.add(createPathFromListOfReversedNodes(revList));
-		}
-		
-		return allPaths;
-	}
-
-	
 	boolean checkForCircularConnections(){
 		
 		forEachRootOfACircle((rootOfCircle) -> {
@@ -127,16 +90,5 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		}
 		return copy;
 	}
-
-	private Path<ID_TYPE, NodePermissions> createPathFromListOfReversedNodes(List<GraphNode<ID_TYPE, NodePermissions>> reverseListOfNodes) {
-		throw new RuntimeException("Not yet implemeted!");
-//		return null;
-	}
-
-	
-	
-	
-
-
 	
 }
