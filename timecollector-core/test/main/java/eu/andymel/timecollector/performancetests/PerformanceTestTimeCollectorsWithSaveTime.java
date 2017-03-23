@@ -1,5 +1,6 @@
 package eu.andymel.timecollector.performancetests;
 
+import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.*;
 
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +17,15 @@ import eu.andymel.timecollector.util.NanoClock;
  * Total time needed: 2.771 seconds for 50000 iterations 
  * That's 55420.0nanos per iteration
  * 
+ * rebuilt saveTime
+ * PerformanceTest: Create TimeCollectorWithPath
+ * Total time needed: 3.35 seconds for 50000 iterations
+ * That's 67000.0nanos per iteration
+ * 
+ * new saveTime and getRecordedPaths
+ * PerformanceTest: Create TimeCollectorWithPath
+ * Total time needed: 0.761 seconds for 50000 iterations
+ * That's 15220.0nanos per iteration
  */
 
 /**
@@ -33,7 +43,7 @@ public class PerformanceTestTimeCollectorsWithSaveTime {
 		
 		TextualPathAnalyzer<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> analyzer = new TextualPathAnalyzer<>();
 		
-		boolean includeTimeMeasurement = false;
+		waitForInput();
 		
 		Instant start = Instant.now();
 		for(int i=0; i<amount; i++){

@@ -101,7 +101,7 @@ public class NodesAndEdgesTest {
 		tcEAS.saveTime(TestMilestones.MS4);
 		tcEAS.saveTime(TestMilestones.MS6);
 		
-		checkRecPathLength(tcEAS, 17);
+		checkRecPath(tcEAS, 17);
 	}
 	
 	@Test
@@ -112,20 +112,20 @@ public class NodesAndEdgesTest {
 		tcEAS.saveTime(TestMilestones.MS4);
 		tcEAS.saveTime(TestMilestones.MS6);
 		
-		checkRecPathLength(tcEAS, 5);	
+		checkRecPath(tcEAS, 5);	
 	}
 	
 	@Test
 	public void testRecPathLength1() {
 		
 		tcEAS.saveTime(TestMilestones.MS1);
-		checkRecPathLength(tcEAS, 1);
+		checkRecPath(tcEAS, 1);
 		
 		tcEAS.saveTime(TestMilestones.MS2);
-		checkRecPathLength(tcEAS, 2);
+		checkRecPath(tcEAS, 2);
 
 		tcEAS.saveTime(TestMilestones.MS3);
-		checkRecPathLength(tcEAS, 3);
+		checkRecPath(tcEAS, 3);
 
 	}
 

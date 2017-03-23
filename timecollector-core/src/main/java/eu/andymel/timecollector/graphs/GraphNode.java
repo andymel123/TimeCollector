@@ -29,6 +29,11 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> extends AbstractNode<ID_TYPE, PAYL
 		super(id, payload, mutltiEdges);
 	}
 	
+	public static<ID_TYPE, PAYLOAD_TYPE> GraphNode<ID_TYPE, PAYLOAD_TYPE> create(ID_TYPE id, PAYLOAD_TYPE payload, Mutable mutable, boolean mutltiEdges){
+		return new GraphNode<ID_TYPE, PAYLOAD_TYPE>(id, payload, mutable, mutltiEdges);
+	}
+	
+	
 	void addNextNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
 		checkMutable();
 		if(!isAllowMutltipleEdges() && nextNodes.size()>0){

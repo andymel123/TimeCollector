@@ -22,12 +22,16 @@ public class PathRecorder<MILESTONE_TYPE, PAYLOAD_TYPE>{
 	
 	private final List<Path<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE>> possiblePaths;	
 	private final List<Path<GraphNode<MILESTONE_TYPE, NodePermissions>, PAYLOAD_TYPE>> immutableViewOnPossiblePaths;	
-
 	private PathRecorder(AllowedPathsGraph<MILESTONE_TYPE> allowedPath) {
 		this.allowedPath = allowedPath;
 		this.possiblePaths = new LinkedList<>();
 		this.immutableViewOnPossiblePaths = Collections.unmodifiableList(possiblePaths);
 	}
+	
+	
+//	private PathRecorder(AllowedPathsGraph<MILESTONE_TYPE> allowedPath) {
+//		this.allowedPath = allowedPath;
+//	}
 	
 	public static <MILESTONE_TYPE, PAYLOAD_TYPE> PathRecorder<MILESTONE_TYPE, PAYLOAD_TYPE> create(AllowedPathsGraph<MILESTONE_TYPE> allowedPath){
 		return new PathRecorder<>(allowedPath);

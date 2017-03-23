@@ -13,7 +13,19 @@ public interface Mutable {
 			return "mutable";
 		};
 	};
-	
+
+	public static final Mutable IMMUTABLE = new Mutable() {
+		@Override
+		public boolean isMutable() {
+			return true;
+		}
+		
+		@Override
+		public String toString(){
+			return "immutable";
+		};
+	};
+
 	boolean isMutable();
 	
 	default void check(){

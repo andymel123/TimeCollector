@@ -32,11 +32,11 @@ public class TextualPathAnalyzer<ID_TYPE> implements Analyzer<ID_TYPE, TimeColle
 		
 		nn(tc, "TimeCollector is null!");
 		
-		List<Path<GraphNode<ID_TYPE, NodePermissions>, Instant>> paths = tc.getRecordedPaths();
+		List<List<GraphNode<GraphNode<ID_TYPE, NodePermissions>, Instant>>> paths = tc.getRecordedPaths();
 
 		ne(paths, "TimeCollector does not contain recorded paths!");
 		
-		Path<GraphNode<ID_TYPE, NodePermissions>, Instant> path = paths.get(0);
+		List<GraphNode<GraphNode<ID_TYPE, NodePermissions>, Instant>> path = paths.get(0);
 		
 		Iterator<GraphNode<GraphNode<ID_TYPE, NodePermissions>, Instant>> it = path.iterator();
 		

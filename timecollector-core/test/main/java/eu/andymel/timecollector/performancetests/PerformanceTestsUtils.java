@@ -28,7 +28,7 @@ public class PerformanceTestsUtils {
 		}
 	}
 
-	private static final void o(Object o){
+	public static final void o(Object o){
 		System.out.println(o);
 	}
 

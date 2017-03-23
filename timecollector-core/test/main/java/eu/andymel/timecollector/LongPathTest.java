@@ -1,6 +1,6 @@
 package eu.andymel.timecollector;
 
-import static eu.andymel.timecollector.PathTestUtils.checkRecPathLength;
+import static eu.andymel.timecollector.PathTestUtils.checkRecPath;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -29,7 +29,7 @@ public class LongPathTest {
 	@Test
 	public void testFirstMileStone() {
 		tc.saveTime(TestMilestones.CREATION);
-		List<Path<GraphNode<TestMilestones, NodePermissions>, Instant>> recordedPaths =  tc.getRecordedPaths();
+		List<List<GraphNode<GraphNode<TestMilestones, NodePermissions>, Instant>>> recordedPaths =  tc.getRecordedPaths();
 		assertNotNull(recordedPaths);
 		assertEquals(1, recordedPaths.size());
 	}
@@ -63,7 +63,7 @@ public class LongPathTest {
 		tc.saveTime(TestMilestones.AFTER_HANDLER);
 		tc.saveTime(TestMilestones.AFTER_HANDLER_CONTEXT);
 
-		checkRecPathLength(tc, 23);
+		checkRecPath(tc, 23);
 		
 		TextualPathAnalyzer<TestMilestones> analyzer = new TextualPathAnalyzer();
 		analyzer.addCollector(tc);
