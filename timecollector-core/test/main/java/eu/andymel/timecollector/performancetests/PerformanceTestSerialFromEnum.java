@@ -1,16 +1,10 @@
 package eu.andymel.timecollector.performancetests;
 
-import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.*;
-import java.io.IOException;
-import java.time.Instant;
-import java.util.concurrent.TimeUnit;
+import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.waitForInput;
 
-import eu.andymel.timecollector.TestTimeCollectorProvider;
+import java.time.Instant;
+
 import eu.andymel.timecollector.TimeCollectorSerial;
-import eu.andymel.timecollector.TimeCollectorWithPath;
-import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
-import eu.andymel.timecollector.report.TextualPathAnalyzer;
-import eu.andymel.timecollector.util.NanoClock;
 
 public class PerformanceTestSerialFromEnum {
 

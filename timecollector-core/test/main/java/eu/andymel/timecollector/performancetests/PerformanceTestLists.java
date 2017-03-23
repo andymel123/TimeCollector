@@ -1,10 +1,10 @@
 package eu.andymel.timecollector.performancetests;
 
-import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.*;
+import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.end;
+import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.o;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;

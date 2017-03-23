@@ -1,20 +1,18 @@
 package eu.andymel.timecollector.report;
 
-import static eu.andymel.timecollector.util.Preconditions.*;
+import static eu.andymel.timecollector.util.Preconditions.ne;
+import static eu.andymel.timecollector.util.Preconditions.nn;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
-import eu.andymel.timecollector.graphs.Path;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
 
 public class TextualPathAnalyzer<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> {

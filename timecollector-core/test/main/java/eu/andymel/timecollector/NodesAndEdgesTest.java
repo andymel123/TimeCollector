@@ -1,11 +1,6 @@
 package eu.andymel.timecollector;
 
-import static eu.andymel.timecollector.PathTestUtils.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.time.Instant;
-import java.util.List;
+import static eu.andymel.timecollector.PathTestUtils.checkRecPath;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,9 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
-import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
-import eu.andymel.timecollector.graphs.Path;
 import eu.andymel.timecollector.graphs.PermissionNode;
 
 public class NodesAndEdgesTest {

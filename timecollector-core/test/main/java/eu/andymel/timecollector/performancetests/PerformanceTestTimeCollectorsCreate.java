@@ -1,6 +1,6 @@
 package eu.andymel.timecollector.performancetests;
 
-import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.*;
+import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.waitForInput;
 
 import java.time.Instant;
 

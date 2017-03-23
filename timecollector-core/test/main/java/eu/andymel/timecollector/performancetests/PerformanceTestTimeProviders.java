@@ -1,6 +1,5 @@
 package eu.andymel.timecollector.performancetests;
 
-import java.time.Duration;
 import java.time.Instant;
 
 import eu.andymel.timecollector.util.AvgMaxCalcLong;

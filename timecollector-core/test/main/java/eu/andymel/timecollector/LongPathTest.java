@@ -14,7 +14,6 @@ import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
-import eu.andymel.timecollector.graphs.Path;
 import eu.andymel.timecollector.report.TextualPathAnalyzer;
 
 public class LongPathTest {

@@ -1,13 +1,12 @@
 package eu.andymel.timecollector.performancetests;
 
-import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.*;
+import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.waitForInput;
 
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 import eu.andymel.timecollector.TestTimeCollectorProvider;
 import eu.andymel.timecollector.TimeCollectorWithPath;
-import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.report.TextualPathAnalyzer;
 import eu.andymel.timecollector.util.NanoClock;
 

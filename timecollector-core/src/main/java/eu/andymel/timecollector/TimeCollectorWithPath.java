@@ -5,7 +5,6 @@ import static eu.andymel.timecollector.util.Preconditions.nn;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,8 +17,6 @@ import eu.andymel.timecollector.graphs.Edge;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.Mutable;
 import eu.andymel.timecollector.graphs.NodePermissions;
-import eu.andymel.timecollector.graphs.Path;
-import eu.andymel.timecollector.graphs.PathRecorder;
 
 public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILESTONE_TYPE> {
 
