@@ -62,16 +62,23 @@ public class Edge<Node_Type> {
 				return false;
 		} else if (!edgePermissions.equals(other.edgePermissions))
 			return false;
+
+		/* I use identity here as two edges to equal nodes are ok
+		 * but two edges to the same instance of a node makes 
+		 * no sense */
+
 		if (from == null) {
 			if (other.from != null)
 				return false;
-		} else if (!from.equals(other.from))
+		} 
+		else if (from!=other.from)	/* IDENTITY CHECK! */
 			return false;
 		if (to == null) {
 			if (other.to != null)
 				return false;
-		} else if (!to.equals(other.to))
+		} else if (to!=other.to)	/* IDENTITY CHECK! */
 			return false;
+		
 		return true;
 	}
 

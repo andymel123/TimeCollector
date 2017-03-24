@@ -14,11 +14,20 @@ import java.util.List;
  */
 public class GraphNode<ID_TYPE, PAYLOAD_TYPE> extends AbstractNode<ID_TYPE, PAYLOAD_TYPE>{
 
-	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> prevNodes = new LinkedList<>();
-	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> nextNodes = new LinkedList<>();
+	// TODO maybe replace lists by HashSets as this would ensure that edges are unique and not in there twice 
+	/*
+	private final Set<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> edgesToPrev = new HashSet<>();
+	private final Set<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> edgesToNext = new HashSet<>();
 	
-	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnPrevNodes = Collections.unmodifiableList(prevNodes);
-	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnNextNodes = Collections.unmodifiableList(nextNodes);
+	private final Set<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnPrevEdges = Collections.unmodifiableSet(edgesToPrev);
+	private final Set<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnNextEdges = Collections.unmodifiableSet(edgesToNext);
+	 */
+	
+	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> edgesToPrev = new LinkedList<>();
+	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> edgesToNext = new LinkedList<>();
+	
+	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnPrevEdges = Collections.unmodifiableList(edgesToPrev);
+	private final List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> immutableViewOnNextEdges = Collections.unmodifiableList(edgesToNext);
 	
 	
 	GraphNode(ID_TYPE id, PAYLOAD_TYPE payload, Mutable mutable, boolean mutltiEdges) {
@@ -36,33 +45,33 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> extends AbstractNode<ID_TYPE, PAYL
 	
 	void addNextNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
 		checkMutable();
-		if(!isAllowMutltipleEdges() && nextNodes.size()>0){
-			throw new IllegalStateException("This Node does not allow to add more than one child! Current child: "+Arrays.toString(nextNodes.toArray())+". You want to add "+e);
+		if(!isAllowMutltipleEdges() && edgesToNext.size()>0){
+			throw new IllegalStateException("This Node does not allow to add more than one child! Current child: "+Arrays.toString(edgesToNext.toArray())+". You want to add "+e);
 		}
-		nextNodes.add(e);
+		edgesToNext.add(e);
 	}
 	
 
 	void addPrevNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
 		checkMutable();
-		if(!isAllowMutltipleEdges() && prevNodes.size()>0){
-			throw new IllegalStateException("This Node does not allow to add more than one parent! Current parent: "+Arrays.toString(prevNodes.toArray())+". You want to add "+e);
+		if(!isAllowMutltipleEdges() && edgesToPrev.size()>0){
+			throw new IllegalStateException("This Node does not allow to add more than one parent! Current parent: "+Arrays.toString(edgesToPrev.toArray())+". You want to add "+e);
 		}
-		prevNodes.add(e);
+		edgesToPrev.add(e);
 	}
 
 	List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> getNextNodesEditable() {
-		return nextNodes;
+		return edgesToNext;
 	}
 	List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> getPrevNodesEditable() {
-		return prevNodes;
+		return edgesToPrev;
 	}
 
 	public List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> getEdgesToChildren() {
-		return immutableViewOnNextNodes;
+		return immutableViewOnNextEdges;
 	}
 	public List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> getEdgesToParents() {
-		return immutableViewOnPrevNodes;
+		return immutableViewOnPrevEdges;
 	}
 
 	// ids have to be unique because otherwise it's not possible to simply say timeCollector.getTime(milestone)
@@ -73,9 +82,9 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> extends AbstractNode<ID_TYPE, PAYL
 		
 //		if(idToSearch.equals(milestone))return this; this is not a child
 		
-		if(nextNodes==null)return null;
+		if(edgesToNext==null)return null;
 		
-		for(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edgeToChildNode: nextNodes){
+		for(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edgeToChildNode: edgesToNext){
 			GraphNode<ID_TYPE, PAYLOAD_TYPE> childNode = edgeToChildNode.getChildNode();
 			if(idToSearch.equals(childNode.getId()))return childNode;
 			GraphNode<ID_TYPE, PAYLOAD_TYPE> found = childNode.getChildWithId(idToSearch);

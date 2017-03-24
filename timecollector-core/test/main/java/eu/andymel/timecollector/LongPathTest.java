@@ -70,6 +70,196 @@ public class LongPathTest {
 		
 	}
 
+	@Test
+	public void testRetryPath(){
+		tc.saveTime(TestMilestones.CREATION);
+		tc.saveTime(TestMilestones.BEFORE_HANDLER_CONTEXT);
+		tc.saveTime(TestMilestones.BEFORE_SEARCH_HANDLER);
+		tc.saveTime(TestMilestones.AFTER_SEARCH_HANDLER);
+		tc.saveTime(TestMilestones.BEFORE_HANDLER);
+			tc.saveTime(TestMilestones.BEFORE_DAO_GETSTATE);
+				tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+				tc.saveTime(TestMilestones.AFTER_DBPOOL);
+				tc.saveTime(TestMilestones.BEFORE_DB_GETSTATE);
+				tc.saveTime(TestMilestones.AFTER_DB_GETSTATE);
+			tc.saveTime(TestMilestones.AFTER_DAO_GETSTATE); // 11
+			
+			tc.saveTime(TestMilestones.BEFORE_CALC1);
+			tc.saveTime(TestMilestones.AFTER_CALC1);
+			
+			tc.saveTime(TestMilestones.BEFORE_DECIDER);
+			tc.saveTime(TestMilestones.AFTER_DECIDER);
+			
+			tc.saveTime(TestMilestones.BEFORE_DAO_SAVE);
+				tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+				tc.saveTime(TestMilestones.AFTER_DBPOOL);
+				tc.saveTime(TestMilestones.BEFORE_DB_SAVE_DECISION1);	// 19
+				
+				/* retry start */
+				tc.saveTime(TestMilestones.RETRY);
+					tc.saveTime(TestMilestones.AFTER_DB_SAVE_DECISION1);
+					tc.saveTime(TestMilestones.AFTER_DAO_SAVE);
+					
+					tc.saveTime(TestMilestones.BEFORE_DAO_GETSTATE);
+						tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+						tc.saveTime(TestMilestones.AFTER_DBPOOL);
+						tc.saveTime(TestMilestones.BEFORE_DB_GETSTATE);
+						tc.saveTime(TestMilestones.AFTER_DB_GETSTATE);
+					tc.saveTime(TestMilestones.AFTER_DAO_GETSTATE);		// 28
+					
+					tc.saveTime(TestMilestones.BEFORE_CALC1);
+					tc.saveTime(TestMilestones.AFTER_CALC1);
+					
+					tc.saveTime(TestMilestones.BEFORE_DECIDER);
+					tc.saveTime(TestMilestones.AFTER_DECIDER);
+					
+					tc.saveTime(TestMilestones.BEFORE_DAO_SAVE);
+						tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+						tc.saveTime(TestMilestones.AFTER_DBPOOL);
+						tc.saveTime(TestMilestones.BEFORE_DB_SAVE_DECISION1);	// 36
+
+				/* retry end */
+						
+				tc.saveTime(TestMilestones.AFTER_DB_SAVE_DECISION1);
+			tc.saveTime(TestMilestones.AFTER_DAO_SAVE);
+		tc.saveTime(TestMilestones.AFTER_HANDLER);
+		tc.saveTime(TestMilestones.AFTER_HANDLER_CONTEXT);
+
+		checkRecPath(tc, 40);
+		
+		TextualPathAnalyzer<TestMilestones> analyzer = new TextualPathAnalyzer();
+		analyzer.addCollector(tc);
+		o(analyzer.toString());
+		
+	}
+	
+	@Test
+	public void testRetryPathAlternative(){
+		tc.saveTime(TestMilestones.CREATION);
+		tc.saveTime(TestMilestones.BEFORE_HANDLER_CONTEXT);
+		tc.saveTime(TestMilestones.BEFORE_SEARCH_HANDLER);
+		tc.saveTime(TestMilestones.AFTER_SEARCH_HANDLER);
+		tc.saveTime(TestMilestones.BEFORE_HANDLER);
+			tc.saveTime(TestMilestones.BEFORE_DAO_GETSTATE);
+				tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+				tc.saveTime(TestMilestones.AFTER_DBPOOL);
+				tc.saveTime(TestMilestones.BEFORE_DB_GETSTATE);
+				tc.saveTime(TestMilestones.AFTER_DB_GETSTATE);
+			tc.saveTime(TestMilestones.AFTER_DAO_GETSTATE); // 11
+			
+			tc.saveTime(TestMilestones.BEFORE_CALC1);
+			tc.saveTime(TestMilestones.AFTER_CALC1);
+			
+			tc.saveTime(TestMilestones.BEFORE_DECIDER);
+			tc.saveTime(TestMilestones.AFTER_DECIDER);
+			
+			tc.saveTime(TestMilestones.BEFORE_DAO_SAVE);
+				tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+				tc.saveTime(TestMilestones.AFTER_DBPOOL);
+				tc.saveTime(TestMilestones.BEFORE_DB_SAVE_DECISION1);	// 19
+				
+				/* retry start */
+				tc.saveTime(TestMilestones.RETRY);
+					tc.saveTime(TestMilestones.AFTER_DB_SAVE_DECISION1);
+					tc.saveTime(TestMilestones.AFTER_DAO_SAVE);
+					
+					tc.saveTime(TestMilestones.BEFORE_DAO_GETSTATE);
+						tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+						tc.saveTime(TestMilestones.AFTER_DBPOOL);
+						tc.saveTime(TestMilestones.BEFORE_DB_GETSTATE);
+						tc.saveTime(TestMilestones.AFTER_DB_GETSTATE);
+					tc.saveTime(TestMilestones.AFTER_DAO_GETSTATE);		// 28
+					
+					tc.saveTime(TestMilestones.BEFORE_CALC1);
+					tc.saveTime(TestMilestones.AFTER_CALC1);
+					
+					tc.saveTime(TestMilestones.BEFORE_DECIDER);
+					tc.saveTime(TestMilestones.AFTER_DECIDER);
+					
+					tc.saveTime(TestMilestones.BEFORE_DAO_SAVE);
+						tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+						tc.saveTime(TestMilestones.AFTER_DBPOOL);
+
+				/* alternative end */
+						
+				tc.saveTime(TestMilestones.BEFORE_DB_SAVE_DECISION2);	// 36
+				tc.saveTime(TestMilestones.AFTER_DB_SAVE_DECISION2);
+			tc.saveTime(TestMilestones.AFTER_DAO_SAVE);
+		tc.saveTime(TestMilestones.AFTER_HANDLER);
+		tc.saveTime(TestMilestones.AFTER_HANDLER_CONTEXT);
+
+		checkRecPath(tc, 40);
+		
+		TextualPathAnalyzer<TestMilestones> analyzer = new TextualPathAnalyzer();
+		analyzer.addCollector(tc);
+		o(analyzer.toString());
+		
+	}
+	
+	@Test(expected=MilestoneNotAllowedException.class)
+	public void testRetryPathOneMissing(){
+		tc.saveTime(TestMilestones.CREATION);
+		tc.saveTime(TestMilestones.BEFORE_HANDLER_CONTEXT);
+		tc.saveTime(TestMilestones.BEFORE_SEARCH_HANDLER);
+		tc.saveTime(TestMilestones.AFTER_SEARCH_HANDLER);
+		tc.saveTime(TestMilestones.BEFORE_HANDLER);
+			tc.saveTime(TestMilestones.BEFORE_DAO_GETSTATE);
+				tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+				tc.saveTime(TestMilestones.AFTER_DBPOOL);
+				tc.saveTime(TestMilestones.BEFORE_DB_GETSTATE);
+				tc.saveTime(TestMilestones.AFTER_DB_GETSTATE);
+			tc.saveTime(TestMilestones.AFTER_DAO_GETSTATE); // 11
+			
+			tc.saveTime(TestMilestones.BEFORE_CALC1);
+			tc.saveTime(TestMilestones.AFTER_CALC1);
+			
+			tc.saveTime(TestMilestones.BEFORE_DECIDER);
+			tc.saveTime(TestMilestones.AFTER_DECIDER);
+			
+			tc.saveTime(TestMilestones.BEFORE_DAO_SAVE);
+				tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+				tc.saveTime(TestMilestones.AFTER_DBPOOL);
+				tc.saveTime(TestMilestones.BEFORE_DB_SAVE_DECISION1);	// 19
+				
+				/* retry start */
+				tc.saveTime(TestMilestones.RETRY);
+					tc.saveTime(TestMilestones.AFTER_DB_SAVE_DECISION1);
+					tc.saveTime(TestMilestones.AFTER_DAO_SAVE);
+					
+					tc.saveTime(TestMilestones.BEFORE_DAO_GETSTATE);
+						tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+//						tc.saveTime(TestMilestones.AFTER_DBPOOL);
+						tc.saveTime(TestMilestones.BEFORE_DB_GETSTATE);
+						tc.saveTime(TestMilestones.AFTER_DB_GETSTATE);
+					tc.saveTime(TestMilestones.AFTER_DAO_GETSTATE);		// 28
+					
+					tc.saveTime(TestMilestones.BEFORE_CALC1);
+					tc.saveTime(TestMilestones.AFTER_CALC1);
+					
+					tc.saveTime(TestMilestones.BEFORE_DECIDER);
+					tc.saveTime(TestMilestones.AFTER_DECIDER);
+					
+					tc.saveTime(TestMilestones.BEFORE_DAO_SAVE);
+						tc.saveTime(TestMilestones.BEFORE_DBPOOL);
+						tc.saveTime(TestMilestones.AFTER_DBPOOL);
+						tc.saveTime(TestMilestones.BEFORE_DB_SAVE_DECISION1);	// 36
+
+				/* retry end */
+						
+				tc.saveTime(TestMilestones.AFTER_DB_SAVE_DECISION1);
+			tc.saveTime(TestMilestones.AFTER_DAO_SAVE);
+		tc.saveTime(TestMilestones.AFTER_HANDLER);
+		tc.saveTime(TestMilestones.AFTER_HANDLER_CONTEXT);
+
+		checkRecPath(tc, 40);
+		
+		TextualPathAnalyzer<TestMilestones> analyzer = new TextualPathAnalyzer();
+		analyzer.addCollector(tc);
+		o(analyzer.toString());
+		
+	}
+	
+	
 	@Test (expected=MilestoneNotAllowedException.class)
 	public void testFullPathOneMissing(){
 		tc.saveTime(TestMilestones.CREATION);

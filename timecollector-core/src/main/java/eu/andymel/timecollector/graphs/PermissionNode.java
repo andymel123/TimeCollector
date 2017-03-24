@@ -18,7 +18,11 @@ public class PermissionNode<ID_TYPE> extends GraphNode<ID_TYPE, NodePermissions>
 	
 	@Override
 	public String toString() {
-		return "PNode["+getId()+", "+hashCode()+"]";
+		return "PNode@"+System.identityHashCode(this)
+		+"["
+			+getId()+", "
+			+hashCode()
+		+"]";
 	}
 	
 	@Override

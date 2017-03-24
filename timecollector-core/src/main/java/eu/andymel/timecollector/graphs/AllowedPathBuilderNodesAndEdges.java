@@ -20,6 +20,8 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AllowedPathBuilderNodesAndEdges.class);
 	
+	/** It should be ok to simply skip edges that the user adds multiple times (between the same instances of nodes)
+	 * to find problems this can be activated */
 	private static final boolean THROW_ERROR_IF_EDGE_IS_ADDED_MULTIPLE_TIMES = false;
 	
 	private final PermissionNode<ID_TYPE> startNode;
@@ -83,17 +85,21 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		}
 		
 		Edge<PermissionNode<ID_TYPE>> newEdge = Edge.create(node1, node2, edgePermissions);
+		checkEdge(newEdge);
 		
-		if(THROW_ERROR_IF_EDGE_IS_ADDED_MULTIPLE_TIMES){
-			int idx = edges.indexOf(newEdge);
-			if(idx!=-1){
-				throw new IllegalStateException("There is already an edge like the one you want to add at index "+idx+" of your "+edges.size()+" edges! Edge: '"+newEdge+"'");
+		int idx = edges.indexOf(newEdge);
+		if(idx!=-1){
+			// don't add equal edges (equal means connecting the same INSTANCES of nodes, not equal nodes)
+			String msg = "This edge was saved earlier! '"+newEdge+"'";
+			if(THROW_ERROR_IF_EDGE_IS_ADDED_MULTIPLE_TIMES){
+				throw new IllegalStateException(msg);
+			} else {
+				LOG.warn(msg);
+				return this;
 			}
 		}
-		checkEdge(newEdge);
+	
 		edges.add(newEdge);
-		
-		
 		return this;
 	}
 	
