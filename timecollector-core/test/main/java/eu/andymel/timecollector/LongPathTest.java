@@ -64,7 +64,7 @@ public class LongPathTest {
 
 		checkRecPath(tc, 23);
 		
-		TextualPathAnalyzer<TestMilestones> analyzer = new TextualPathAnalyzer();
+		TextualPathAnalyzer<TestMilestones> analyzer = TextualPathAnalyzer.create();
 		analyzer.addCollector(tc);
 		o(analyzer.toString());
 		
@@ -127,7 +127,7 @@ public class LongPathTest {
 
 		checkRecPath(tc, 40);
 		
-		TextualPathAnalyzer<TestMilestones> analyzer = new TextualPathAnalyzer();
+		TextualPathAnalyzer<TestMilestones> analyzer = TextualPathAnalyzer.create();
 		analyzer.addCollector(tc);
 		o(analyzer.toString());
 		
@@ -190,7 +190,7 @@ public class LongPathTest {
 
 		checkRecPath(tc, 40);
 		
-		TextualPathAnalyzer<TestMilestones> analyzer = new TextualPathAnalyzer();
+		TextualPathAnalyzer<TestMilestones> analyzer = TextualPathAnalyzer.create();
 		analyzer.addCollector(tc);
 		o(analyzer.toString());
 		
@@ -253,7 +253,7 @@ public class LongPathTest {
 
 		checkRecPath(tc, 40);
 		
-		TextualPathAnalyzer<TestMilestones> analyzer = new TextualPathAnalyzer();
+		TextualPathAnalyzer<TestMilestones> analyzer = TextualPathAnalyzer.create();
 		analyzer.addCollector(tc);
 		o(analyzer.toString());
 		

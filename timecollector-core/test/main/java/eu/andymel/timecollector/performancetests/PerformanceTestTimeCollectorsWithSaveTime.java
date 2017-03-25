@@ -43,7 +43,7 @@ public class PerformanceTestTimeCollectorsWithSaveTime {
 		
 		NanoClock clock = new NanoClock();
 		
-		TextualPathAnalyzer<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> analyzer = new TextualPathAnalyzer<>();
+		TextualPathAnalyzer<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> analyzer = TextualPathAnalyzer.create();
 		
 		waitForInput();
 		
