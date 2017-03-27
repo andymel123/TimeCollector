@@ -16,22 +16,14 @@ import eu.andymel.timecollector.util.AvgMaxCalcLongTest;
 
 public abstract class AbstractTextualAnalyzer<ID_TYPE, TC_TYPE extends TimeCollector<ID_TYPE>> implements Analyzer<ID_TYPE, TC_TYPE> {
 
-//	private LinkedHashMap<String, AvgMaxCalcLong> timesPerSpan;
-	
-	/**
-	 * HashMap in HashMap as outer key is the first milestone, inner key the second
-	 */
+	/** HashMap in HashMap as outer key is the first milestone, inner key the second */
 	private HashMap<ID_TYPE, HashMap<ID_TYPE, AvgMaxCalcLong>> timesPerSpan;
-	
-//	private int maxTimeSpanNameLength = 0;
-	private int count = 0;
 	
 	public AbstractTextualAnalyzer() {
 		timesPerSpan = new HashMap<>();
 	}
 	
 	protected void addTimes(ID_TYPE m1, ID_TYPE m2, Temporal t1, Temporal t2) {
-//		String timeSpanName = getTimeSpanName(m1, m2);
 		HashMap<ID_TYPE, AvgMaxCalcLong> inner = timesPerSpan.get(m1);
 		AvgMaxCalcLong calc = null;
 		if(inner==null){
@@ -47,7 +39,7 @@ public abstract class AbstractTextualAnalyzer<ID_TYPE, TC_TYPE extends TimeColle
 		calc.add(Duration.between(t1, t2).toNanos());
 	}
 
-	protected String getTimeSpanName(String from, String to) {
+	protected String getTimeSpanName(ID_TYPE from, ID_TYPE to) {
 		return from+"->"+to;
 	}
 
@@ -63,7 +55,7 @@ public abstract class AbstractTextualAnalyzer<ID_TYPE, TC_TYPE extends TimeColle
 				ID_TYPE m2 = e.getKey();
 				AvgMaxCalcLong calc = e.getValue();
 				
-				String column1 = getTimeSpanName(m1.toString(), m2.toString());
+				String column1 = getTimeSpanName(m1, m2);
 				// TODO replace by own implementation that does not round to full numbers (to get 0,001ms)
 				String column2 = String.valueOf(unit.convert(calc.getMin(),TimeUnit.NANOSECONDS)); 
 				String column3 = String.valueOf(unit.convert((long)calc.getAvg(),TimeUnit.NANOSECONDS));

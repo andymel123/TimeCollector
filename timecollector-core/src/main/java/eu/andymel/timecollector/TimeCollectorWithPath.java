@@ -21,10 +21,14 @@ import eu.andymel.timecollector.graphs.NodePermissions;
 
 public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILESTONE_TYPE> {
 
+	public static enum ONPATHLOSE{
+		EXCEPTION,
+		LISTENER,
+		ASSERT
+	}
+	
 	/** The clock to use to save time stamps */
 	private final Clock clock;
-	
-//	private final PathRecorder<MILESTONE_TYPE, Instant> pathRecorder;
 	
 	private LinkedList<LinkedList<GraphNode<MILESTONE_TYPE, NodePermissions>>> possibleListsOfWalkedAllowedGraphNodes;	// outer LinkedList as I want to remove from in between fast, inner as I want to call getLast()
 	private LinkedList<MILESTONE_TYPE> recordedMilestones;	// LinkedList as it seems slightly faster (see PerformanceTestLists)
@@ -41,8 +45,6 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 		nn(clock, "'clock' my not be null!");
 		nn(allowed, "'path' my not be null!");
 		this.clock = clock;
-//		this.pathRecorder = PathRecorder.create(allowed);
-		
 		this.recordedMilestones = new LinkedList<>();	 
 		this.recordedTimes = new ArrayList<>();			
 		this.possibleListsOfWalkedAllowedGraphNodes = new LinkedList<>();	
@@ -195,7 +197,6 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	 */
 	public List<List<SimpleEntry<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>>> getRecordedPaths() {
 
-//		List<List<GraphNode<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>>> result = new LinkedList<>();
 		List<List<SimpleEntry<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>>> result = new LinkedList<>();
 		
 		for(LinkedList<GraphNode<MILESTONE_TYPE, NodePermissions>> possiblePath: possibleListsOfWalkedAllowedGraphNodes){
@@ -203,10 +204,6 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 			int count=0;
 			for(GraphNode<MILESTONE_TYPE, NodePermissions> allowedNode: possiblePath){
 				recPath.add(
-					// TODO don't use GraphNode as data container here as it has overhad thats not needed here
-					// Profiler: 3/4 of the time spent in this method is needed in the GraphNode constructor!!!
-					// for example replace by AbstractMap.SimpleEntry
-//					GraphNode.create(allowedNode, recordedTimes.get(count++), Mutable.IMMUTABLE, false)
 					new SimpleEntry<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>(allowedNode, recordedTimes.get(count++))
 				);
 			}

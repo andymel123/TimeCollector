@@ -13,8 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO copy and add immutable view on the path when finished to add nodes
- * 
  * @author andymatic
  *
  * @param <ID_TYPE> The type of the id object (milestone)
@@ -35,8 +33,6 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 	
 	private final Mutable mutable;
 	
-//	private boolean finishedLinking = false;
-	
 	protected Graph(ID_TYPE id, PAYLOAD_TYPE payload, boolean allowMultipleEdges, Mutable mutable) {
 		this(new GraphNode<>(id, payload, mutable, allowMultipleEdges), allowMultipleEdges, mutable);
 	}
@@ -49,16 +45,6 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 		this.lastNodes.add(startNode);
 	}
 
-//	void setFinishLinking(){
-//		lastNodes = Collections.unmodifiableList(lastNodes);
-//		// set all nodes finished (links between nodes may not be changed anymore)
-////		nodes.values().forEach(
-////			list -> list.forEach(
-////				node->node.setLinkingFinished()
-////			)
-////		);
-//	}
-	
 	// !used in the constructor! (Don't simply change accessibility to override!)
 	private final void addNodeToHashMap(GraphNode<ID_TYPE, PAYLOAD_TYPE> startNode) {
 		ID_TYPE id = startNode.getId();
@@ -80,48 +66,11 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 		return lastNodes;
 	}
 
-//	@Deprecated
-//	/**
-//	 * @Deprecated as addNode without a clue at which end of a possibly complex graph
-//	 * to add the node makes no sense in the generic way as I mean graphs now
-//	 * @param id
-//	 * @param payload
-//	 * @return
-//	 */
-//	public GraphNode<ID_TYPE, PAYLOAD_TYPE> addNode(ID_TYPE id, PAYLOAD_TYPE payload) {
-//		
-//		// preconditions
-//		nn(id, "The given id is null!");
-//		mutable.check();
-//		
-//		//build new node for this milestone
-//		GraphNode<ID_TYPE, PAYLOAD_TYPE> newNode = new GraphNode<ID_TYPE, PAYLOAD_TYPE>(id, payload, mutable, allowMultipleEdges);
-//		
-//		// connect the new node with the last nodes
-//		for(GraphNode<ID_TYPE, PAYLOAD_TYPE> lastNode: lastNodes){
-//			/* Put in the same instance of edge because the only mutable things
-//			 * in the edge are the nodes itself, and those I need to be the same instance */
-//			Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edge = Edge.create(lastNode, newNode);
-//			lastNode.addNextNode(edge);
-//			newNode.addPrevNode(edge);
-//		}
-//		
-//		// set the lastAddedNodes reference on the new node
-//		lastNodes.clear();
-//		lastNodes.add(newNode);
-//		
-//		// add to hashSet to find fast
-//		addNodeToHashMap(newNode);
-//		
-//		return newNode;
-//	}
-	
 	public Mutable getMutable() {
 		return mutable;
 	}
 
 	public void addParallel(List<Graph<ID_TYPE, PAYLOAD_TYPE>> anyOfThoseSubPaths){
-//	public void addParallel(List<AllowedPathBuilder<NODE_ID_TYPE>> anyOfThoseSubPaths){
 		
 		// preconditions
 		checkMutable();
@@ -134,8 +83,6 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 		
 		// add subpathes to last nodes of current path
 		for(Graph<ID_TYPE, PAYLOAD_TYPE> subPath: anyOfThoseSubPaths){
-//		for(AllowedPathBuilder<NODE_ID_TYPE> builder: anyOfThoseSubPaths){
-//			Graph<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> subPath = builder.a
 			GraphNode<ID_TYPE, PAYLOAD_TYPE> firstOfSubPath = subPath.getStartNode();
 			List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> lastNodesOfSubPath = subPath.getLastNodes();
 			newNodes.addAll(lastNodesOfSubPath);
@@ -200,27 +147,6 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 		return node.getPayload();
 	}
 
-//	private PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> getChildWithId(PathNode<NODE_ID_TYPE, NODE_PAYLOAD_TYPE> root, NODE_ID_TYPE idToSearch) {
-//
-//		// preconditions
-//		nn(root, "'root' is null!");
-//		nn(idToSearch, "'idToSearch' is null!");
-//		
-//		// if the startnode itself is the searched node...return it
-//		if(idToSearch.equals(root.getId())){
-//			/* root is not a child of itself, returning null would be enough here,
-//			 * but I throw an error as I should check that earlier and I want to 
-//			 * recognize this as a problem. */
-//			throw new IllegalStateException("'"+idToSearch+"' can't be the id of "
-//				+ "a child as it's already the id of your given root note!");
-//		};
-//		
-//		// otherwise search recursivly in its childs
-//		return root.getChildWithId(idToSearch);
-//		
-//	}
-
-	
 	/**
 	 * calls single threaded
 	 * @param consumer
