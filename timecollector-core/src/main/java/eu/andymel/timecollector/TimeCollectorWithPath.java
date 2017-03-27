@@ -4,6 +4,7 @@ import static eu.andymel.timecollector.util.Preconditions.nn;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -179,19 +180,21 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	/**
 	 * @return all possible paths (if there are multiple paths in the allowedGrap that fit)
 	 */
-	public List<List<GraphNode<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>>> getRecordedPaths() {
+	public List<List<SimpleEntry<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>>> getRecordedPaths() {
 
-		List<List<GraphNode<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>>> result = new LinkedList<>();
+//		List<List<GraphNode<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>>> result = new LinkedList<>();
+		List<List<SimpleEntry<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>>> result = new LinkedList<>();
 		
 		for(LinkedList<GraphNode<MILESTONE_TYPE, NodePermissions>> possiblePath: possibleListsOfWalkedAllowedGraphNodes){
-			List<GraphNode<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>> recPath = new ArrayList<>(possiblePath.size()); // Arraylist as nobody will remove or add entries in between but maybe jump to index?!
+			List<SimpleEntry<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>> recPath = new ArrayList<>(possiblePath.size()); // Arraylist as nobody will remove or add entries in between but maybe jump to index?!
 			int count=0;
 			for(GraphNode<MILESTONE_TYPE, NodePermissions> allowedNode: possiblePath){
 				recPath.add(
 					// TODO don't use GraphNode as data container here as it has overhad thats not needed here
 					// Profiler: 3/4 of the time spent in this method is needed in the GraphNode constructor!!!
 					// for example replace by AbstractMap.SimpleEntry
-					GraphNode.create(allowedNode, recordedTimes.get(count++), Mutable.IMMUTABLE, false)
+//					GraphNode.create(allowedNode, recordedTimes.get(count++), Mutable.IMMUTABLE, false)
+					new SimpleEntry<GraphNode<MILESTONE_TYPE, NodePermissions>, Instant>(allowedNode, recordedTimes.get(count++))
 				);
 			}
 			result.add(Collections.unmodifiableList(recPath));

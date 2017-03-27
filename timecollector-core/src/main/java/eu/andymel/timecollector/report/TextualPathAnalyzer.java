@@ -6,6 +6,7 @@ import static eu.andymel.timecollector.util.Preconditions.nn;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
+import java.util.AbstractMap.SimpleEntry;
 
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.GraphNode;
@@ -22,20 +23,20 @@ public class TextualPathAnalyzer<ID_TYPE> extends AbstractTextualAnalyzer<ID_TYP
 		
 		nn(tc, "TimeCollector is null!");
 		
-		List<List<GraphNode<GraphNode<ID_TYPE, NodePermissions>, Instant>>> paths = tc.getRecordedPaths();
+		List<List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>>> paths = tc.getRecordedPaths();
 
 		ne(paths, "TimeCollector does not contain recorded paths!");
 		
-		List<GraphNode<GraphNode<ID_TYPE, NodePermissions>, Instant>> path = paths.get(0);
+		List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> path = paths.get(0);
 		
-		Iterator<GraphNode<GraphNode<ID_TYPE, NodePermissions>, Instant>> it = path.iterator();
+		Iterator<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> it = path.iterator();
 		
 		Instant lastInstant = null;
 		String lastName = null;
 		while(it.hasNext()){
-			GraphNode<GraphNode<ID_TYPE, NodePermissions>, Instant> node = it.next();
-			GraphNode<ID_TYPE, NodePermissions> nodeFromAllowedGraph = node.getId();
-			Instant recordedInstant = node.getPayload();
+			SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant> node = it.next();
+			GraphNode<ID_TYPE, NodePermissions> nodeFromAllowedGraph = node.getKey();
+			Instant recordedInstant = node.getValue();
 			String milestoneName = nodeFromAllowedGraph.getId().toString();
 			if(lastInstant!=null){
 				addTimes(lastName, milestoneName, lastInstant, recordedInstant);

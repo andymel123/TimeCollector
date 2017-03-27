@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.AbstractMap.SimpleEntry;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +29,7 @@ public class LongPathTest {
 	@Test
 	public void testFirstMileStone() {
 		tc.saveTime(TestMilestones.CREATION);
-		List<List<GraphNode<GraphNode<TestMilestones, NodePermissions>, Instant>>> recordedPaths =  tc.getRecordedPaths();
+		List<List<SimpleEntry<GraphNode<TestMilestones, NodePermissions>, Instant>>> recordedPaths =  tc.getRecordedPaths();
 		assertNotNull(recordedPaths);
 		assertEquals(1, recordedPaths.size());
 	}
