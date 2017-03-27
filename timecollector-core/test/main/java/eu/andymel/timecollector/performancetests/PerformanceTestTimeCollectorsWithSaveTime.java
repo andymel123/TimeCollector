@@ -28,6 +28,13 @@ import eu.andymel.timecollector.util.NanoClock;
  * PerformanceTest: Create TimeCollectorWithPath
  * Total time needed: 0.761 seconds for 50000 iterations
  * That's 15220.0nanos per iteration
+ * 
+ * using HashMap<ID1, HashMap<ID2, time>> instead of Hashmap<String, time>
+ * using AbstractMap.SimpleEntry instead of GraphNode for getting RecPath
+ * PerformanceTest: Create TimeCollectorWithPath
+ * Total time needed: 0.511 seconds for 50000 iterations
+ * That's 10220.0nanos per iteration
+ * 
  */
 
 /**

@@ -32,7 +32,7 @@ public class TextualSerialAnalyzer<ID_TYPE extends Enum<ID_TYPE>> extends Abstra
 		while(it.hasNext()){
 			ID_TYPE nextMS = it.next();
 			Instant nextTime = tc.getTime(nextMS);
-			addTimes(lastMS.name(), nextMS.name(), lastTime, nextTime);
+			addTimes(lastMS, nextMS, lastTime, nextTime);
 			lastTime = nextTime;
 			lastMS = nextMS;
 		}

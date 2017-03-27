@@ -36,17 +36,17 @@ public class TextualPathAnalyzer<ID_TYPE> extends AbstractTextualAnalyzer<ID_TYP
 		Iterator<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> it = path.iterator();
 		
 		Instant lastInstant = null;
-		String lastName = null;
+		ID_TYPE lastMilestone = null;
 		while(it.hasNext()){
 			SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant> node = it.next();
 			GraphNode<ID_TYPE, NodePermissions> nodeFromAllowedGraph = node.getKey();
 			Instant recordedInstant = node.getValue();
-			String milestoneName = nodeFromAllowedGraph.getId().toString();
+			ID_TYPE milestone = nodeFromAllowedGraph.getId();
 			if(lastInstant!=null){
-				addTimes(lastName, milestoneName, lastInstant, recordedInstant);
+				addTimes(lastMilestone, milestone, lastInstant, recordedInstant);
 			}
 			lastInstant = recordedInstant;
-			lastName = milestoneName;
+			lastMilestone = milestone;
 		}
 		
 	}
