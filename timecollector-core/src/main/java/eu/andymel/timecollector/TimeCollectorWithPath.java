@@ -58,6 +58,7 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 		return new TimeCollectorWithPath<MILESTONE_TYPE>(clock, path);
 	}
 	
+	
 	/* (non-Javadoc)
 	 * @see eu.andymel.timecollector.TimeCollector#saveTime(MILESTONE_TYPE)
 	 */
@@ -86,13 +87,15 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 		for(LinkedList<GraphNode<MILESTONE_TYPE, NodePermissions>> l:possibleListsOfWalkedAllowedGraphNodes){
 			if(l.size() != recordedMilestonesCount){
 				throw new IllegalStateException("Milestones recorded: "+recordedMilestonesCount+
-						" but one of the possiblePaths has just a size of "+l.size()+"! You wanted to save '"+m+"'");
+					" but one of the possiblePaths has just a size of "+l.size()+"! You wanted to save '"+m+"'. "
+					+ "The recorded path: "+getGraphNodeListAsString(l));
 			}
 		}
 		
 	}
 
 	
+
 	private void checkPossible(MILESTONE_TYPE newMilestone) {
 		
 		if(recordedMilestones.size()==0){
@@ -168,14 +171,24 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	private MilestoneNotAllowedException newMilestoneNotAllowedException(MILESTONE_TYPE newMilestone) {
 		
 		return new MilestoneNotAllowedException(
-			"Milestone '"+newMilestone+"' is not allowed now! Former milestones were: ["+ 
-				recordedMilestones.stream()
-					.map(m->m.toString())
-					.collect(Collectors.joining(" -> "))
-			+"]"
-		);
+			"Milestone '"+newMilestone+"' is not allowed now! "
+			+ "Former milestones were: ["+ getMileStoneListAsString(recordedMilestones)+"]");
 		
 	}
+
+	private String getMileStoneListAsString(List<MILESTONE_TYPE> list) {
+		if(list==null || list.size()==0)return "";
+		
+		return list.stream()
+				.map(m->m.toString())
+				.collect(Collectors.joining(" -> "));
+	}
+	private String getGraphNodeListAsString(List<GraphNode<MILESTONE_TYPE, NodePermissions>> list) {
+		return list.stream()
+				.map(n->n.getId().toString())
+				.collect(Collectors.joining(" -> "));
+	}
+
 
 	/**
 	 * @return all possible paths (if there are multiple paths in the allowedGrap that fit)

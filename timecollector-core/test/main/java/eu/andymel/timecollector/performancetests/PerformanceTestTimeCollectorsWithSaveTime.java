@@ -2,7 +2,8 @@ package eu.andymel.timecollector.performancetests;
 
 
 
-import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.*;
+import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.o;
+import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.waitForInput;
 
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +43,7 @@ public class PerformanceTestTimeCollectorsWithSaveTime {
 		
 		NanoClock clock = new NanoClock();
 		
-		TextualPathAnalyzer<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> analyzer = new TextualPathAnalyzer<>();
+		TextualPathAnalyzer<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> analyzer = TextualPathAnalyzer.create();
 		
 		waitForInput();
 		

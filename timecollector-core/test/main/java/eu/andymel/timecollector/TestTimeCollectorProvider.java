@@ -2,6 +2,7 @@ package eu.andymel.timecollector;
 
 import java.time.Clock;
 
+import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.PermissionNode;
 
@@ -14,9 +15,6 @@ public class TestTimeCollectorProvider {
 		BEFORE_SEARCH_HANDLER,
 		AFTER_SEARCH_HANDLER,
 		BEFORE_HANDLER,
-		
-		BEFORE_DBPOOL,
-		AFTER_DBPOOL,
 		
 		BEFORE_DAO_GETSTATE,
 		BEFORE_DB_GETSTATE,
@@ -37,8 +35,14 @@ public class TestTimeCollectorProvider {
 		AFTER_DAO_SAVE,
 
 		AFTER_HANDLER,
-		AFTER_HANDLER_CONTEXT;
+		AFTER_HANDLER_CONTEXT,
 
+		
+		BEFORE_DBPOOL,
+		AFTER_DBPOOL,
+		RETRY
+
+		
 	}
 	
 	private final static PermissionNode<TestMilestones> nCreation 					= PermissionNode.create(TestMilestones.CREATION);
@@ -66,6 +70,7 @@ public class TestTimeCollectorProvider {
 	private final static PermissionNode<TestMilestones> nBEFORE_DBPOOL_SAVE 		= PermissionNode.create(TestMilestones.BEFORE_DBPOOL);
 	private final static PermissionNode<TestMilestones> nAFTER_DBPOOL_SAVE 			= PermissionNode.create(TestMilestones.AFTER_DBPOOL);
 	private final static PermissionNode<TestMilestones> nBEFORE_DB_SAVE_DESICION1 	= PermissionNode.create(TestMilestones.BEFORE_DB_SAVE_DECISION1);
+	private final static PermissionNode<TestMilestones> nRETRY 						= PermissionNode.create(TestMilestones.RETRY);
 	private final static PermissionNode<TestMilestones> nAFTER_DB_SAVE_DESICION1 	= PermissionNode.create(TestMilestones.AFTER_DB_SAVE_DECISION1);
 	private final static PermissionNode<TestMilestones> nBEFORE_DB_SAVE_DESICION2 	= PermissionNode.create(TestMilestones.BEFORE_DB_SAVE_DECISION2);
 	private final static PermissionNode<TestMilestones> nAFTER_DB_SAVE_DESICION2 	= PermissionNode.create(TestMilestones.AFTER_DB_SAVE_DECISION2);
@@ -87,7 +92,7 @@ public class TestTimeCollectorProvider {
 				nBEFORE_DECIDER, nAFTER_DECIDER,
 				nBEFORE_DAO_SAVE,
 				nBEFORE_DBPOOL_SAVE, nAFTER_DBPOOL_SAVE,
-				nBEFORE_DB_SAVE_DESICION1, nAFTER_DB_SAVE_DESICION1,
+				nBEFORE_DB_SAVE_DESICION1, nRETRY, nAFTER_DB_SAVE_DESICION1,
 				nBEFORE_DB_SAVE_DESICION2, nAFTER_DB_SAVE_DESICION2,
 				nAFTER_DAO_SAVE, nAFTER_HANDLER, nAFTER_HANDLER_CONTEXT
 			)
@@ -147,7 +152,7 @@ public class TestTimeCollectorProvider {
 			.path(
 				/* if db request for saving descion1 leads to an db error
 				 * we try again (jump back to reading in the new state from the db) */
-				nBEFORE_DB_SAVE_DESICION1, nBEFORE_DAO_GETSTATE
+				nBEFORE_DB_SAVE_DESICION1, nRETRY, nAFTER_DB_SAVE_DESICION1, nAFTER_DAO_SAVE, nBEFORE_DAO_GETSTATE
 			)					
 			.build();
 		

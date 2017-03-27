@@ -14,10 +14,14 @@ import eu.andymel.timecollector.graphs.NodePermissions;
 
 public class TextualPathAnalyzer<ID_TYPE> extends AbstractTextualAnalyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> {
 
-	public TextualPathAnalyzer() {
+	private TextualPathAnalyzer() {
 		super();
 	}
 
+	public static<ID_TYPE> TextualPathAnalyzer<ID_TYPE> create(){
+		return new TextualPathAnalyzer<>();
+	}
+	
 	@Override
 	public synchronized void addCollector(TimeCollectorWithPath<ID_TYPE> tc) {
 		
