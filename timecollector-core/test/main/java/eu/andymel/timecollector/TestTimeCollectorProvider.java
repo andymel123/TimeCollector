@@ -2,7 +2,6 @@ package eu.andymel.timecollector;
 
 import java.time.Clock;
 
-import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.PermissionNode;
 

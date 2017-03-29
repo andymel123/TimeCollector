@@ -16,7 +16,6 @@ import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.Edge;
 import eu.andymel.timecollector.graphs.GraphNode;
-import eu.andymel.timecollector.graphs.Mutable;
 import eu.andymel.timecollector.graphs.NodePermissions;
 
 public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILESTONE_TYPE> {
@@ -27,11 +26,12 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 		ASSERT
 	}
 	
+	private static final boolean ASSERT_CORRECTNESS_AT_EACH_SAVETIME = false;
+	
 	/** The clock to use to save time stamps */
 	private final Clock clock;
 	
 	private LinkedList<LinkedList<GraphNode<MILESTONE_TYPE, NodePermissions>>> possibleListsOfWalkedAllowedGraphNodes;	// outer LinkedList as I want to remove from in between fast, inner as I want to call getLast()
-	private LinkedList<MILESTONE_TYPE> recordedMilestones;	// LinkedList as it seems slightly faster (see PerformanceTestLists)
 	private ArrayList<Instant> recordedTimes;				// ArrayList as I use get(i) in getRecordedPaths()
 	private AllowedPathsGraph<MILESTONE_TYPE> allowedGraph;
 	
@@ -45,13 +45,19 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 		nn(clock, "'clock' my not be null!");
 		nn(allowed, "'path' my not be null!");
 		this.clock = clock;
-		this.recordedMilestones = new LinkedList<>();	 
 		this.recordedTimes = new ArrayList<>();			
 		this.possibleListsOfWalkedAllowedGraphNodes = new LinkedList<>();	
 		this.allowedGraph = allowed;
 		this.recordedMilestonesCount = 0;
 	}
 
+	public AllowedPathsGraph<MILESTONE_TYPE> getAllowedGraph() {
+		if(allowedGraph.getMutable().isMutable()){
+			throw new IllegalStateException("An allowedGraph that is "
+			+ "retrieved from a timecollector should not be mutable anymore!");
+		}
+		return allowedGraph;
+	}
 	
 	public static <MILESTONE_TYPE> TimeCollectorWithPath<MILESTONE_TYPE> createWithPath(AllowedPathsGraph<MILESTONE_TYPE> path){
 		return new TimeCollectorWithPath<MILESTONE_TYPE>(path);
@@ -70,20 +76,19 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 		checkPossible(m);
 		
 		recordedTimes.add(clock.instant());
-		recordedMilestones.add(m);
 
-		recordedMilestonesCount++;
+		if(ASSERT_CORRECTNESS_AT_EACH_SAVETIME)assertions(m);
 		
+	}
+
+	private void assertions(MILESTONE_TYPE m){
+		
+		recordedMilestonesCount++;
 		
 		// just some fast checks to find problems as early as possible
 		if( recordedTimes.size() != recordedMilestonesCount){
 			throw new IllegalStateException("Milestones recorded: "+recordedMilestonesCount+
 					" but just "+recordedTimes.size()+" times recorded! You wanted to save '"+m+"'");
-		}
-
-		if( recordedMilestones.size() != recordedMilestonesCount){
-			throw new IllegalStateException("Milestones recorded: "+recordedMilestones.size()+
-					" but the counter says "+recordedMilestonesCount+"! You wanted to save '"+m+"'");
 		}
 
 		for(LinkedList<GraphNode<MILESTONE_TYPE, NodePermissions>> l:possibleListsOfWalkedAllowedGraphNodes){
@@ -93,14 +98,11 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 					+ "The recorded path: "+getGraphNodeListAsString(l));
 			}
 		}
-		
 	}
-
-	
 
 	private void checkPossible(MILESTONE_TYPE newMilestone) {
 		
-		if(recordedMilestones.size()==0){
+		if(recordedTimes.size()==0){
 			// shortcut this is the first milestone
 			if(!newMilestone.equals(allowedGraph.getStartNode().getId())){
 				throw newMilestoneNotAllowedException(newMilestone);
@@ -172,19 +174,25 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	
 	private MilestoneNotAllowedException newMilestoneNotAllowedException(MILESTONE_TYPE newMilestone) {
 		
+		String mileStones = null;
+		if(possibleListsOfWalkedAllowedGraphNodes.size()>0){
+			mileStones = getMileStoneListAsString(possibleListsOfWalkedAllowedGraphNodes.getFirst());
+		}
+		
 		return new MilestoneNotAllowedException(
 			"Milestone '"+newMilestone+"' is not allowed now! "
-			+ "Former milestones were: ["+ getMileStoneListAsString(recordedMilestones)+"]");
+			+ "Former milestones were: ["+ mileStones +"]");
 		
 	}
 
-	private String getMileStoneListAsString(List<MILESTONE_TYPE> list) {
+	private String getMileStoneListAsString(List<GraphNode<MILESTONE_TYPE, NodePermissions>> list) {
 		if(list==null || list.size()==0)return "";
 		
 		return list.stream()
-				.map(m->m.toString())
+				.map(m->m.getId().toString())
 				.collect(Collectors.joining(" -> "));
 	}
+	
 	private String getGraphNodeListAsString(List<GraphNode<MILESTONE_TYPE, NodePermissions>> list) {
 		return list.stream()
 				.map(n->n.getId().toString())

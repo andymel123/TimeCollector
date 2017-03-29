@@ -2,38 +2,17 @@ package eu.andymel.timecollector.performancetests;
 
 
 
-import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.o;
-import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.waitForInput;
-
+import java.io.File;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 import eu.andymel.timecollector.TestTimeCollectorProvider;
 import eu.andymel.timecollector.TimeCollectorWithPath;
-import eu.andymel.timecollector.report.TextualPathAnalyzer;
+import eu.andymel.timecollector.report.HTMLFileAnalyzer;
 import eu.andymel.timecollector.util.NanoClock;
 
 /*
- * 20170322
- * PerformanceTest: Create TimeCollectorWithPath
- * Total time needed: 2.771 seconds for 50000 iterations 
- * That's 55420.0nanos per iteration
- * 
- * rebuilt saveTime
- * PerformanceTest: Create TimeCollectorWithPath
- * Total time needed: 3.35 seconds for 50000 iterations
- * That's 67000.0nanos per iteration
- * 
- * new saveTime and getRecordedPaths
- * PerformanceTest: Create TimeCollectorWithPath
- * Total time needed: 0.761 seconds for 50000 iterations
- * That's 15220.0nanos per iteration
- * 
- * using HashMap<ID1, HashMap<ID2, time>> instead of Hashmap<String, time>
- * using AbstractMap.SimpleEntry instead of GraphNode for getting RecPath
- * PerformanceTest: Create TimeCollectorWithPath
- * Total time needed: 0.511 seconds for 50000 iterations
- * That's 10220.0nanos per iteration
  * 
  */
 
@@ -42,7 +21,7 @@ import eu.andymel.timecollector.util.NanoClock;
  * @author andymatic
  *
  */
-public class PerformanceTestTimeCollectorsWithSaveTime {
+public class PerformanceTestWithHTMLFileAnalyzer {
 
 	public static void main(String[] args) {
 		
@@ -50,9 +29,9 @@ public class PerformanceTestTimeCollectorsWithSaveTime {
 		
 		NanoClock clock = new NanoClock();
 		
-		TextualPathAnalyzer<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> analyzer = TextualPathAnalyzer.create();
+		HTMLFileAnalyzer<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> analyzer = HTMLFileAnalyzer.create();
 		
-		waitForInput();
+//		waitForInput();
 		
 		Instant start = Instant.now();
 		for(int i=0; i<amount; i++){
@@ -85,7 +64,13 @@ public class PerformanceTestTimeCollectorsWithSaveTime {
 		}
 		PerformanceTestsUtils.end("Create TimeCollectorWithPath", amount, start);
 		
-		o(analyzer.toString(TimeUnit.NANOSECONDS));
+//		o(analyzer.getHTMLString(TimeUnit.NANOSECONDS));
+		try {
+			analyzer.writeToFile(new File("output.html"), TimeUnit.NANOSECONDS, false);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	

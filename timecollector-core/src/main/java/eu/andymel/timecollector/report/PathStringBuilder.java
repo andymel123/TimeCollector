@@ -2,7 +2,6 @@ package eu.andymel.timecollector.report;
 
 import java.time.Duration;
 import java.time.temporal.Temporal;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -12,22 +11,23 @@ import java.util.concurrent.TimeUnit;
 
 import eu.andymel.timecollector.TimeCollector;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
-import eu.andymel.timecollector.util.AvgMaxCalcLongTest;
 
-public abstract class AbstractTextualAnalyzer<ID_TYPE, TC_TYPE extends TimeCollector<ID_TYPE>> implements Analyzer<ID_TYPE, TC_TYPE> {
+public class PathStringBuilder<ID_TYPE, TC_TYPE extends TimeCollector<ID_TYPE>> {
 
 	/** HashMap in HashMap as outer key is the first milestone, inner key the second */
 	private HashMap<ID_TYPE, HashMap<ID_TYPE, AvgMaxCalcLong>> timesPerSpan;
 	
-	public AbstractTextualAnalyzer() {
-		timesPerSpan = new HashMap<>();
+	public PathStringBuilder() {
+		/* LinkedHashMap to get insertion order, has same performance as HashMap in my measurements */
+		timesPerSpan = new LinkedHashMap<>();
 	}
 	
 	protected void addTimes(ID_TYPE m1, ID_TYPE m2, Temporal t1, Temporal t2) {
 		HashMap<ID_TYPE, AvgMaxCalcLong> inner = timesPerSpan.get(m1);
 		AvgMaxCalcLong calc = null;
 		if(inner==null){
-			inner = new HashMap<>();
+			inner = new LinkedHashMap<>();
+			timesPerSpan.put(m1, inner);
 		} else {
 			calc = inner.get(m2);
 		}
@@ -79,13 +79,15 @@ public abstract class AbstractTextualAnalyzer<ID_TYPE, TC_TYPE extends TimeColle
 		
 		columnWidth[0] = Math.max(columnWidth[0], headerTimeSpan.length());
 
+		String formatString = 	"%"+(columnWidth[0]+3)+"s %"+(columnWidth[1]+2)+"s %"+(columnWidth[2]+2)+"s %"+(columnWidth[3]+2)+"s";
+		
 		// header
-		sb.append(String.format("%"+(columnWidth[0]+2)+"s %"+(columnWidth[1]+2)+"s %"+(columnWidth[2]+2)+"s %"+(columnWidth[3]+2)+"s", headerTimeSpan, "min", "avg", "max")).append('\n');
+		sb.append(String.format(formatString, headerTimeSpan, "min", "avg", "max")).append('\n');
 
 		// other rows
-		String formatString = 	"%"+(columnWidth[0]+2)+"s %"+(columnWidth[1]+2)+"d %"+(columnWidth[2]+2)+"d %"+(columnWidth[3]+2)+"d";
-		
-		for(String[] row: rows)sb.append(String.format(formatString, row[0], row[1], row[2], row[3])).append('\n');
+		for(String[] row: rows){
+			sb.append(String.format(formatString, row[0], row[1], row[2], row[3])).append('\n');
+		}
 		
 		return sb.toString();
 			

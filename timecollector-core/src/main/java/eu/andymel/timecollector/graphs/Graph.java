@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -203,6 +204,13 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 		
 	};
 	
+	public Set<GraphNode<ID_TYPE, PAYLOAD_TYPE>> getAllNodes() {
+		Set<GraphNode<ID_TYPE, PAYLOAD_TYPE>> result = new HashSet<>();
+		// TODO not nice to change the result state within a lambda!
+		forEach(n->result.add(n));
+		return result;
+	}
+
 	
 	protected List<GraphNode<ID_TYPE, PAYLOAD_TYPE>> getAllNodesWIthId(ID_TYPE nodeId) {
 		return nodes.get(nodeId);

@@ -1,0 +1,46 @@
+<html>
+<head>
+  <title>eu.andymel.timeCollector Performance Graph v.01</title>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.19.1/vis.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.19.1/vis-network.min.js" rel="stylesheet" type="text/css" />
+
+  <style type="text/css">
+    #mynetwork {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<p>
+  _REPLACE_DESCRIPTION_
+</p>
+
+<div id="timedGraph"></div>
+
+<script type="text/javascript">
+  // create an array with nodes
+  var nodes = new vis.DataSet([
+	  _REPLACE_NODES_
+  ]);
+
+  // create an array with edges
+  var edges = new vis.DataSet([
+	  _REPLACE_EDGES_
+  ]);
+
+  // create a network
+  var container = document.getElementById('timedGraph');
+  var data = {
+    nodes: nodes,
+    edges: edges
+  };
+  var options = {};
+  var network = new vis.Network(container, data, options);
+</script>
+
+
+</body>
+</html>

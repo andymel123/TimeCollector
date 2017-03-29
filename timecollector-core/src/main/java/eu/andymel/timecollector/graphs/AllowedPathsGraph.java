@@ -5,6 +5,7 @@ import static eu.andymel.timecollector.util.Preconditions.nn;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> {
 	

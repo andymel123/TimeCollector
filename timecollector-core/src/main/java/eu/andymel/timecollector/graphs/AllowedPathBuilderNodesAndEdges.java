@@ -168,61 +168,8 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 
 		simpleMutable.setImmutable();
 		
-//		throw new IllegalStateException("TODO I need an instance of AllowedPathsGraph");
 		return new AllowedPathsGraph<>(startNode, simpleMutable);
 	}
-
-//	private static final <ID_TYPE> boolean checkForCircularConnections(Graph<ID_TYPE, NodePermissions> graph){
-//		
-//		nn(graph, "graph is null!");
-//		
-////		GraphNode<ID_TYPE, PAYLOAD_TYPE> node = graph.getStartNode();
-////		HashSet<GraphNode<ID_TYPE, PAYLOAD_TYPE>>
-//
-//		graph.forEachRootOfACircle((rootOfCircle) -> {
-//			/* walk through the parents of this node and search 
-//			 * for some edge permission that terminates the loop 
-//			 * every loop (that should be recorded) has to end 
-//			 * otherwise recording data would stack up endlessly */
-//			
-//			nn(rootOfCircle, "'rootOfCircle' is null!");
-//			
-//			/* as long as there is just one parent node I can iterate instead of something
-//			 * recursive to prevent stack overflow in graphs that are very deep */
-//			List<Edge<GraphNode<ID_TYPE, NodePermissions>>> parents = rootOfCircle.getEdgesToParents();
-//			if(parents==null){
-//				/* if the currentFirstNode is the startNode we should have handled that earlier
-//				 * all other nodes need to have parents */
-//				throw new IllegalStateException("No parents for node with id '"+rootOfCircle.getId()+"'");
-//			}
-//			
-//			while(parents.size()==1){
-//				GraphNode<ID_TYPE, NodePermissions> singleParent = parents.get(0).getParentNode();
-//				baseReversedList.add(singleParent.copy());
-//				
-//				if(singleParent == getStartNode()){
-//					// path finished
-//					results.add(baseReversedList);
-//					return;
-//				} else {
-//					parents = singleParent.getEdgesToParents();
-//				}
-//			}
-//
-//			// if mutliple parents...use recursive approach
-//			for(Edge<GraphNode<ID_TYPE, NodePermissions>> edgeToParent: parents){
-//				GraphNode<ID_TYPE, NodePermissions> parent = edgeToParent.getParentNode();
-//				List<GraphNode<ID_TYPE, NodePermissions>> copyOfReversedList = copyNodeList(baseReversedList);
-//				copyOfReversedList.add(parent.copy());
-//				getAllReversedListsOfNodesToStartNode(copyOfReversedList, parent, results);
-//			}
-//			
-//		});
-//		
-//		return false;
-//	}
-	
-	
 	
 	public AllowedPathBuilderNodesAndEdges<ID_TYPE> path(PermissionNode<ID_TYPE>... nodes) {
 		

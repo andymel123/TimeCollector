@@ -5,12 +5,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
-import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 
