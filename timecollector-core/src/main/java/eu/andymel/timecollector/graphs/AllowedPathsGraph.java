@@ -35,17 +35,17 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		return super.getStartNode();
 	}
 	
-	boolean checkForCircularConnections(){
-		
-		forEachRootOfACircle((rootOfCircle) -> {
-			/* 
-			 * 1.) get all paths to itself
-			 * 2.) heck paths for edge permissions that ensure termination
-			 */
-		});
-		
-		return false;
-	}
+//	boolean checkForCircularConnections(){
+//		
+//		forEachRootOfACircle((rootOfCircle) -> {
+//			/* 
+//			 * 1.) get all paths to itself
+//			 * 2.) heck paths for edge permissions that ensure termination
+//			 */
+//		});
+//		
+//		return false;
+//	}
 
 	
 	private void getAllReversedListsOfNodesToStartNode(List<GraphNode<ID_TYPE, NodePermissions>> baseReversedList, GraphNode<ID_TYPE, NodePermissions> currentFirstNode, List<List<GraphNode<ID_TYPE, NodePermissions>>> results) {

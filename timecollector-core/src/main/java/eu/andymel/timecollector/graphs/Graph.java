@@ -5,6 +5,7 @@ import static eu.andymel.timecollector.util.Preconditions.nn;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +13,8 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.andymel.timecollector.util.IdentitySet;
 
 /**
  * @author andymatic
@@ -153,14 +156,18 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 	 * @param consumer
 	 */
 	void forEach(Consumer<GraphNode<ID_TYPE, PAYLOAD_TYPE>> consumer){
-		forEachChild(getStartNode(), consumer, new HashSet<>(), false);
+//		IdentityHashMap<GraphNode<ID_TYPE, PAYLOAD_TYPE>, Void> found = new IdentityHashMap<>();
+		
+		IdentitySet<GraphNode<ID_TYPE,PAYLOAD_TYPE>> found = new IdentitySet<>();
+		forEachChild(getStartNode(), consumer, found, false);
+		int i=0;
 	}
 
-	void forEachRootOfACircle(Consumer<GraphNode<ID_TYPE, PAYLOAD_TYPE>> consumer){
-		forEachChild(getStartNode(), consumer, new HashSet<>(), true);
-	}
+//	void forEachRootOfACircle(Consumer<GraphNode<ID_TYPE, PAYLOAD_TYPE>> consumer){
+//		forEachChild(getStartNode(), consumer, new IdentityHashMap<>().keySet(), true);
+//	}
 
-	private void forEachChild(GraphNode<ID_TYPE, PAYLOAD_TYPE> rootOfSearch, Consumer<GraphNode<ID_TYPE, PAYLOAD_TYPE>> consumer, HashSet<GraphNode<ID_TYPE, PAYLOAD_TYPE>> alreadyDone, boolean onlyCallConsumerForRootOfCircles){
+	private void forEachChild(GraphNode<ID_TYPE, PAYLOAD_TYPE> rootOfSearch, Consumer<GraphNode<ID_TYPE, PAYLOAD_TYPE>> consumer, Set<GraphNode<ID_TYPE,PAYLOAD_TYPE>> set, boolean onlyCallConsumerForRootOfCircles){
 		
 		GraphNode<ID_TYPE, PAYLOAD_TYPE> node = rootOfSearch;
 
@@ -169,7 +176,7 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 			// preconditions
 			nn(node, "'node' is null!");
 			
-			if(alreadyDone.contains(node)){
+			if(set.contains(node)){
 				// this node was visited earlier
 				if(onlyCallConsumerForRootOfCircles){
 					consumer.accept(node);
@@ -181,7 +188,7 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 				if(!onlyCallConsumerForRootOfCircles){
 					consumer.accept(node);
 				}
-				alreadyDone.add(node);
+				set.add(node);
 			}
 			
 			List<Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>>> edgesToChildren = node.getEdgesToChildren(); 
@@ -196,7 +203,7 @@ public class Graph<ID_TYPE, PAYLOAD_TYPE> {
 			}
 			
 			for(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> edgeToChild: edgesToChildren){
-				forEachChild(edgeToChild.getChildNode(), consumer, alreadyDone, onlyCallConsumerForRootOfCircles);
+				forEachChild(edgeToChild.getChildNode(), consumer, set, onlyCallConsumerForRootOfCircles);
 			}
 			
 			break;

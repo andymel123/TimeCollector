@@ -51,20 +51,20 @@ public class TestTimeCollectorProvider {
 	private final static PermissionNode<TestMilestones> nAFTER_SEARCH_HANDLER 		= PermissionNode.create(TestMilestones.AFTER_SEARCH_HANDLER);
      
 	private final static PermissionNode<TestMilestones> nBEFORE_HANDLER 			= PermissionNode.create(TestMilestones.BEFORE_HANDLER);
-	 	
+	// 5 	
 	private final static PermissionNode<TestMilestones> nBEFORE_DAO_GETSTATE 		= PermissionNode.create(TestMilestones.BEFORE_DAO_GETSTATE);
 	private final static PermissionNode<TestMilestones> nBEFORE_DBPOOL_GETSTATE		= PermissionNode.create(TestMilestones.BEFORE_DBPOOL);
 	private final static PermissionNode<TestMilestones> nAFTER_DBPOOL_GETSTATE		= PermissionNode.create(TestMilestones.AFTER_DBPOOL);
 	private final static PermissionNode<TestMilestones> nBEFORE_DB_GETSTATE 		= PermissionNode.create(TestMilestones.BEFORE_DB_GETSTATE);
 	private final static PermissionNode<TestMilestones> nAFTER_DB_GETSTATE 			= PermissionNode.create(TestMilestones.AFTER_DB_GETSTATE);
 	private final static PermissionNode<TestMilestones> nAFTER_DAO_GETSTATE 		= PermissionNode.create(TestMilestones.AFTER_DAO_GETSTATE);
-	 
+	//11
 	private final static PermissionNode<TestMilestones> nBEFORE_CALC 				= PermissionNode.create(TestMilestones.BEFORE_CALC1);
 	private final static PermissionNode<TestMilestones> nAFTER_CALC 				= PermissionNode.create(TestMilestones.AFTER_CALC1);
 	 
 	private final static PermissionNode<TestMilestones> nBEFORE_DECIDER 			= PermissionNode.create(TestMilestones.BEFORE_DECIDER);
 	private final static PermissionNode<TestMilestones> nAFTER_DECIDER 				= PermissionNode.create(TestMilestones.AFTER_DECIDER);
-	 
+	//15 
 	private final static PermissionNode<TestMilestones> nBEFORE_DAO_SAVE 			= PermissionNode.create(TestMilestones.BEFORE_DAO_SAVE);
 	private final static PermissionNode<TestMilestones> nBEFORE_DBPOOL_SAVE 		= PermissionNode.create(TestMilestones.BEFORE_DBPOOL);
 	private final static PermissionNode<TestMilestones> nAFTER_DBPOOL_SAVE 			= PermissionNode.create(TestMilestones.AFTER_DBPOOL);
@@ -73,7 +73,7 @@ public class TestTimeCollectorProvider {
 	private final static PermissionNode<TestMilestones> nAFTER_DB_SAVE_DESICION1 	= PermissionNode.create(TestMilestones.AFTER_DB_SAVE_DECISION1);
 	private final static PermissionNode<TestMilestones> nBEFORE_DB_SAVE_DESICION2 	= PermissionNode.create(TestMilestones.BEFORE_DB_SAVE_DECISION2);
 	private final static PermissionNode<TestMilestones> nAFTER_DB_SAVE_DESICION2 	= PermissionNode.create(TestMilestones.AFTER_DB_SAVE_DECISION2);
-	 	
+	// 23
 	private final static PermissionNode<TestMilestones> nAFTER_DAO_SAVE 			= PermissionNode.create(TestMilestones.AFTER_DAO_SAVE);
 	private final static PermissionNode<TestMilestones> nAFTER_HANDLER 				= PermissionNode.create(TestMilestones.AFTER_HANDLER);
 	private final static PermissionNode<TestMilestones> nAFTER_HANDLER_CONTEXT		= PermissionNode.create(TestMilestones.AFTER_HANDLER_CONTEXT);
@@ -84,16 +84,16 @@ public class TestTimeCollectorProvider {
 			nodes(
 				nCreation,
 				nBEFORE_HANDLER_CONTEXT, nBEFORE_SEARCH_HANDLER, nAFTER_SEARCH_HANDLER,
-				nBEFORE_HANDLER,
-				nBEFORE_DAO_GETSTATE,nBEFORE_DBPOOL_GETSTATE, nAFTER_DBPOOL_GETSTATE, 
-				nBEFORE_DB_GETSTATE, nAFTER_DB_GETSTATE, nAFTER_DAO_GETSTATE,
-				nBEFORE_CALC, nAFTER_CALC,
-				nBEFORE_DECIDER, nAFTER_DECIDER,
+				nBEFORE_HANDLER,	// 5
+				nBEFORE_DAO_GETSTATE,nBEFORE_DBPOOL_GETSTATE, nAFTER_DBPOOL_GETSTATE, // 8 
+				nBEFORE_DB_GETSTATE, nAFTER_DB_GETSTATE, nAFTER_DAO_GETSTATE,	// 11
+				nBEFORE_CALC, nAFTER_CALC,	// 13
+				nBEFORE_DECIDER, nAFTER_DECIDER,	// 15
 				nBEFORE_DAO_SAVE,
-				nBEFORE_DBPOOL_SAVE, nAFTER_DBPOOL_SAVE,
-				nBEFORE_DB_SAVE_DESICION1, nRETRY, nAFTER_DB_SAVE_DESICION1,
-				nBEFORE_DB_SAVE_DESICION2, nAFTER_DB_SAVE_DESICION2,
-				nAFTER_DAO_SAVE, nAFTER_HANDLER, nAFTER_HANDLER_CONTEXT
+				nBEFORE_DBPOOL_SAVE, nAFTER_DBPOOL_SAVE,	// 18
+				nBEFORE_DB_SAVE_DESICION1, nRETRY, nAFTER_DB_SAVE_DESICION1,	// 21
+				nBEFORE_DB_SAVE_DESICION2, nAFTER_DB_SAVE_DESICION2,	// 23
+				nAFTER_DAO_SAVE, nAFTER_HANDLER, nAFTER_HANDLER_CONTEXT	//26
 			)
 			.path(
 					// first milestone in the life of each data object

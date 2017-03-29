@@ -1,6 +1,7 @@
 package eu.andymel.timecollector;
 
 import static eu.andymel.timecollector.PathTestUtils.checkRecPath;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -66,6 +67,11 @@ public class NodesAndEdgesTest {
 //		tcEASMax3 = TimeCollectorWithPath.<TestMilestones>createWithPath(new TestClock(), pathMax3);
 	}
 
+	@Test
+	public void testAllNodesInThere(){
+		assertEquals(6, tcEAS.getAllowedGraph().getAllNodes().size());
+	}
+	
 	@Test
 	public void testEASMax3_1() {
 		tcEAS.saveTime(TestMilestones.MS1);

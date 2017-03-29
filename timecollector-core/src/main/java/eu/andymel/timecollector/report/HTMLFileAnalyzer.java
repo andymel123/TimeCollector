@@ -143,7 +143,7 @@ public class HTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzer<ID_TYPE> {
 			}else{
 				nodesString.append(',');
 			}
-			nodesString.append(String.format(oneNodeString, node.getId(), node.getId()));	
+			nodesString.append(String.format(oneNodeString, System.identityHashCode(node), node.getId()));	
 		}
 		
 		
@@ -163,8 +163,8 @@ public class HTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzer<ID_TYPE> {
 			edgesString.append(
 				String.format(
 					edgeFormat, 
-					edge.getParentNode().getId(), 
-					edge.getChildNode().getId(),
+					System.identityHashCode(edge.getParentNode()), 
+					System.identityHashCode(edge.getChildNode()),
 					unit.convert(calc.getMin(),TimeUnit.NANOSECONDS),
 					unit.convert((long)calc.getAvg(),TimeUnit.NANOSECONDS),
 					unit.convert(calc.getMax(),TimeUnit.NANOSECONDS)
