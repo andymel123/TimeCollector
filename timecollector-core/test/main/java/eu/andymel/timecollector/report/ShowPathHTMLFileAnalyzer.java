@@ -30,7 +30,8 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 	private static enum placeholder{
 		_REPLACE_DESCRIPTION_,
 		_REPLACE_NODES_,
-		_REPLACE_EDGES_
+		_REPLACE_EDGES_,
+		_REPLACE_TIMETABLE_
 	}
 	
 
@@ -109,17 +110,48 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 			nodesString.append(String.format(oneNodeString, String.valueOf(identityHashCode), node.getId()));	
 		}
 		
+		String[][] arr = getAsStringTable(unit).asArray();
 
+		String tableString = "No Data!";
+		
+		if(arr!=null && arr.length>1){
+
+			// first line is the header
+			StringBuilder sbTable = new StringBuilder();
+			sbTable
+			.append("<table>")
+			.append("<tr><th>")
+			.append(arr[0][0]).append("</th><th>")
+			.append(arr[0][1]).append("</th><th>")
+			.append(arr[0][2]).append("</th><th>")
+			.append(arr[0][3])
+			.append("</th></tr>");
+
+			for(int r=1; r<arr.length; r++){
+				sbTable
+				.append("<tr><td>")
+				.append(arr[r][0]).append("</td><td>")
+				.append(arr[r][1]).append("</td><td>")
+				.append(arr[r][2]).append("</td><td>")
+				.append(arr[r][3])
+				.append("</td></tr>");
+			}
+			
+			sbTable.append("</table>");
+			
+			tableString = sbTable.toString();
+		}
 		
 		
 		
 		String description = "TimeCollectors analyzed: "+getNumberOfAddedTimeCollectors();
-		description += "\nEdge labels show (min | avg |max) in "+unit;
+		description += "\nEdge labels show 'min | avg | max (count)' in "+unit;
 		
 		String template = getTemplate();
-		template = template.replaceFirst(placeholder._REPLACE_DESCRIPTION_.name(), description);
-		template = template.replaceFirst(placeholder._REPLACE_NODES_.name(), nodesString.toString());
-		template = template.replaceFirst(placeholder._REPLACE_EDGES_.name(), edgesString.toString());
+		template = template.replaceFirst(placeholder._REPLACE_DESCRIPTION_.name(), 	description);
+		template = template.replaceFirst(placeholder._REPLACE_NODES_.name(), 		nodesString.toString());
+		template = template.replaceFirst(placeholder._REPLACE_EDGES_.name(), 		edgesString.toString());
+		template = template.replaceFirst(placeholder._REPLACE_TIMETABLE_.name(), 	tableString);
 		return template;
 	}
 	

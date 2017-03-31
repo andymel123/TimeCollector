@@ -9,10 +9,22 @@ public class AvgMaxCalcLong {
 	private boolean valid = false;
 	
 	public static AvgMaxCalcLong create() {
-		return new AvgMaxCalcLong();
+		return new AvgMaxCalcLong(false);
+	}
+	public static AvgMaxCalcLong createInitializedWithZero() {
+		return new AvgMaxCalcLong(true);
 	}
 
-	private AvgMaxCalcLong() {};
+	
+	private AvgMaxCalcLong(boolean initializeWith0) {
+		if(initializeWith0){
+			// set everything to 0 without counting this as the first entry
+			this.avg = 0;
+			this.max = 0;
+			this.min = 0;
+			valid = true;
+		}
+	};
 	
 	public void add(long l){
 		valid = true;

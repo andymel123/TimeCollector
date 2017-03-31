@@ -19,13 +19,6 @@ public abstract class AbstractHTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnal
 	// TODO hash and save mutliple allowedgraphs for Dashboard views 
 	private AllowedPathsGraph<ID_TYPE> allowedGraph;
 	
-//	private HashMap<Edge<GraphNode<ID_TYPE, NodePermissions>>, AvgMaxCalcLong> timesPerEdge;
-	
-	protected AbstractHTMLFileAnalyzer() {
-//		timesPerEdge = new LinkedHashMap<>();
-	}
-
-
 	
 	@Override
 	public synchronized void addCollector(TimeCollectorWithPath<ID_TYPE> tc) {

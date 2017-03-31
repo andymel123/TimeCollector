@@ -7,6 +7,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.Temporal;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -94,4 +96,32 @@ public abstract class AbstractPathAnalyzer<ID_TYPE> implements Analyzer<ID_TYPE,
 		return timesPerSpan;
 	}
 	
+	protected String getTimeSpanName(GraphNode<ID_TYPE, NodePermissions> from, GraphNode<ID_TYPE, NodePermissions> to) {
+		return from.getId()+"->"+to.getId();
+	}
+
+	public StringTable getAsStringTable(TimeUnit unit) {
+		
+		StringTable table = new StringTable();
+		
+		table.row("TimeSpan (Unit: "+unit+")", "min", "avg", "max");
+		
+		for(Entry<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> outer: getTimesPerSpan().entrySet()){
+			GraphNode<ID_TYPE, NodePermissions> node1 = outer.getKey();
+			IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong> inner = outer.getValue();
+			for(Entry<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong> e: inner.entrySet()){
+				GraphNode<ID_TYPE, NodePermissions> node2 = e.getKey();
+				AvgMaxCalcLong calc = e.getValue();
+
+				// TODO replace by own implementation that does not round to full numbers (to get 0,001ms)
+				String column1 = getTimeSpanName(node1, node2);
+				String column2 = String.valueOf(unit.convert(calc.getMin(),TimeUnit.NANOSECONDS)); 
+				String column3 = String.valueOf(unit.convert((long)calc.getAvg(),TimeUnit.NANOSECONDS));
+				String column4 = String.valueOf(unit.convert(calc.getMax(),TimeUnit.NANOSECONDS));
+				
+				table.row(column1, column2, column3, column4);
+			}
+		}
+		return table;
+	}
 }
