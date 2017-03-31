@@ -1,25 +1,15 @@
 package eu.andymel.timecollector.report;
 
-import static eu.andymel.timecollector.util.Preconditions.ne;
-
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
-import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.Edge;
 import eu.andymel.timecollector.graphs.GraphNode;
@@ -27,92 +17,23 @@ import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
 import eu.andymel.timecollector.util.IdentitySet;
 
-public class HTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzer<ID_TYPE> {
+public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(HTMLFileAnalyzer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ShowPathHTMLFileAnalyzer.class);
 
 	private static final File TEMPLATE_FILE = new File("template.html");
-	
+
 	private static String htmlTemplate;
 
-	private AllowedPathsGraph<ID_TYPE> allowedGraph;
-	
-	HashMap<Edge<GraphNode<ID_TYPE, NodePermissions>>, AvgMaxCalcLong> timesPerEdge;
-	
-	private int countTimeCollectorsAdded = 0;
-	
 	private static enum placeholder{
 		_REPLACE_DESCRIPTION_,
 		_REPLACE_NODES_,
 		_REPLACE_EDGES_
 	}
 	
-	private HTMLFileAnalyzer() {
-		timesPerEdge = new LinkedHashMap<>();
-	}
-	public static HTMLFileAnalyzer<TestMilestones> create() {
-		return new HTMLFileAnalyzer<>();
-	}
 
-
-	
-	@Override
-	public synchronized void addCollector(TimeCollectorWithPath<ID_TYPE> tc) {
-		if(allowedGraph==null)allowedGraph = tc.getAllowedGraph();
-		super.addCollector(tc);
-		countTimeCollectorsAdded++;
-	}
-
-	@Override
-	protected void addTimes(
-		GraphNode<ID_TYPE, NodePermissions> node1, 
-		GraphNode<ID_TYPE, NodePermissions> node2,
-		Instant instant1, Instant instant2) {
-		
-		List<Edge<GraphNode<ID_TYPE, NodePermissions>>> edgesToChildren = node1.getEdgesToChildren();
-		ne(edgesToChildren, "'edgesToChildren' may not be empty!");
-		
-		Edge<GraphNode<ID_TYPE, NodePermissions>> edgeOfTime = null;
-		if(edgesToChildren.size()==1){
-			edgeOfTime = edgesToChildren.get(0);
-		}else{
-			for(Edge<GraphNode<ID_TYPE, NodePermissions>> edge: edgesToChildren){
-				if(edge.getChildNode()==node2){
-					edgeOfTime = edge;
-				}
-			}
-		}
-		
-		if(edgeOfTime==null){
-			throw new IllegalStateException("There is no edge to '"+node2+"' in "+node1);
-		}
-		
-		addEdgeWithTime(edgeOfTime, Duration.between(instant1, instant2).toNanos());
-		
-	}
-	
-
-	private void addEdgeWithTime(Edge<GraphNode<ID_TYPE, NodePermissions>> edge, long time) {
-		AvgMaxCalcLong calc = timesPerEdge.get(edge);
-		if(calc == null){
-			calc = AvgMaxCalcLong.create();
-			timesPerEdge.put(edge, calc);
-		}
-		calc.add(time);
-	}
-
-	private static String readFile(File file) throws IOException {
-		byte[] encoded = getBytesFromFile(file);
-		return new String(encoded);
-	}
-	private static byte[] getBytesFromFile(File file) throws IOException{
-		return Files.readAllBytes(file.toPath());
-	}
-	public static void writeFile(File f, String s, boolean appendToFileIfExisting) throws IOException{
-		FileWriter fw = new FileWriter(f, appendToFileIfExisting);
-		fw.write(s);
-		fw.flush();
-		fw.close();
+	public static <ID_TYPE> ShowPathHTMLFileAnalyzer<ID_TYPE> create() {
+		return new ShowPathHTMLFileAnalyzer<>();
 	}
 
 	private synchronized String getTemplate(){
@@ -126,13 +47,11 @@ public class HTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzer<ID_TYPE> {
 		}
 		return htmlTemplate;
 	}
-	
-	public void writeToFile(File f, TimeUnit unit, boolean appendToFileIfExisting) throws IOException{
-		writeFile(f, getHTMLString(unit), appendToFileIfExisting);
-	}
-	
+
 	public String getHTMLString(TimeUnit unit) {
 		
+		AllowedPathsGraph<ID_TYPE> allowedGraph = getAllowedGraph();
+		Objects.requireNonNull(allowedGraph, "'allowedGraph' is null!");
 		Set<GraphNode<ID_TYPE, NodePermissions>> allNodes = allowedGraph.getAllNodes();
 		Set<GraphNode<ID_TYPE, NodePermissions>> nodesUsedByAtLeastOneEdge = new IdentitySet<>(allNodes.size());
 		
@@ -186,7 +105,7 @@ public class HTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzer<ID_TYPE> {
 		
 		
 		
-		String description = "TimeCollectors analyzed: "+countTimeCollectorsAdded;
+		String description = "TimeCollectors analyzed: "+getNumberOfAddedTimeCollectors();
 		description += "\nEdge labels show (min | avg |max) in "+unit;
 		
 		String template = getTemplate();
@@ -195,5 +114,8 @@ public class HTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzer<ID_TYPE> {
 		template = template.replaceFirst(placeholder._REPLACE_EDGES_.name(), edgesString.toString());
 		return template;
 	}
-
+	
+	
+	
+	
 }

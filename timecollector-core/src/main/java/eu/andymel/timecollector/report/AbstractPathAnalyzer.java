@@ -14,8 +14,13 @@ import eu.andymel.timecollector.graphs.NodePermissions;
 
 public abstract class AbstractPathAnalyzer<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> {
 
+	private int countTimeCollectorsAdded = 0;
+	
+
 	@Override
-	public void addCollector(TimeCollectorWithPath<ID_TYPE> tc) {
+	public synchronized void addCollector(TimeCollectorWithPath<ID_TYPE> tc) {
+		// TODO make async!
+		
 		nn(tc, "TimeCollector is null!");
 		
 		List<List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>>> paths = tc.getRecordedPaths();
@@ -40,6 +45,8 @@ public abstract class AbstractPathAnalyzer<ID_TYPE> implements Analyzer<ID_TYPE,
 			lastInstant = instant;
 			lastNode = node;
 		}
+		
+		countTimeCollectorsAdded++;
 
 	}
 
@@ -48,5 +55,10 @@ public abstract class AbstractPathAnalyzer<ID_TYPE> implements Analyzer<ID_TYPE,
 		GraphNode<ID_TYPE, NodePermissions> node2, 
 		Instant lastInstant, Instant instant
 	);
+
+	public int getNumberOfAddedTimeCollectors() {
+		return countTimeCollectorsAdded;
+	}
+
 
 }

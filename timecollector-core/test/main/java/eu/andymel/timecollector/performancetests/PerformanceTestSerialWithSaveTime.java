@@ -12,8 +12,8 @@ import eu.andymel.timecollector.util.NanoClock;
 
 /*
  * PerformanceTest: TimeCollectorSerial with TestMilestones
- * Total time needed: 1.884 seconds for 1000000 iterations
- * That's 1884.0nanos per iteration
+ * Total time needed: 0.168 seconds for 50000 iterations
+ * That's 3360.0nanos per iteration
  */
 
 /**
@@ -31,14 +31,29 @@ public class PerformanceTestSerialWithSaveTime {
 		MS5,
 		MS6,
 		MS7,
-		MS8
+		MS8,
+		MS9,
+		MS10,
+		MS11,
+		MS12,
+		MS13,
+		MS14,
+		MS15,
+		MS16,
+		MS17,
+		MS18,
+		MS19,
+		MS20,
+		MS21,
+		MS22,
+		MS23,
 	}
 	
 	public static void main(String[] args) {
 
 		waitForInput();
 		
-		int amount = 100_000;
+		int amount = 50_000;
 		
 		NanoClock clock = new NanoClock();
 		
@@ -55,7 +70,21 @@ public class PerformanceTestSerialWithSaveTime {
 			tc.saveTime(TestMilestones.MS6);
 			tc.saveTime(TestMilestones.MS7);
 			tc.saveTime(TestMilestones.MS8);
-			
+			tc.saveTime(TestMilestones.MS9);
+			tc.saveTime(TestMilestones.MS10);
+			tc.saveTime(TestMilestones.MS11);
+			tc.saveTime(TestMilestones.MS12);
+			tc.saveTime(TestMilestones.MS13);
+			tc.saveTime(TestMilestones.MS14);
+			tc.saveTime(TestMilestones.MS15);
+			tc.saveTime(TestMilestones.MS16);
+			tc.saveTime(TestMilestones.MS17);
+			tc.saveTime(TestMilestones.MS18);
+			tc.saveTime(TestMilestones.MS19);
+			tc.saveTime(TestMilestones.MS20);
+			tc.saveTime(TestMilestones.MS21);
+			tc.saveTime(TestMilestones.MS22);
+			tc.saveTime(TestMilestones.MS23);
 			analyzer.addCollector(tc);
 		}
 		PerformanceTestsUtils.end("TimeCollectorSerial with "+TestMilestones.class.getSimpleName(), amount, start);
