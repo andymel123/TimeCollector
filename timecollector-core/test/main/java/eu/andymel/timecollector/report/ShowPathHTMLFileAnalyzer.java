@@ -3,6 +3,7 @@ package eu.andymel.timecollector.report;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Objects;
@@ -106,11 +107,19 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 			}else{
 				nodesString.append(',');
 			}
-			int identityHashCode = System.identityHashCode(node); 
+			int identityHashCode = System.identityHashCode(node);
 			nodesString.append(String.format(oneNodeString, String.valueOf(identityHashCode), node.getId()));	
 		}
 		
-		String[][] arr = getAsStringTable(unit).asArray();
+		StringTable table = getAsStringTable(unit);
+		table.sort((String[] row1, String[] row2)->{
+			try{
+				return Integer.compare(Integer.parseInt(row2[2]), Integer.parseInt(row1[2]));	
+			}catch(Exception e){
+				return Integer.MAX_VALUE;	// header(not a number) to the top
+			}
+		});
+		String[][] arr = table.asArray();
 
 		String tableString = "No Data!";
 		
@@ -156,6 +165,9 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 	}
 	
 	
-	
+	@Override
+	protected String getTimeSpanName(GraphNode<ID_TYPE, NodePermissions> from, GraphNode<ID_TYPE, NodePermissions> to) {
+		return from.getId()+" <b>&rArr;</b> "+to.getId();
+	}
 	
 }

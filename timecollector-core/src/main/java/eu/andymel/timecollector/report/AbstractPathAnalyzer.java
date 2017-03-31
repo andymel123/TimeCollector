@@ -97,7 +97,7 @@ public abstract class AbstractPathAnalyzer<ID_TYPE> implements Analyzer<ID_TYPE,
 	}
 	
 	protected String getTimeSpanName(GraphNode<ID_TYPE, NodePermissions> from, GraphNode<ID_TYPE, NodePermissions> to) {
-		return from.getId()+"->"+to.getId();
+		return from.getId()+" -> "+to.getId();
 	}
 
 	public StringTable getAsStringTable(TimeUnit unit) {

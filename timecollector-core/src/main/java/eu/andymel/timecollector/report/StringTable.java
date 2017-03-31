@@ -2,6 +2,7 @@ package eu.andymel.timecollector.report;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
@@ -24,6 +25,9 @@ public class StringTable {
 		return rows.get(0).length;
 	}
 	
+	public void sort(Comparator<String[]> comp){
+		rows.sort(comp);
+	}
 	
 	public StringTable row(String...columns){
 		
