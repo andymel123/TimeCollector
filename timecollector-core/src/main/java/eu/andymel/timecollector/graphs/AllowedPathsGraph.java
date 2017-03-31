@@ -9,23 +9,24 @@ import java.util.Set;
 
 public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> {
 	
-	AllowedPathsGraph(ID_TYPE idOfStartNode, NodePermissions nodePermissionsOfStartNode, Mutable mutable) {
+//	AllowedPathsGraph(ID_TYPE idOfStartNode, NodePermissions nodePermissionsOfStartNode, Mutable mutable) {
+//		super(
+//			idOfStartNode, 
+//			nodePermissionsOfStartNode, 
+//			true, // allow multiedges, circles,...
+//			mutable
+//		);
+//	}
+	AllowedPathsGraph(Set<GraphNode<ID_TYPE, NodePermissions>> nodes, GraphNode<ID_TYPE, NodePermissions> startNode, Mutable mutable) {
 		super(
-			idOfStartNode, 
-			nodePermissionsOfStartNode, 
-			true, // allow multiedges, circles,...
-			mutable
-		);
-	}
-	AllowedPathsGraph(PermissionNode<ID_TYPE> startNode, Mutable mutable) {
-		super(
+			nodes,
 			startNode,
 			true, // allow multiedges, circles,...
 			mutable
 		);
 	}
 	
-	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilderNodesAndEdges<ID_TYPE> nodes(PermissionNode<ID_TYPE> startNode, PermissionNode<ID_TYPE>... otherNodes){
+	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilderNodesAndEdges<ID_TYPE> nodes(GraphNode<ID_TYPE, NodePermissions> startNode, GraphNode<ID_TYPE, NodePermissions>... otherNodes){
 		return new AllowedPathBuilderNodesAndEdges<ID_TYPE>(startNode, Arrays.asList(otherNodes));
 	}
 	

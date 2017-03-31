@@ -24,12 +24,12 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 	 * to find problems this can be activated */
 	private static final boolean THROW_ERROR_IF_EDGE_IS_ADDED_MULTIPLE_TIMES = false;
 	
-	private final PermissionNode<ID_TYPE> startNode;
-	private final Set<PermissionNode<ID_TYPE>> nodes;
-	private final List<Edge<PermissionNode<ID_TYPE>>> edges;
+	private final GraphNode<ID_TYPE, NodePermissions> startNode;
+	private final Set<GraphNode<ID_TYPE, NodePermissions>> nodes;
+	private final List<Edge<GraphNode<ID_TYPE, NodePermissions>>> edges;
 	private final SimpleMutable simpleMutable = new SimpleMutable(true);
 	 
-	AllowedPathBuilderNodesAndEdges(PermissionNode<ID_TYPE> startNode, List<PermissionNode<ID_TYPE>> otherNodes) {
+	AllowedPathBuilderNodesAndEdges(GraphNode<ID_TYPE, NodePermissions> startNode, List<GraphNode<ID_TYPE, NodePermissions>> otherNodes) {
 		
 		// preconditions
 		nn(startNode, "'startNode' is null!");
@@ -41,7 +41,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 			 * to equal nodes). I use an IdentityHashSet to ensure that same 
 			 * instances are not in there more than once */
 			this.nodes = Collections.newSetFromMap(
-				new IdentityHashMap<PermissionNode<ID_TYPE>,Boolean>()
+				new IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>,Boolean>()
 			);
 			this.nodes.add(startNode); // first has to be the satrtNode!
 			this.nodes.addAll(otherNodes);
@@ -63,16 +63,16 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 	}
 	
 	
-	public AllowedPathBuilderNodesAndEdges<ID_TYPE> edgeWithMax(int max, PermissionNode<ID_TYPE> node1, PermissionNode<ID_TYPE> node2) {
+	public AllowedPathBuilderNodesAndEdges<ID_TYPE> edgeWithMax(int max, GraphNode<ID_TYPE, NodePermissions> node1, GraphNode<ID_TYPE, NodePermissions> node2) {
 		return edge(node1, node2, EdgePermissions.max(max));
 	}
 
-	public AllowedPathBuilderNodesAndEdges<ID_TYPE> edge(PermissionNode<ID_TYPE> node1, PermissionNode<ID_TYPE> node2){
+	public AllowedPathBuilderNodesAndEdges<ID_TYPE> edge(GraphNode<ID_TYPE, NodePermissions> node1, GraphNode<ID_TYPE, NodePermissions> node2){
 		return edge(node1, node2, null);
 	}
 		
 
-	public AllowedPathBuilderNodesAndEdges<ID_TYPE> edge(PermissionNode<ID_TYPE> node1, PermissionNode<ID_TYPE> node2, EdgePermissions edgePermissions){
+	public AllowedPathBuilderNodesAndEdges<ID_TYPE> edge(GraphNode<ID_TYPE, NodePermissions> node1, GraphNode<ID_TYPE, NodePermissions> node2, EdgePermissions edgePermissions){
 		
 		// preconditions
 		nn(node1, "'node1' is null!");
@@ -84,7 +84,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 			throw new IllegalStateException("The second node you provided ws not found! You have to use the "+PermissionNode.class.getSimpleName()+" instances that you provided in the "+AllowedPathsGraph.class.getSimpleName()+".nodes() method!");
 		}
 		
-		Edge<PermissionNode<ID_TYPE>> newEdge = Edge.create(node1, node2, edgePermissions);
+		Edge<GraphNode<ID_TYPE, NodePermissions>> newEdge = Edge.create(node1, node2, edgePermissions);
 		checkEdge(newEdge);
 		
 		int idx = edges.indexOf(newEdge);
@@ -103,9 +103,9 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		return this;
 	}
 	
-	private static <ID_TYPE> void checkEdge(Edge<PermissionNode<ID_TYPE>> newEdge) {
-		PermissionNode<ID_TYPE> child = newEdge.getChildNode();
-		PermissionNode<ID_TYPE> parent = newEdge.getParentNode();
+	private static <ID_TYPE> void checkEdge(Edge<GraphNode<ID_TYPE, NodePermissions>> newEdge) {
+		GraphNode<ID_TYPE, NodePermissions> child = newEdge.getChildNode();
+		GraphNode<ID_TYPE, NodePermissions> parent = newEdge.getParentNode();
 		
 		nn(child, "childNode in edge is null!");
 		nn(parent, "parentNode in edge is null!");
@@ -120,17 +120,18 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 			throw new IllegalStateException("You have already build this path! Use the previously returned instance.");
 		}
 		
-		List<PermissionNode<ID_TYPE>> copyOfNodes = new ArrayList<>(nodes);
-		List<Edge<PermissionNode<ID_TYPE>>> copyOfEdges = new ArrayList<>(edges);
+		// copy to be able to remove waht I added, to see if something is left after adding everything I get
+		List<GraphNode<ID_TYPE, NodePermissions>> copyOfNodes = new ArrayList<>(nodes);
+		List<Edge<GraphNode<ID_TYPE, NodePermissions>>> copyOfEdges = new ArrayList<>(edges);
 		
-		Iterator<PermissionNode<ID_TYPE>> itNodes = copyOfNodes.iterator();
+		Iterator<GraphNode<ID_TYPE, NodePermissions>> itNodes = copyOfNodes.iterator();
 		while(itNodes.hasNext()){
-			PermissionNode<ID_TYPE> node1 = itNodes.next();
-			Iterator<Edge<PermissionNode<ID_TYPE>>> itEdges = copyOfEdges.iterator();
+			GraphNode<ID_TYPE, NodePermissions> node1 = itNodes.next();
+			Iterator<Edge<GraphNode<ID_TYPE, NodePermissions>>> itEdges = copyOfEdges.iterator();
 			boolean nodeRemoved = false;
 			while(itEdges.hasNext()){
-				Edge<PermissionNode<ID_TYPE>> edge = itEdges.next();
-				PermissionNode<ID_TYPE> node2 = edge.getChildNode();
+				Edge<GraphNode<ID_TYPE, NodePermissions>> edge = itEdges.next();
+				GraphNode<ID_TYPE, NodePermissions> node2 = edge.getChildNode();
 				if(edge.getParentNode()==node1){
 					itEdges.remove();
 					if(!nodeRemoved){
@@ -168,20 +169,20 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 
 		simpleMutable.setImmutable();
 		
-		return new AllowedPathsGraph<>(startNode, simpleMutable);
+		return new AllowedPathsGraph<ID_TYPE>(nodes, startNode, simpleMutable);
 	}
 	
-	public AllowedPathBuilderNodesAndEdges<ID_TYPE> path(PermissionNode<ID_TYPE>... nodes) {
+	public AllowedPathBuilderNodesAndEdges<ID_TYPE> path(GraphNode<ID_TYPE, NodePermissions>... nodes) {
 		
 		// preconditiions
 		nn(nodes, "You need to provide nodes for this call!");
 		
-		Iterator<PermissionNode<ID_TYPE>> it = Arrays.asList(nodes).iterator();
+		Iterator<GraphNode<ID_TYPE, NodePermissions>> it = Arrays.asList(nodes).iterator();
 		if(!it.hasNext())return this;
-		PermissionNode<ID_TYPE> node1 = it.next();
+		GraphNode<ID_TYPE, NodePermissions> node1 = it.next();
 		checkInNodes(node1);
 		while(it.hasNext()){
-			PermissionNode<ID_TYPE> node2 = it.next();
+			GraphNode<ID_TYPE, NodePermissions> node2 = it.next();
 			try{
 				checkInNodes(node2);
 			}catch(IllegalStateException e){
@@ -194,7 +195,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 	}
 
 
-	private void checkInNodes(PermissionNode<ID_TYPE> node) {
+	private void checkInNodes(GraphNode<ID_TYPE, NodePermissions> node) {
 		if(!this.nodes.contains(node)){
 			throw new IllegalStateException("You try to add a path with a node that "
 				+ "you did not specify in nodes(...)! Node: "+node);

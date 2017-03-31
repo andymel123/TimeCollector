@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import eu.andymel.timecollector.TestTimeCollectorProvider;
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.report.HTMLFileAnalyzer;
@@ -23,6 +26,8 @@ import eu.andymel.timecollector.util.NanoClock;
  */
 public class PerformanceTestWithHTMLFileAnalyzer {
 
+	private static final Logger LOG = LoggerFactory.getLogger(PerformanceTestWithHTMLFileAnalyzer.class);
+	
 	public static void main(String[] args) {
 		
 		int amount = 50_000;
@@ -66,7 +71,9 @@ public class PerformanceTestWithHTMLFileAnalyzer {
 		
 //		o(analyzer.getHTMLString(TimeUnit.NANOSECONDS));
 		try {
-			analyzer.writeToFile(new File("output.html"), TimeUnit.NANOSECONDS, false);
+			File f = new File("output.html");
+			analyzer.writeToFile(f, TimeUnit.NANOSECONDS, false);
+			LOG.info("HTML written to file '"+f.getAbsolutePath()+"'");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

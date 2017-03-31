@@ -25,6 +25,7 @@ import eu.andymel.timecollector.graphs.Edge;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
+import eu.andymel.timecollector.util.IdentitySet;
 
 public class HTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzer<ID_TYPE> {
 
@@ -132,28 +133,23 @@ public class HTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzer<ID_TYPE> {
 	
 	public String getHTMLString(TimeUnit unit) {
 		
-		Set<GraphNode<ID_TYPE, NodePermissions>> nodes = allowedGraph.getAllNodes();
-		
-		StringBuilder nodesString = new StringBuilder();
-		String oneNodeString = "{id: '%s', label: '%s'}";
-		boolean isFirst = true;
-		for(GraphNode<ID_TYPE, NodePermissions> node:nodes){
-			if(isFirst){
-				isFirst = false;
-			}else{
-				nodesString.append(',');
-			}
-			nodesString.append(String.format(oneNodeString, System.identityHashCode(node), node.getId()));	
-		}
-		
+		Set<GraphNode<ID_TYPE, NodePermissions>> allNodes = allowedGraph.getAllNodes();
+		Set<GraphNode<ID_TYPE, NodePermissions>> nodesUsedByAtLeastOneEdge = new IdentitySet<>(allNodes.size());
 		
 		StringBuilder edgesString = new StringBuilder();
 		String edgeFormat = "{from: '%s', to: '%s', label: '(%s | %s | %s)', arrows:'to'}";
-		isFirst = true;
+		boolean isFirst = true;
 		
+		// build string of edges
 		for(Entry<Edge<GraphNode<ID_TYPE, NodePermissions>>, AvgMaxCalcLong> entry:timesPerEdge.entrySet()){
 			Edge<GraphNode<ID_TYPE, NodePermissions>> edge = entry.getKey();
 			AvgMaxCalcLong calc = entry.getValue();
+			
+			GraphNode<ID_TYPE, NodePermissions> from = edge.getParentNode();
+			GraphNode<ID_TYPE, NodePermissions> to = edge.getChildNode();
+			
+			nodesUsedByAtLeastOneEdge.add(from);
+			nodesUsedByAtLeastOneEdge.add(to);
 			
 			if(isFirst){
 				isFirst = false;
@@ -163,14 +159,32 @@ public class HTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzer<ID_TYPE> {
 			edgesString.append(
 				String.format(
 					edgeFormat, 
-					System.identityHashCode(edge.getParentNode()), 
-					System.identityHashCode(edge.getChildNode()),
+					System.identityHashCode(from), 
+					System.identityHashCode(to),
 					unit.convert(calc.getMin(),TimeUnit.NANOSECONDS),
 					unit.convert((long)calc.getAvg(),TimeUnit.NANOSECONDS),
 					unit.convert(calc.getMax(),TimeUnit.NANOSECONDS)
 				)
 			);	
 		}
+		
+		// build string of nodes that were used for at least one edge
+		StringBuilder nodesString = new StringBuilder();
+		String oneNodeString = "{id: '%s', label: '%s'}";
+		isFirst = true;
+		for(GraphNode<ID_TYPE, NodePermissions> node:nodesUsedByAtLeastOneEdge){
+			if(isFirst){
+				isFirst = false;
+			}else{
+				nodesString.append(',');
+			}
+			int identityHashCode = System.identityHashCode(node); 
+			nodesString.append(String.format(oneNodeString, String.valueOf(identityHashCode), node.getId()));	
+		}
+		
+
+		
+		
 		
 		String description = "TimeCollectors analyzed: "+countTimeCollectorsAdded;
 		description += "\nEdge labels show (min | avg |max) in "+unit;

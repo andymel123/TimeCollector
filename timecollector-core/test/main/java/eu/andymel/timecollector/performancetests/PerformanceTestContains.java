@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.graphs.PermissionNode;
 
@@ -16,11 +17,11 @@ public class PerformanceTestContains {
 		int amount = 50_000;
 		
 		// fill a list and an array
-		List<PermissionNode<e>> list = new ArrayList<>(amount);
+		List<GraphNode<e, NodePermissions>> list = new ArrayList<>(amount);
 		for(int i=0;i <amount; i++){
 			list.add(PermissionNode.create(e.a, NodePermissions.NO_CHECKS));
 		}
-		PermissionNode<?>[] array = list.toArray(new PermissionNode[amount]);
+		GraphNode<?,?>[] array = list.toArray(new PermissionNode[amount]);
 		
 		
 		// ask for every added PermissionNode if it's contained in the list  

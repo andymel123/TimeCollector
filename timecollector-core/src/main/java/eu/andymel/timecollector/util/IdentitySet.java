@@ -26,6 +26,13 @@ public class IdentitySet<E> implements Set<E> {
 		this.map = new IdentityHashMap<E, Object>(size);
 	}
 
+	public IdentitySet(Set<E> setToCopy) {
+		this.map = new IdentityHashMap<E, Object>(setToCopy.size());
+		for(E e:setToCopy){
+			this.map.putIfAbsent(e, DUMMY_MAP_CONTENT);
+		}
+	}
+
 	@Override
 	public int size() {
 		return map.size();
