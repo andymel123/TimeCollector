@@ -1,6 +1,7 @@
 package eu.andymel.timecollector.performancetests;
 
 
+import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,9 @@ import eu.andymel.timecollector.report.ShowPathHTMLFileAnalyzer;
 import eu.andymel.timecollector.util.NanoClock;
 
 /*
- * 
+ * PerformanceTest: Create TimeCollectorWithPath
+ * Total time needed: 0.397 seconds for 50000 iterations
+ * That's 7940.0nanos per iteration
  */
 
 /**
@@ -37,7 +40,7 @@ public class PerformanceTestWithHTMLFileAnalyzer {
 		
 		AbstractHTMLFileAnalyzer<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> analyzer = ShowPathHTMLFileAnalyzer.create();
 		
-//		waitForInput();
+		waitForInput();
 		
 		Instant start = Instant.now();
 		for(int i=0; i<amount; i++){

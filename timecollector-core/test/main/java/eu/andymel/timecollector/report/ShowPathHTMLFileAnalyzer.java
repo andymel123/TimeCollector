@@ -3,6 +3,7 @@ package eu.andymel.timecollector.report;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -52,6 +53,10 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 		
 		AllowedPathsGraph<ID_TYPE> allowedGraph = getAllowedGraph();
 		Objects.requireNonNull(allowedGraph, "'allowedGraph' is null!");
+		
+		HashMap<Edge<GraphNode<ID_TYPE, NodePermissions>>, AvgMaxCalcLong> timesPerEdge = getTimesPerEdge();
+		Objects.requireNonNull(timesPerEdge, "'timesPerEdge' is null!");
+		
 		Set<GraphNode<ID_TYPE, NodePermissions>> allNodes = allowedGraph.getAllNodes();
 		Set<GraphNode<ID_TYPE, NodePermissions>> nodesUsedByAtLeastOneEdge = new IdentitySet<>(allNodes.size());
 		
