@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -54,42 +55,44 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 		AllowedPathsGraph<ID_TYPE> allowedGraph = getAllowedGraph();
 		Objects.requireNonNull(allowedGraph, "'allowedGraph' is null!");
 		
-		HashMap<Edge<GraphNode<ID_TYPE, NodePermissions>>, AvgMaxCalcLong> timesPerEdge = getTimesPerEdge();
-		Objects.requireNonNull(timesPerEdge, "'timesPerEdge' is null!");
+		IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> timesPerSpan = getTimesPerSpan();
+		Objects.requireNonNull(timesPerSpan, "'timesPerSpan' is null!");
 		
 		Set<GraphNode<ID_TYPE, NodePermissions>> allNodes = allowedGraph.getAllNodes();
 		Set<GraphNode<ID_TYPE, NodePermissions>> nodesUsedByAtLeastOneEdge = new IdentitySet<>(allNodes.size());
 		
 		StringBuilder edgesString = new StringBuilder();
-		String edgeFormat = "{from: '%s', to: '%s', label: '(%s | %s | %s)', arrows:'to'}";
+		String edgeFormat = "{from: '%s', to: '%s', label: '%s | %s | %s (%s)', arrows:'to'}";
 		boolean isFirst = true;
 		
 		// build string of edges
-		for(Entry<Edge<GraphNode<ID_TYPE, NodePermissions>>, AvgMaxCalcLong> entry:timesPerEdge.entrySet()){
-			Edge<GraphNode<ID_TYPE, NodePermissions>> edge = entry.getKey();
-			AvgMaxCalcLong calc = entry.getValue();
-			
-			GraphNode<ID_TYPE, NodePermissions> from = edge.getParentNode();
-			GraphNode<ID_TYPE, NodePermissions> to = edge.getChildNode();
-			
-			nodesUsedByAtLeastOneEdge.add(from);
-			nodesUsedByAtLeastOneEdge.add(to);
-			
-			if(isFirst){
-				isFirst = false;
-			}else{
-				edgesString.append(',');
+		for(Entry<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> outer: getTimesPerSpan().entrySet()){
+			GraphNode<ID_TYPE, NodePermissions> node1 = outer.getKey();
+			IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong> inner = outer.getValue();
+			for(Entry<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong> e: inner.entrySet()){
+				GraphNode<ID_TYPE, NodePermissions> node2 = e.getKey();
+				AvgMaxCalcLong calc = e.getValue();
+				
+				nodesUsedByAtLeastOneEdge.add(node1);
+				nodesUsedByAtLeastOneEdge.add(node2);
+				
+				if(isFirst){
+					isFirst = false;
+				}else{
+					edgesString.append(',');
+				}
+				edgesString.append(
+					String.format(
+						edgeFormat, 
+						System.identityHashCode(node1), 
+						System.identityHashCode(node2),
+						unit.convert(calc.getMin(),TimeUnit.NANOSECONDS),
+						unit.convert((long)calc.getAvg(),TimeUnit.NANOSECONDS),
+						unit.convert(calc.getMax(),TimeUnit.NANOSECONDS),
+						calc.getCount()
+					)
+				);
 			}
-			edgesString.append(
-				String.format(
-					edgeFormat, 
-					System.identityHashCode(from), 
-					System.identityHashCode(to),
-					unit.convert(calc.getMin(),TimeUnit.NANOSECONDS),
-					unit.convert((long)calc.getAvg(),TimeUnit.NANOSECONDS),
-					unit.convert(calc.getMax(),TimeUnit.NANOSECONDS)
-				)
-			);	
 		}
 		
 		// build string of nodes that were used for at least one edge

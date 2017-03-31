@@ -40,7 +40,7 @@ public class PerformanceTestWithHTMLFileAnalyzer {
 		
 		AbstractHTMLFileAnalyzer<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> analyzer = ShowPathHTMLFileAnalyzer.create();
 		
-		waitForInput();
+//		waitForInput();
 		
 		Instant start = Instant.now();
 		for(int i=0; i<amount; i++){
