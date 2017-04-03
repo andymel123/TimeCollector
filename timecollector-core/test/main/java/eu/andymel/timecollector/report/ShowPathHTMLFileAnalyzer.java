@@ -2,10 +2,8 @@ package eu.andymel.timecollector.report;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map.Entry;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
-import eu.andymel.timecollector.graphs.Edge;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
@@ -64,8 +61,10 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 		Set<GraphNode<ID_TYPE, NodePermissions>> nodesUsedByAtLeastOneEdge = new IdentitySet<>(allNodes.size());
 		
 		StringBuilder edgesString = new StringBuilder();
-		String edgeFormat = "{from: '%s', to: '%s', label: '%s | %s | %s (%s)', arrows:'to'}";
+		String edgeFormat = "{from: '%s', to: '%s', label: '%s | %s | %s (%.2f%%)', arrows:'to', value: %s}";
 		boolean isFirst = true;
+		
+		double totalAvg = getAvgSummedUp();
 		
 		// build string of edges
 		for(Entry<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> outer: getTimesPerSpan().entrySet()){
@@ -83,15 +82,19 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 				}else{
 					edgesString.append(',');
 				}
+				
+				double avg = calc.getAvg();
+				double weightFactor = 100*avg/totalAvg;
 				edgesString.append(
 					String.format(
 						edgeFormat, 
 						System.identityHashCode(node1), 
 						System.identityHashCode(node2),
 						unit.convert(calc.getMin(),TimeUnit.NANOSECONDS),
-						unit.convert((long)calc.getAvg(),TimeUnit.NANOSECONDS),
+						unit.convert((long)avg,TimeUnit.NANOSECONDS),
 						unit.convert(calc.getMax(),TimeUnit.NANOSECONDS),
-						calc.getCount()
+						weightFactor,
+						weightFactor
 					)
 				);
 			}
@@ -99,7 +102,7 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 		
 		// build string of nodes that were used for at least one edge
 		StringBuilder nodesString = new StringBuilder();
-		String oneNodeString = "{id: '%s', label: '%s'}";
+		String oneNodeString = "{id: '%s', label: '%s', shape: 'box'}";
 		isFirst = true;
 		for(GraphNode<ID_TYPE, NodePermissions> node:nodesUsedByAtLeastOneEdge){
 			if(isFirst){
@@ -136,6 +139,7 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 			.append(arr[0][3])
 			.append("</th></tr>");
 
+			// rows
 			for(int r=1; r<arr.length; r++){
 				sbTable
 				.append("<tr><td>")
@@ -145,6 +149,11 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 				.append(arr[r][3])
 				.append("</td></tr>");
 			}
+			
+			sbTable
+			.append("<tr><td>Sum of averages</td><td></td><td>")
+			.append((long)totalAvg)
+			.append("</td><td></td></tr>");
 			
 			sbTable.append("</table>");
 			

@@ -65,25 +65,7 @@
   var data = {
     nodes: nodes,
     edges: edges,
-    physics: {
-        forceAtlas2Based: {
-            gravitationalConstant: -26,
-            centralGravity: 0.001,
-            springLength: 430,
-            springConstant: 1.38,
-            avoidOverlap: 11.5
-
-        },
-        maxVelocity: 46,
-        solver: 'forceAtlas2Based',
-        timestep: 0.35,
-        stabilization: {
-            enabled: true,
-            iterations: 1000,
-            updateInterval: 25
-        }
-
-    }
+    physics: false
   };
   var options = {};
   var network = new vis.Network(container, data, options);

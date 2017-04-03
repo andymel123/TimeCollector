@@ -7,13 +7,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.Temporal;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.GraphNode;
@@ -100,6 +99,14 @@ public abstract class AbstractPathAnalyzer<ID_TYPE> implements Analyzer<ID_TYPE,
 		return from.getId()+" -> "+to.getId();
 	}
 
+	protected double getAvgSummedUp(){
+		return timesPerSpan.values().stream()// get all IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>
+			.map(IdentityHashMap::values)	// map to Collections of AvgMaxCalcLong
+			.flatMap(Collection::stream)	// combine to one stream of AvgMaxCalcLong
+			.mapToDouble(c->c.getAvg())		// map from AvgMaxCalcLong to avg values
+			.sum();							// sum all avg up
+	}
+	
 	public StringTable getAsStringTable(TimeUnit unit) {
 		
 		StringTable table = new StringTable();
