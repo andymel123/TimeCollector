@@ -2,11 +2,7 @@ package eu.andymel.timecollector.graphs;
 
 import static eu.andymel.timecollector.util.Preconditions.nn;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
