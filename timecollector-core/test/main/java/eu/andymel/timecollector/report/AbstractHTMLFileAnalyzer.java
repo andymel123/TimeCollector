@@ -19,7 +19,8 @@ public abstract class AbstractHTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnal
 	// TODO hash and save mutliple allowedgraphs for Dashboard views 
 	private AllowedPathsGraph<ID_TYPE> allowedGraph;
 	
-	
+	private static String htmlTemplate;
+
 	@Override
 	public synchronized void addCollector(TimeCollectorWithPath<ID_TYPE> tc) {
 		// TODO make async!
@@ -41,6 +42,20 @@ public abstract class AbstractHTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnal
 		fw.flush();
 		fw.close();
 	}
+
+	protected synchronized String getTemplate(){
+		if(htmlTemplate==null){
+			try {
+				htmlTemplate = readFile(getTemplateFile());
+			} catch (IOException e) {
+				LOG.error("Can't load template!", e);
+				htmlTemplate = "";
+			}
+		}
+		return htmlTemplate;
+	}
+	
+	protected abstract File getTemplateFile();
 
 	public void writeToFile(File f, TimeUnit unit, boolean appendToFileIfExisting) throws IOException{
 		writeFile(f, getHTMLString(unit), appendToFileIfExisting);

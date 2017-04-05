@@ -1,0 +1,83 @@
+<html>
+<head>
+  <title>eu.andymel.timeCollector Performance Graph v.01</title>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.19.1/vis.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.19.1/vis-network.min.js" rel="stylesheet" type="text/css" />
+
+  <style type="text/css">
+    body{
+     	color: #333;
+     	font-family: Arial, Helvetica, sans-serif;
+    }
+    #wrapper {
+	  margin-right: 700px;
+	}
+	#timedGraph {
+	  float: left;
+	  width: 100%;
+/* 	  background-color: #CCF; */
+	}
+	#avgTimeSortedTable {
+	  float: right;
+	  width: 700px;
+	  margin-right: -700px;
+/* 	  background-color: #FFA; */
+	}
+	#avgTimeSortedTable tr:nth-child(even) {
+	    background-color: #ececec;
+	}
+	#avgTimeSortedTable td{
+	  text-align: right;
+	}
+	#avgTimeSortedTable td:first-child {
+		text-align: left; 
+	}
+	#cleared {
+	  clear: both;
+	}
+  </style>
+</head>
+<body>
+
+<p>
+  TimeCollectors analyzed: 50000
+Edge labels show 'min | avg | max (count)' in NANOSECONDS
+</p>
+
+<div id="wrapper">
+	<div id="timedGraph"></div>
+	<div id="avgTimeSortedTable"><table><tr><th>TimeSpan (Unit: NANOSECONDS)</th><th>min</th><th>avg</th><th>max</th></tr><tr><td>BEFORE_DAO_SAVE <b>&rArr;</b> BEFORE_DBPOOL</td><td>0</td><td>248</td><td>1213090</td></tr><tr><td>AFTER_DAO_GETSTATE <b>&rArr;</b> BEFORE_CALC1</td><td>0</td><td>221</td><td>16580</td></tr><tr><td>CREATION <b>&rArr;</b> BEFORE_HANDLER_CONTEXT</td><td>0</td><td>219</td><td>188299</td></tr><tr><td>BEFORE_DB_SAVE_DECISION1 <b>&rArr;</b> AFTER_DB_SAVE_DECISION1</td><td>0</td><td>196</td><td>1234408</td></tr><tr><td>AFTER_DBPOOL <b>&rArr;</b> BEFORE_DB_SAVE_DECISION1</td><td>0</td><td>179</td><td>1494553</td></tr><tr><td>AFTER_DAO_SAVE <b>&rArr;</b> AFTER_HANDLER</td><td>0</td><td>165</td><td>491868</td></tr><tr><td>BEFORE_CALC1 <b>&rArr;</b> AFTER_CALC1</td><td>0</td><td>161</td><td>82899</td></tr><tr><td>BEFORE_DBPOOL <b>&rArr;</b> AFTER_DBPOOL</td><td>0</td><td>158</td><td>82505</td></tr><tr><td>AFTER_DB_SAVE_DECISION1 <b>&rArr;</b> AFTER_DAO_SAVE</td><td>0</td><td>147</td><td>761093</td></tr><tr><td>AFTER_DB_GETSTATE <b>&rArr;</b> AFTER_DAO_GETSTATE</td><td>0</td><td>145</td><td>103426</td></tr><tr><td>AFTER_DECIDER <b>&rArr;</b> BEFORE_DAO_SAVE</td><td>0</td><td>143</td><td>329228</td></tr><tr><td>AFTER_HANDLER <b>&rArr;</b> AFTER_HANDLER_CONTEXT</td><td>0</td><td>142</td><td>73425</td></tr><tr><td>BEFORE_SEARCH_HANDLER <b>&rArr;</b> AFTER_SEARCH_HANDLER</td><td>0</td><td>142</td><td>459104</td></tr><tr><td>BEFORE_DB_GETSTATE <b>&rArr;</b> AFTER_DB_GETSTATE</td><td>0</td><td>139</td><td>26844</td></tr><tr><td>AFTER_SEARCH_HANDLER <b>&rArr;</b> BEFORE_HANDLER</td><td>0</td><td>137</td><td>24080</td></tr><tr><td>BEFORE_DAO_GETSTATE <b>&rArr;</b> BEFORE_DBPOOL</td><td>0</td><td>136</td><td>44608</td></tr><tr><td>BEFORE_DECIDER <b>&rArr;</b> AFTER_DECIDER</td><td>0</td><td>136</td><td>30791</td></tr><tr><td>BEFORE_HANDLER <b>&rArr;</b> BEFORE_DAO_GETSTATE</td><td>0</td><td>135</td><td>39871</td></tr><tr><td>BEFORE_HANDLER_CONTEXT <b>&rArr;</b> BEFORE_SEARCH_HANDLER</td><td>0</td><td>135</td><td>245145</td></tr><tr><td>AFTER_CALC1 <b>&rArr;</b> BEFORE_DECIDER</td><td>0</td><td>133</td><td>18159</td></tr><tr><td>AFTER_DBPOOL <b>&rArr;</b> BEFORE_DB_GETSTATE</td><td>0</td><td>132</td><td>22896</td></tr><tr><td>BEFORE_DBPOOL <b>&rArr;</b> AFTER_DBPOOL</td><td>0</td><td>128</td><td>9869</td></tr><tr><td>Sum of averages</td><td></td><td>3487</td><td></td></tr></table></div>
+</div>
+
+<script type="text/javascript">
+  // create an array with nodes
+  var nodes = new vis.DataSet([
+	  {id: '1523554304', label: 'AFTER_DB_GETSTATE', shape: 'box'},{id: '1229416514', label: 'CREATION', shape: 'box'},{id: '918221580', label: 'BEFORE_CALC1', shape: 'box'},{id: '925858445', label: 'BEFORE_DBPOOL', shape: 'box'},{id: '640070680', label: 'BEFORE_HANDLER', shape: 'box'},{id: '1555009629', label: 'AFTER_HANDLER', shape: 'box'},{id: '746292446', label: 'AFTER_DBPOOL', shape: 'box'},{id: '1159190947', label: 'BEFORE_DAO_SAVE', shape: 'box'},{id: '1175962212', label: 'AFTER_DAO_GETSTATE', shape: 'box'},{id: '617901222', label: 'AFTER_DECIDER', shape: 'box'},{id: '1510467688', label: 'BEFORE_DAO_GETSTATE', shape: 'box'},{id: '1414644648', label: 'AFTER_SEARCH_HANDLER', shape: 'box'},{id: '1995265320', label: 'BEFORE_DBPOOL', shape: 'box'},{id: '666988784', label: 'BEFORE_SEARCH_HANDLER', shape: 'box'},{id: '2016447921', label: 'BEFORE_HANDLER_CONTEXT', shape: 'box'},{id: '1421795058', label: 'AFTER_DAO_SAVE', shape: 'box'},{id: '798154996', label: 'AFTER_DBPOOL', shape: 'box'},{id: '41359092', label: 'AFTER_HANDLER_CONTEXT', shape: 'box'},{id: '1554547125', label: 'BEFORE_DECIDER', shape: 'box'},{id: '523429237', label: 'AFTER_DB_SAVE_DECISION1', shape: 'box'},{id: '681842940', label: 'BEFORE_DB_SAVE_DECISION1', shape: 'box'},{id: '2055281021', label: 'AFTER_CALC1', shape: 'box'},{id: '1072591677', label: 'BEFORE_DB_GETSTATE', shape: 'box'}
+  ]);
+
+  // create an array with edges
+  var edges = new vis.DataSet([
+	  {from: '1523554304', to: '1175962212', label: '0 | 145 | 103426 (4,17%)', arrows:'to', value: 4.169992371358159},{from: '1229416514', to: '2016447921', label: '0 | 219 | 188299 (6,31%)', arrows:'to', value: 6.3051277597652025},{from: '918221580', to: '2055281021', label: '0 | 161 | 82899 (4,62%)', arrows:'to', value: 4.619984633062122},{from: '925858445', to: '798154996', label: '0 | 158 | 82505 (4,53%)', arrows:'to', value: 4.53431223972003},{from: '640070680', to: '1510467688', label: '0 | 135 | 39871 (3,88%)', arrows:'to', value: 3.8803554034794936},{from: '1555009629', to: '41359092', label: '0 | 142 | 73425 (4,08%)', arrows:'to', value: 4.076699250476637},{from: '746292446', to: '1072591677', label: '0 | 132 | 22896 (3,80%)', arrows:'to', value: 3.800958296165007},{from: '1159190947', to: '925858445', label: '0 | 248 | 1213090 (7,14%)', arrows:'to', value: 7.136221204440222},{from: '1175962212', to: '918221580', label: '0 | 221 | 16580 (6,35%)', arrows:'to', value: 6.351747365495371},{from: '617901222', to: '1159190947', label: '0 | 143 | 329228 (4,11%)', arrows:'to', value: 4.112690671170812},{from: '1414644648', to: '640070680', label: '0 | 137 | 24080 (3,94%)', arrows:'to', value: 3.9404437619383947},{from: '1510467688', to: '1995265320', label: '0 | 136 | 44608 (3,92%)', arrows:'to', value: 3.9186758258696415},{from: '1995265320', to: '746292446', label: '0 | 128 | 9869 (3,69%)', arrows:'to', value: 3.6900660432849985},{from: '666988784', to: '1414644648', label: '0 | 142 | 459104 (4,08%)', arrows:'to', value: 4.083295125509},{from: '2016447921', to: '666988784', label: '0 | 135 | 245145 (3,88%)', arrows:'to', value: 3.8779380820933764},{from: '1421795058', to: '1555009629', label: '0 | 165 | 491868 (4,75%)', arrows:'to', value: 4.745723769938117},{from: '798154996', to: '681842940', label: '0 | 179 | 1494553 (5,16%)', arrows:'to', value: 5.156113253233189},{from: '1554547125', to: '617901222', label: '0 | 136 | 30791 (3,91%)', arrows:'to', value: 3.9080419057888673},{from: '523429237', to: '1421795058', label: '0 | 147 | 761093 (4,23%)', arrows:'to', value: 4.230861269415294},{from: '681842940', to: '523429237', label: '0 | 196 | 1234408 (5,63%)', arrows:'to', value: 5.634066152388401},{from: '1072591677', to: '1523554304', label: '0 | 139 | 26844 (4,01%)', arrows:'to', value: 4.011687356051129},{from: '2055281021', to: '1554547125', label: '0 | 133 | 18159 (3,81%)', arrows:'to', value: 3.814998259356538}
+  ]);
+
+  // create a network
+  var container = document.getElementById('timedGraph');
+  var data = {
+    nodes: nodes,
+    edges: edges,
+    physics: false
+  };
+  var options = {};
+  var network = new vis.Network(container, data, options);
+  
+//   network.on("stabilizationIterationsDone", function() {
+// 		network.setOptions({
+// 			physics : false
+// 		});
+// 	});
+</script>
+
+
+</body>
+</html>

@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import eu.andymel.timecollector.TestTimeCollectorProvider;
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.report.AbstractHTMLFileAnalyzer;
-import eu.andymel.timecollector.report.ShowPathHTMLFileAnalyzer;
+import eu.andymel.timecollector.report.HTMLAnalyzerBars;
+import eu.andymel.timecollector.report.HTMLAnalyzerPath;
+import eu.andymel.timecollector.report.HTMLAnalyzerCandlestick;
 import eu.andymel.timecollector.util.NanoClock;
 
 /*
@@ -38,7 +40,11 @@ public class PerformanceTestWithHTMLFileAnalyzer {
 		
 		NanoClock clock = new NanoClock();
 		
-		AbstractHTMLFileAnalyzer<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> analyzer = ShowPathHTMLFileAnalyzer.create();
+		AbstractHTMLFileAnalyzer<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> analyzer;
+		
+		analyzer = HTMLAnalyzerPath.create();
+//		analyzer = HTMLAnalyzerCandlestick.create();
+//		analyzer = HTMLAnalyzerBars.create();
 		
 //		waitForInput();
 		

@@ -1,0 +1,92 @@
+<html>
+	<head>
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	
+		<script type="text/javascript">
+		
+			google.charts.load('current', {'packages':['corechart']});
+			google.charts.setOnLoadCallback(drawChart);
+	
+			function drawChart() {
+			    var data = google.visualization.arrayToDataTable([
+			    	['AFTER_DBPOOL => BEFORE_DB_SAVE_DECISION1', 0, 292, 292, 6512319],['CREATION => BEFORE_HANDLER_CONTEXT', 0, 275, 275, 1388363],['AFTER_DAO_GETSTATE => BEFORE_CALC1', 0, 247, 247, 60398],['BEFORE_DAO_SAVE => BEFORE_DBPOOL', 0, 244, 244, 19343],['AFTER_DECIDER => BEFORE_DAO_SAVE', 0, 184, 184, 2034977],['BEFORE_DBPOOL => AFTER_DBPOOL', 0, 174, 174, 37107],['BEFORE_CALC1 => AFTER_CALC1', 0, 173, 173, 73820],['AFTER_DB_GETSTATE => AFTER_DAO_GETSTATE', 0, 168, 168, 829781],['BEFORE_HANDLER_CONTEXT => BEFORE_SEARCH_HANDLER', 0, 168, 168, 1235592],['BEFORE_DB_SAVE_DECISION1 => AFTER_DB_SAVE_DECISION1', 0, 161, 161, 22106],['AFTER_DAO_SAVE => AFTER_HANDLER', 0, 159, 159, 41449],['BEFORE_DB_GETSTATE => AFTER_DB_GETSTATE', 0, 159, 159, 384889],['AFTER_SEARCH_HANDLER => BEFORE_HANDLER', 0, 156, 156, 400285],['AFTER_HANDLER => AFTER_HANDLER_CONTEXT', 0, 153, 153, 49344],['AFTER_DBPOOL => BEFORE_DB_GETSTATE', 0, 148, 148, 15790],['BEFORE_DBPOOL => AFTER_DBPOOL', 0, 148, 148, 81321],['BEFORE_HANDLER => BEFORE_DAO_GETSTATE', 0, 146, 146, 95137],['BEFORE_DAO_GETSTATE => BEFORE_DBPOOL', 0, 146, 146, 17369],['BEFORE_SEARCH_HANDLER => AFTER_SEARCH_HANDLER', 0, 145, 145, 57239],['BEFORE_DECIDER => AFTER_DECIDER', 0, 145, 145, 33159],['AFTER_CALC1 => BEFORE_DECIDER', 0, 143, 143, 28423],['AFTER_DB_SAVE_DECISION1 => AFTER_DAO_SAVE', 0, 142, 142, 100269]
+			      // Treat first row as data as well.
+			    ], true);
+			
+			    var options = {
+			      legend:'none',
+			      hAxis: {
+			    	  slantedText:true,
+			    	  slantedTextAngle: 70,
+			    	  maxAlternation: 10,
+			    	  maxTextLines: 10,
+			    	  showTextEvery: 1,
+			    	  textPosition: 'out',
+			    	  textStyle: { 
+			    		  fontSize: 8
+			    	  }
+			      },
+			      vAxis: {
+			    	  viewWindow: {
+			    		  max: 379.6
+			    	  }
+			      }
+			    };
+			
+			    var chart = new google.visualization.CandlestickChart(document.getElementById('timedGraph'));
+			
+			    chart.draw(data, options);
+			}
+	  	</script>
+	  	
+		<style type="text/css">
+			body {
+				color: #333;
+				font-family: Arial, Helvetica, sans-serif;
+			}
+			
+			#wrapper {
+				margin-right: 700px;
+			}
+			
+			#timedGraph {
+				float: left;
+				width: 100%;
+				/* 	  background-color: #CCF; */
+			}
+			
+			#avgTimeSortedTable {
+				float: right;
+				width: 700px;
+				margin-right: -700px;
+				/* 	  background-color: #FFA; */
+			}
+			
+			#avgTimeSortedTable tr:nth-child(even) {
+				background-color: #ececec;
+			}
+			
+			#avgTimeSortedTable td {
+				text-align: right;
+			}
+			
+			#avgTimeSortedTable td:first-child {
+				text-align: left;
+			}
+			
+			#cleared {
+				clear: both;
+			}
+		</style>
+	
+	</head>
+	<body>
+		<p>TimeCollectors analyzed: 50000
+Edge labels show 'min | avg | max (count)' in NANOSECONDS</p>
+	
+		<div id="wrapper">
+			<div id="timedGraph"></div>
+			<div id="avgTimeSortedTable"><table><tr><th>TimeSpan (Unit: NANOSECONDS)</th><th>min</th><th>avg</th><th>max</th></tr><tr><td>AFTER_DBPOOL => BEFORE_DB_SAVE_DECISION1</td><td>0</td><td>292</td><td>6512319</td></tr><tr><td>CREATION => BEFORE_HANDLER_CONTEXT</td><td>0</td><td>275</td><td>1388363</td></tr><tr><td>AFTER_DAO_GETSTATE => BEFORE_CALC1</td><td>0</td><td>247</td><td>60398</td></tr><tr><td>BEFORE_DAO_SAVE => BEFORE_DBPOOL</td><td>0</td><td>244</td><td>19343</td></tr><tr><td>AFTER_DECIDER => BEFORE_DAO_SAVE</td><td>0</td><td>184</td><td>2034977</td></tr><tr><td>BEFORE_DBPOOL => AFTER_DBPOOL</td><td>0</td><td>174</td><td>37107</td></tr><tr><td>BEFORE_CALC1 => AFTER_CALC1</td><td>0</td><td>173</td><td>73820</td></tr><tr><td>AFTER_DB_GETSTATE => AFTER_DAO_GETSTATE</td><td>0</td><td>168</td><td>829781</td></tr><tr><td>BEFORE_HANDLER_CONTEXT => BEFORE_SEARCH_HANDLER</td><td>0</td><td>168</td><td>1235592</td></tr><tr><td>BEFORE_DB_SAVE_DECISION1 => AFTER_DB_SAVE_DECISION1</td><td>0</td><td>161</td><td>22106</td></tr><tr><td>AFTER_DAO_SAVE => AFTER_HANDLER</td><td>0</td><td>159</td><td>41449</td></tr><tr><td>BEFORE_DB_GETSTATE => AFTER_DB_GETSTATE</td><td>0</td><td>159</td><td>384889</td></tr><tr><td>AFTER_SEARCH_HANDLER => BEFORE_HANDLER</td><td>0</td><td>156</td><td>400285</td></tr><tr><td>AFTER_HANDLER => AFTER_HANDLER_CONTEXT</td><td>0</td><td>153</td><td>49344</td></tr><tr><td>AFTER_DBPOOL => BEFORE_DB_GETSTATE</td><td>0</td><td>148</td><td>15790</td></tr><tr><td>BEFORE_DBPOOL => AFTER_DBPOOL</td><td>0</td><td>148</td><td>81321</td></tr><tr><td>BEFORE_HANDLER => BEFORE_DAO_GETSTATE</td><td>0</td><td>146</td><td>95137</td></tr><tr><td>BEFORE_DAO_GETSTATE => BEFORE_DBPOOL</td><td>0</td><td>146</td><td>17369</td></tr><tr><td>BEFORE_SEARCH_HANDLER => AFTER_SEARCH_HANDLER</td><td>0</td><td>145</td><td>57239</td></tr><tr><td>BEFORE_DECIDER => AFTER_DECIDER</td><td>0</td><td>145</td><td>33159</td></tr><tr><td>AFTER_CALC1 => BEFORE_DECIDER</td><td>0</td><td>143</td><td>28423</td></tr><tr><td>AFTER_DB_SAVE_DECISION1 => AFTER_DAO_SAVE</td><td>0</td><td>142</td><td>100269</td></tr><tr><td>Sum of averages</td><td></td><td>3884</td><td></td></tr></table></div>
+		</div>
+	</body>
+</html>

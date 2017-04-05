@@ -17,11 +17,9 @@ import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
 import eu.andymel.timecollector.util.IdentitySet;
 
-public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE> {
+public class HTMLAnalyzerPath<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ShowPathHTMLFileAnalyzer.class);
-
-	private static final File TEMPLATE_FILE = new File("template.html");
+	private static final Logger LOG = LoggerFactory.getLogger(HTMLAnalyzerPath.class);
 
 	private static String htmlTemplate;
 
@@ -33,22 +31,15 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 	}
 	
 
-	public static <ID_TYPE> ShowPathHTMLFileAnalyzer<ID_TYPE> create() {
-		return new ShowPathHTMLFileAnalyzer<>();
+	public static <ID_TYPE> HTMLAnalyzerPath<ID_TYPE> create() {
+		return new HTMLAnalyzerPath<>();
 	}
 
-	private synchronized String getTemplate(){
-		if(htmlTemplate==null){
-			try {
-				htmlTemplate = readFile(TEMPLATE_FILE);
-			} catch (IOException e) {
-				LOG.error("Can't load template!", e);
-				htmlTemplate = "";
-			}
-		}
-		return htmlTemplate;
+	@Override
+	protected File getTemplateFile() {
+		return new File("templatePath.html");
 	}
-
+	
 	public String getHTMLString(TimeUnit unit) {
 		
 		AllowedPathsGraph<ID_TYPE> allowedGraph = getAllowedGraph();
@@ -130,31 +121,26 @@ public class ShowPathHTMLFileAnalyzer<ID_TYPE> extends AbstractHTMLFileAnalyzer<
 
 			// first line is the header
 			StringBuilder sbTable = new StringBuilder();
-			sbTable
-			.append("<table>")
-			.append("<tr><th>")
-			.append(arr[0][0]).append("</th><th>")
-			.append(arr[0][1]).append("</th><th>")
-			.append(arr[0][2]).append("</th><th>")
-			.append(arr[0][3])
-			.append("</th></tr>");
+			
+			String formatTableHeader= "<tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th></tr>";
+			String formatTableRow 	= "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>";
 
+			
+			sbTable.append("<table>")
+			.append(String.format(formatTableHeader, arr[0][0],arr[0][1],arr[0][2],arr[0][3]));
+			
 			// rows
 			for(int r=1; r<arr.length; r++){
-				sbTable
-				.append("<tr><td>")
-				.append(arr[r][0]).append("</td><td>")
-				.append(arr[r][1]).append("</td><td>")
-				.append(arr[r][2]).append("</td><td>")
-				.append(arr[r][3])
-				.append("</td></tr>");
+				String name = arr[r][0];
+				String min = arr[r][1];
+				String avg = arr[r][2];
+				String max = arr[r][3];
+				
+				sbTable.append(String.format(formatTableRow, name, min, avg, max));
+
 			}
 			
-			sbTable
-			.append("<tr><td>Sum of averages</td><td></td><td>")
-			.append((long)totalAvg)
-			.append("</td><td></td></tr>");
-			
+			sbTable.append(String.format(formatTableRow, "Sum of averages","",(long)totalAvg,""));
 			sbTable.append("</table>");
 			
 			tableString = sbTable.toString();
