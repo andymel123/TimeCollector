@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style type="text/css">
+			    body{
+			     	color: #333;
+			     	font-family: Arial, Helvetica, sans-serif;
+			    }
+			    #wrapper {
+				  margin-right: 700px;
+				}
+				#chartParent {
+				  float: left;
+				  width: 100%;
+/* 				  height: 90vh; */
+				}
+				#chartContainer{
+					max-height: 90vh;
+				}
+				#avgTimeSortedTable {
+				  float: right;
+				  width: 700px;
+				  margin-right: -700px;
+				}
+				#avgTimeSortedTable tr:nth-child(even) {
+				    background-color: #ececec;
+				}
+				#avgTimeSortedTable td{
+				  text-align: right;
+				}
+				#avgTimeSortedTable td:first-child {
+					text-align: left; 
+				}
+				#cleared {
+				  clear: both;
+				}
+		</style>
+		
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="chartParent">
+				<canvas id="chartContainer"></canvas>
+			</div>
+			<div id="avgTimeSortedTable">_REPLACE_TIMETABLE_</div>
+		</div>
+		
+		<script type="text/javascript">
+			var ctx = document.getElementById("chartContainer").getContext("2d");
+			var data = {
+			  labels: ["Data1", "Data2", "Data3"],
+			  datasets: [{
+			      label: "Apples",
+			      backgroundColor: "#F29220",
+			      borderColor: "#F29220",
+			      data: [40,20,30]
+			    }, {
+			      label: "Bananas",
+			      backgroundColor: "#4365B0",
+			      borderColor: "#4365B0",
+			      data: [60,80,70]
+			    }, {
+			      label: "Cookies",
+			      backgroundColor: "#D00",
+			      borderColor: "#D00",
+			      data: [10,5,10]
+			    }]
+			};
+	
+			var myBarChart = new Chart(ctx, {
+			  type: 'bar',
+			  data: data,
+			  options: {
+			    scales: {
+			    	responsive: true,
+			        maintainAspectRatio: false,
+			  		xAxes: [{stacked: true}],
+			    	yAxes: [{
+			      	stacked: true,
+			      	ticks: {
+			        	beginAtZero: true 
+			         }
+			      }]
+			    }
+			  }
+			});
+		</script>
+	</body>
+</html>

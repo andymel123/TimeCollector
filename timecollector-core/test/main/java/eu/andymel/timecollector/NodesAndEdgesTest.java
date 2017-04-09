@@ -1,7 +1,7 @@
 package eu.andymel.timecollector;
 
 import static eu.andymel.timecollector.PathTestUtils.checkRecPath;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;

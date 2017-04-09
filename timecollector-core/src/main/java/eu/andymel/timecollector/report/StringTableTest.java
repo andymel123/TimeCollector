@@ -1,7 +1,5 @@
 package eu.andymel.timecollector.report;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 public class StringTableTest {

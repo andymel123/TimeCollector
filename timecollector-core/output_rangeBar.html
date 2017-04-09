@@ -1,0 +1,81 @@
+<html>
+<head>
+  <title>eu.andymel.timeCollector Performance Graph v.01</title>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.min.js"></script>
+
+  <style type="text/css">
+    body{
+     	color: #333;
+     	font-family: Arial, Helvetica, sans-serif;
+    }
+    #wrapper {
+	  margin-right: 700px;
+	}
+	#timedGraph {
+	  float: left;
+	  width: 100%;
+/* 	  background-color: #CCF; */
+	}
+	#avgTimeSortedTable {
+	  float: right;
+	  width: 700px;
+	  margin-right: -700px;
+/* 	  background-color: #FFA; */
+	}
+	#avgTimeSortedTable tr:nth-child(even) {
+	    background-color: #ececec;
+	}
+	#avgTimeSortedTable td{
+	  text-align: right;
+	}
+	#avgTimeSortedTable td:first-child {
+		text-align: left; 
+	}
+	#cleared {
+	  clear: both;
+	}
+  </style>
+</head>
+<body>
+
+<p>
+  _REPLACE_DESCRIPTION_
+</p>
+
+<div id="wrapper">
+	<div id="timedGraph"></div>
+	<div id="avgTimeSortedTable"><table><tr><th>TimeSpan (Unit: NANOSECONDS)</th><th>min</th><th>avg</th><th>max</th></tr><tr><td>BEFORE_DAO_SAVE => BEFORE_DBPOOL</td><td>0</td><td>310</td><td>2197616</td></tr><tr><td>AFTER_DAO_GETSTATE => BEFORE_CALC1</td><td>0</td><td>303</td><td>1489816</td></tr><tr><td>CREATION => BEFORE_HANDLER_CONTEXT</td><td>0</td><td>260</td><td>218696</td></tr><tr><td>BEFORE_DBPOOL => AFTER_DBPOOL</td><td>0</td><td>227</td><td>2388285</td></tr><tr><td>BEFORE_DB_SAVE_DECISION1 => AFTER_DB_SAVE_DECISION1</td><td>0</td><td>210</td><td>1296385</td></tr><tr><td>BEFORE_DECIDER => AFTER_DECIDER</td><td>0</td><td>193</td><td>1605875</td></tr><tr><td>BEFORE_CALC1 => AFTER_CALC1</td><td>0</td><td>191</td><td>284620</td></tr><tr><td>AFTER_DBPOOL => BEFORE_DB_SAVE_DECISION1</td><td>0</td><td>179</td><td>133428</td></tr><tr><td>BEFORE_DAO_GETSTATE => BEFORE_DBPOOL</td><td>0</td><td>177</td><td>733460</td></tr><tr><td>AFTER_DAO_SAVE => AFTER_HANDLER</td><td>0</td><td>172</td><td>23686</td></tr><tr><td>AFTER_HANDLER => AFTER_HANDLER_CONTEXT</td><td>0</td><td>167</td><td>75004</td></tr><tr><td>AFTER_DB_GETSTATE => AFTER_DAO_GETSTATE</td><td>0</td><td>165</td><td>66715</td></tr><tr><td>AFTER_DBPOOL => BEFORE_DB_GETSTATE</td><td>0</td><td>164</td><td>128296</td></tr><tr><td>BEFORE_DBPOOL => AFTER_DBPOOL</td><td>0</td><td>163</td><td>106189</td></tr><tr><td>BEFORE_DB_GETSTATE => AFTER_DB_GETSTATE</td><td>0</td><td>162</td><td>45397</td></tr><tr><td>AFTER_DECIDER => BEFORE_DAO_SAVE</td><td>0</td><td>159</td><td>64741</td></tr><tr><td>BEFORE_HANDLER => BEFORE_DAO_GETSTATE</td><td>0</td><td>159</td><td>67899</td></tr><tr><td>AFTER_SEARCH_HANDLER => BEFORE_HANDLER</td><td>0</td><td>158</td><td>95926</td></tr><tr><td>AFTER_CALC1 => BEFORE_DECIDER</td><td>0</td><td>158</td><td>55661</td></tr><tr><td>AFTER_DB_SAVE_DECISION1 => AFTER_DAO_SAVE</td><td>0</td><td>154</td><td>41449</td></tr><tr><td>BEFORE_SEARCH_HANDLER => AFTER_SEARCH_HANDLER</td><td>0</td><td>154</td><td>44608</td></tr><tr><td>BEFORE_HANDLER_CONTEXT => BEFORE_SEARCH_HANDLER</td><td>0</td><td>154</td><td>33949</td></tr><tr><td>Sum of averages</td><td></td><td>4152</td><td></td></tr></table></div>
+</div>
+
+<script type="text/javascript">
+  
+	window.onload = function () {
+		var chart = new CanvasJS.Chart("timedGraph",
+		{
+			title: {
+				text: "50000TimeCollectors analyzed: average time in NANOSECONDS"
+			},
+// 			exportEnabled: true,
+			toolTip: {
+				content: "{label} </br> Min: {y[0]}, Avg: {y[2]}, Max: {y[1]}"
+			},
+			data: [
+			{
+				type: "rangeBar",
+// 				yValueFormatString: "#0.## �C",
+				indexLabel: "{y[#index]}",
+				indexLabelFontSize: 14,
+				dataPoints: [
+					{label: 'BEFORE_DAO_SAVE => BEFORE_DBPOOL', y: [ 0,310]},{label: 'AFTER_DAO_GETSTATE => BEFORE_CALC1', y: [ 0,303]},{label: 'CREATION => BEFORE_HANDLER_CONTEXT', y: [ 0,260]},{label: 'BEFORE_DBPOOL => AFTER_DBPOOL', y: [ 0,227]},{label: 'BEFORE_DB_SAVE_DECISION1 => AFTER_DB_SAVE_DECISION1', y: [ 0,210]},{label: 'BEFORE_DECIDER => AFTER_DECIDER', y: [ 0,193]},{label: 'BEFORE_CALC1 => AFTER_CALC1', y: [ 0,191]},{label: 'AFTER_DBPOOL => BEFORE_DB_SAVE_DECISION1', y: [ 0,179]},{label: 'BEFORE_DAO_GETSTATE => BEFORE_DBPOOL', y: [ 0,177]},{label: 'AFTER_DAO_SAVE => AFTER_HANDLER', y: [ 0,172]},{label: 'AFTER_HANDLER => AFTER_HANDLER_CONTEXT', y: [ 0,167]},{label: 'AFTER_DB_GETSTATE => AFTER_DAO_GETSTATE', y: [ 0,165]},{label: 'AFTER_DBPOOL => BEFORE_DB_GETSTATE', y: [ 0,164]},{label: 'BEFORE_DBPOOL => AFTER_DBPOOL', y: [ 0,163]},{label: 'BEFORE_DB_GETSTATE => AFTER_DB_GETSTATE', y: [ 0,162]},{label: 'AFTER_DECIDER => BEFORE_DAO_SAVE', y: [ 0,159]},{label: 'BEFORE_HANDLER => BEFORE_DAO_GETSTATE', y: [ 0,159]},{label: 'AFTER_SEARCH_HANDLER => BEFORE_HANDLER', y: [ 0,158]},{label: 'AFTER_CALC1 => BEFORE_DECIDER', y: [ 0,158]},{label: 'AFTER_DB_SAVE_DECISION1 => AFTER_DAO_SAVE', y: [ 0,154]},{label: 'BEFORE_SEARCH_HANDLER => AFTER_SEARCH_HANDLER', y: [ 0,154]},{label: 'BEFORE_HANDLER_CONTEXT => BEFORE_SEARCH_HANDLER', y: [ 0,154]}
+				]
+			}
+			]
+		});
+		chart.render();
+	}
+</script>
+
+
+</body>
+</html>

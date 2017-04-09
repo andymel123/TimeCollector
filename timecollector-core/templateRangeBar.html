@@ -50,8 +50,30 @@
 
 <script type="text/javascript">
   
-  siehe http://canvasjs.com/docs/charts/chart-types/html5-range-bar-chart/
-  
+	window.onload = function () {
+		var chart = new CanvasJS.Chart("timedGraph",
+		{
+			title: {
+				text: "_REPLACE_GRAPH_TITLE_"
+			},
+// 			exportEnabled: true,
+			toolTip: {
+				content: "{label} </br> Min: {y[0]}, Avg: {y[2]}, Max: {y[1]}"
+			},
+			data: [
+			{
+				type: "rangeBar",
+// 				yValueFormatString: "#0.## °C",
+				indexLabel: "{y[#index]}",
+				indexLabelFontSize: 14,
+				dataPoints: [
+					_REPLACE_DATA_
+				]
+			}
+			]
+		});
+		chart.render();
+	}
 </script>
 
 

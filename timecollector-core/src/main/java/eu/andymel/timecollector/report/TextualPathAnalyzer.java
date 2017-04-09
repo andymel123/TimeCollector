@@ -2,7 +2,7 @@ package eu.andymel.timecollector.report;
 
 import java.util.concurrent.TimeUnit;
 
-public class TextualPathAnalyzer<ID_TYPE> extends AbstractPathAnalyzer<ID_TYPE> {
+public class TextualPathAnalyzer<ID_TYPE> extends AbstractPathAnalyzerAvg<ID_TYPE> {
 
 	private TextualPathAnalyzer() {
 		super();

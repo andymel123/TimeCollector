@@ -2,8 +2,8 @@ package eu.andymel.timecollector.report;
 
 import java.io.File;
 import java.util.IdentityHashMap;
-import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -16,27 +16,30 @@ import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
 import eu.andymel.timecollector.util.IdentitySet;
 
-public class HTMLAnalyzerPath<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE> {
+public class HTMLAnalyzerRangeBars<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(HTMLAnalyzerPath.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HTMLAnalyzerRangeBars.class);
 
 	private static String htmlTemplate;
 
+	private static Random random = new Random();
+	
 	private static enum placeholder{
-		_REPLACE_DESCRIPTION_,
-		_REPLACE_NODES_,
-		_REPLACE_EDGES_,
+		_REPLACE_GRAPH_TITLE_,
+		_REPLACE_LABELS_,
+		_REPLACE_DATA_,
+		_REPLACE_UNIT_,
 		_REPLACE_TIMETABLE_
 	}
 	
 
-	public static <ID_TYPE> HTMLAnalyzerPath<ID_TYPE> create() {
-		return new HTMLAnalyzerPath<>();
+	public static <ID_TYPE> HTMLAnalyzerRangeBars<ID_TYPE> create() {
+		return new HTMLAnalyzerRangeBars<>();
 	}
 
 	@Override
 	protected File getTemplateFile() {
-		return new File("templatePath.html");
+		return new File("templateRangeBar.html");
 	}
 	
 	public String getHTMLString(TimeUnit unit) {
@@ -50,59 +53,8 @@ public class HTMLAnalyzerPath<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE>
 		Set<GraphNode<ID_TYPE, NodePermissions>> allNodes = allowedGraph.getAllNodes();
 		Set<GraphNode<ID_TYPE, NodePermissions>> nodesUsedByAtLeastOneEdge = new IdentitySet<>(allNodes.size());
 		
-		StringBuilder edgesString = new StringBuilder();
-		String edgeFormat = "{from: '%s', to: '%s', label: '%s | %s | %s (%.2f%%)', arrows:'to', value: %s}";
-		boolean isFirst = true;
 		
 		double totalAvg = getAvgSummedUp();
-		
-		// build string of edges
-		for(Entry<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> outer: getTimesPerSpan().entrySet()){
-			GraphNode<ID_TYPE, NodePermissions> node1 = outer.getKey();
-			IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong> inner = outer.getValue();
-			for(Entry<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong> e: inner.entrySet()){
-				GraphNode<ID_TYPE, NodePermissions> node2 = e.getKey();
-				AvgMaxCalcLong calc = e.getValue();
-				
-				nodesUsedByAtLeastOneEdge.add(node1);
-				nodesUsedByAtLeastOneEdge.add(node2);
-				
-				if(isFirst){
-					isFirst = false;
-				}else{
-					edgesString.append(',');
-				}
-				
-				double avg = calc.getAvg();
-				double weightFactor = 100*avg/totalAvg;
-				edgesString.append(
-					String.format(
-						edgeFormat, 
-						System.identityHashCode(node1), 
-						System.identityHashCode(node2),
-						unit.convert(calc.getMin(),TimeUnit.NANOSECONDS),
-						unit.convert((long)avg,TimeUnit.NANOSECONDS),
-						unit.convert(calc.getMax(),TimeUnit.NANOSECONDS),
-						weightFactor,
-						weightFactor
-					)
-				);
-			}
-		}
-		
-		// build string of nodes that were used for at least one edge
-		StringBuilder nodesString = new StringBuilder();
-		String oneNodeString = "{id: '%s', label: '%s', shape: 'box'}";
-		isFirst = true;
-		for(GraphNode<ID_TYPE, NodePermissions> node:nodesUsedByAtLeastOneEdge){
-			if(isFirst){
-				isFirst = false;
-			}else{
-				nodesString.append(',');
-			}
-			int identityHashCode = System.identityHashCode(node);
-			nodesString.append(String.format(oneNodeString, String.valueOf(identityHashCode), node.getId()));	
-		}
 		
 		StringTable table = getAsStringTable(unit);
 		table.sort((String[] row1, String[] row2)->{
@@ -115,18 +67,26 @@ public class HTMLAnalyzerPath<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE>
 		String[][] arr = table.asArray();
 
 		String tableString = "No Data!";
+		String labelString = "";
+		String dataString = "";
 		
 		if(arr!=null && arr.length>1){
 
 			// first line is the header
 			StringBuilder sbTable = new StringBuilder();
+			StringBuilder sbLables = new StringBuilder();
+			StringBuilder sbData = new StringBuilder();
 			
 			String formatTableHeader= "<tr><th>%s</th><th>%s</th><th>%s</th><th>%s</th></tr>";
 			String formatTableRow 	= "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>";
+			//{x: new Date(2014,03,1), y: [ 17,33]},  
+			String formatDataRow 	= "{label: '%s', y: [ %s,%s]}";
 
 			
 			sbTable.append("<table>")
 			.append(String.format(formatTableHeader, arr[0][0],arr[0][1],arr[0][2],arr[0][3]));
+			
+			boolean isFirst = true;
 			
 			// rows
 			for(int r=1; r<arr.length; r++){
@@ -135,25 +95,35 @@ public class HTMLAnalyzerPath<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE>
 				String avg = arr[r][2];
 				String max = arr[r][3];
 				
+//				min = ""+random.nextInt(100);
+				
 				sbTable.append(String.format(formatTableRow, name, min, avg, max));
 
+				if(isFirst){
+					isFirst=false;
+				}else{
+					sbLables.append(',');
+					sbData.append(',');
+				}
+				sbLables.append('"').append(name).append('"');
+				sbData.append(String.format(formatDataRow, name, min, avg));
 			}
 			
 			sbTable.append(String.format(formatTableRow, "Sum of averages","",(long)totalAvg,""));
 			sbTable.append("</table>");
 			
 			tableString = sbTable.toString();
+			dataString = sbData.toString();
+			labelString = sbLables.toString();
 		}
 		
 		
 		
-		String description = "TimeCollectors analyzed: "+getNumberOfAddedTimeCollectors();
-		description += "\nEdge labels show 'min | avg | max (count)' in "+unit;
+		String description = getNumberOfAddedTimeCollectors()+"TimeCollectors analyzed: average time in "+unit;
 		
 		String template = getTemplate();
-		template = template.replaceFirst(placeholder._REPLACE_DESCRIPTION_.name(), 	description);
-		template = template.replaceFirst(placeholder._REPLACE_NODES_.name(), 		nodesString.toString());
-		template = template.replaceFirst(placeholder._REPLACE_EDGES_.name(), 		edgesString.toString());
+		template = template.replaceFirst(placeholder._REPLACE_GRAPH_TITLE_.name(), 	description);
+		template = template.replaceFirst(placeholder._REPLACE_DATA_.name(), 		dataString);
 		template = template.replaceFirst(placeholder._REPLACE_TIMETABLE_.name(), 	tableString);
 		return template;
 	}
@@ -161,7 +131,7 @@ public class HTMLAnalyzerPath<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE>
 	
 	@Override
 	protected String getTimeSpanName(GraphNode<ID_TYPE, NodePermissions> from, GraphNode<ID_TYPE, NodePermissions> to) {
-		return from.getId()+" <b>&rArr;</b> "+to.getId();
+		return from.getId()+" => "+to.getId();
 	}
 	
 }

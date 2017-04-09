@@ -19,7 +19,14 @@ import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
 
-public abstract class AbstractPathAnalyzer<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> {
+/**
+ * This analyzer saves the min/avg/max time between two milestones
+ * 
+ * @author andymatic
+ *
+ * @param <ID_TYPE> the milestone type
+ */
+public abstract class AbstractPathAnalyzerAvg<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> {
 
 	private int countTimeCollectorsAdded = 0;
 
@@ -27,7 +34,7 @@ public abstract class AbstractPathAnalyzer<ID_TYPE> implements Analyzer<ID_TYPE,
 	private IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> timesPerSpan;
 
 	
-	public AbstractPathAnalyzer() {
+	public AbstractPathAnalyzerAvg() {
 		/* LinkedHashMap to get insertion order, has same performance as HashMap in my measurements */
 		timesPerSpan = new IdentityHashMap<>();
 	}

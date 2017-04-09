@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 
-public abstract class AbstractHTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzer<ID_TYPE> {
+public abstract class AbstractHTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzerAvg<ID_TYPE> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractHTMLFileAnalyzer.class);
 

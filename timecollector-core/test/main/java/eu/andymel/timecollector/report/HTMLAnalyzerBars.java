@@ -1,9 +1,7 @@
 package eu.andymel.timecollector.report;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.IdentityHashMap;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
