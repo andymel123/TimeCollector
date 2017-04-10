@@ -74,7 +74,7 @@ public class AnalyzerEach<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollectorWit
         return hashCode;
 	}
 
-	Collection<AnalyzerEachEntry> getAll(){
+	public Collection<AnalyzerEachEntry<ID_TYPE>> getAll(){
 		return Collections.unmodifiableCollection(dataOfDifferentPaths.values());
 	}
 	

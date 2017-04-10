@@ -41,11 +41,10 @@ public class AnalyzerEachTest {
 			.path(n1,n3,n4)
 			.build();
 		
-		
 	}
 	
 	@Test
-	public void test() {
+	public void test2DifferentPaths() {
 
 		AnalyzerEach<SmallTestMilestones> analyzer = AnalyzerEach.create(analyzerClock);
 		
@@ -63,7 +62,7 @@ public class AnalyzerEachTest {
 		tc.saveTime(SmallTestMilestones.MS4);
 		analyzer.addCollector(tc);
 		
-		Collection<AnalyzerEachEntry> all = analyzer.getAll();
+		Collection<AnalyzerEachEntry<SmallTestMilestones>> all = analyzer.getAll();
 		
 		assertEquals(2, all.size());
 
