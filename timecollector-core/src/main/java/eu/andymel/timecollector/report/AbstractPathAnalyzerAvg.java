@@ -114,12 +114,25 @@ public abstract class AbstractPathAnalyzerAvg<ID_TYPE> implements Analyzer<ID_TY
 			.sum();							// sum all avg up
 	}
 	
+	/**
+	 * @param unit
+	 * @return a {@link StringTable} either with two columns (timespan name and length of timespan), or 4 columns (name, min, avg, max).
+	 * The 2 column version is returned if less than 2 timeCollectors were added, if multiple time collectors were added -> 4columns
+	 */
 	public StringTable getAsStringTable(TimeUnit unit) {
 		
 		StringTable table = new StringTable();
 		
-		table.row("TimeSpan (Unit: "+unit+")", "min", "avg", "max");
+		boolean justShowOneValueColumn = getNumberOfAddedTimeCollectors() < 2;
 		
+		if(justShowOneValueColumn){
+			// just show one entry as "time"
+			table.row("TimeSpan (Unit: "+unit+")", "Time");
+		}else{
+			// show 3 entries min/avg/max
+			table.row("TimeSpan (Unit: "+unit+")", "min", "avg", "max");
+		}
+				
 		for(Entry<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> outer: getTimesPerSpan().entrySet()){
 			GraphNode<ID_TYPE, NodePermissions> node1 = outer.getKey();
 			IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong> inner = outer.getValue();
@@ -129,11 +142,15 @@ public abstract class AbstractPathAnalyzerAvg<ID_TYPE> implements Analyzer<ID_TY
 
 				// TODO replace by own implementation that does not round to full numbers (to get 0,001ms)
 				String column1 = getTimeSpanName(node1, node2);
-				String column2 = String.valueOf(unit.convert(calc.getMin(),TimeUnit.NANOSECONDS)); 
-				String column3 = String.valueOf(unit.convert((long)calc.getAvg(),TimeUnit.NANOSECONDS));
-				String column4 = String.valueOf(unit.convert(calc.getMax(),TimeUnit.NANOSECONDS));
+				String column2 = String.valueOf(unit.convert(calc.getMin(),TimeUnit.NANOSECONDS));
 				
-				table.row(column1, column2, column3, column4);
+				if(justShowOneValueColumn){
+					table.row(column1, column2);
+				}else{
+					String column3 = String.valueOf(unit.convert((long)calc.getAvg(),TimeUnit.NANOSECONDS));
+					String column4 = String.valueOf(unit.convert(calc.getMax(),TimeUnit.NANOSECONDS));
+					table.row(column1, column2, column3, column4);
+				}
 			}
 		}
 		return table;
