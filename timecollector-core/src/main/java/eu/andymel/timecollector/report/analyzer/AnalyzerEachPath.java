@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.report;
+package eu.andymel.timecollector.report.analyzer;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -7,12 +7,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.andymel.timecollector.TimeCollector;
 import eu.andymel.timecollector.TimeCollectorWithPath;
+import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 
@@ -21,29 +23,35 @@ import eu.andymel.timecollector.graphs.NodePermissions;
  * 
  * @author andymatic
  */
-public class AnalyzerEach<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>>{
+public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>>{
 
-	private static final Logger LOG = LoggerFactory.getLogger(AnalyzerEach.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AnalyzerEachPath.class);
 	
 	private static final int MAX_NUMBER_OF_COLLECTED_PATHS = 1000;			
 	
-	private final HashMap<Integer, AnalyzerEachRecPathData<ID_TYPE>> dataOfDifferentPaths;
+	private final HashMap<Integer, AnalyzerEachPathData<ID_TYPE>> dataOfDifferentPaths;
 	private final Clock clock;
 	
+	private volatile int countTimeCollectorsAdded = 0;
+
 	/**
 	 * @param clock the clock to use to retrieve the time a timecollector was added to this analyzer
 	 */
-	private AnalyzerEach(Clock clock) {
+	private AnalyzerEachPath(Clock clock) {
 		this.dataOfDifferentPaths = new HashMap<>();
 		this.clock = clock;
 	}
 
-	public static <ID_TYPE> AnalyzerEach<ID_TYPE> create(Clock clock){
-		return new AnalyzerEach<>(clock);
+	/**
+	 * @param clock to get the time when the {@link TimeCollector} is added to the analyzer
+	 * @return
+	 */
+	public static <ID_TYPE> AnalyzerEachPath<ID_TYPE> create(Clock clock){
+		return new AnalyzerEachPath<>(clock);
 	}
 	
 	@Override
-	public void addCollector(TimeCollectorWithPath<ID_TYPE> tc) {
+	public synchronized void addCollector(TimeCollectorWithPath<ID_TYPE> tc) {
 		List<List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>>> recordedPaths = tc.getRecordedPaths();
 		if(recordedPaths.size()==0)return;
 		if(recordedPaths.size()>1){
@@ -54,8 +62,9 @@ public class AnalyzerEach<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollectorWit
 		Integer hashOfPath = Integer.valueOf(hashOfPath(path));
 
 		// get data collector for this kind of path or generate a new such container
-		AnalyzerEachRecPathData<ID_TYPE> pathData = dataOfDifferentPaths.computeIfAbsent(hashOfPath, hash->new AnalyzerEachRecPathData<ID_TYPE>(tc.getAllowedGraph(), path, hash, MAX_NUMBER_OF_COLLECTED_PATHS));
+		AnalyzerEachPathData<ID_TYPE> pathData = dataOfDifferentPaths.computeIfAbsent(hashOfPath, hash->new AnalyzerEachPathData<ID_TYPE>(tc.getAllowedGraph(), path, hash, MAX_NUMBER_OF_COLLECTED_PATHS));
 		pathData.addTimes(path, this.clock);
+		countTimeCollectorsAdded++;
 	}
 	
 	/**
@@ -76,6 +85,23 @@ public class AnalyzerEach<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollectorWit
 
 	public Collection<AnalyzerEachEntry<ID_TYPE>> getAll(){
 		return Collections.unmodifiableCollection(dataOfDifferentPaths.values());
+	}
+	
+	public interface AnalyzerEachEntry<ID_TYPE> {
+		
+		Integer getHashOfRecPath();
+		
+		List<GraphNode<ID_TYPE, NodePermissions>> getRecPath();
+		
+		List<long[]> getCollectedTimes();
+		
+		AllowedPathsGraph<ID_TYPE> getAllowedGraph();
+		
+	}
+
+	@Override
+	public long getNumberOfAddedTimeCollectors() {
+		return countTimeCollectorsAdded;
 	}
 	
 }

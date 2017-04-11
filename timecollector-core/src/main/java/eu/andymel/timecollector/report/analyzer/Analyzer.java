@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.report;
+package eu.andymel.timecollector.report.analyzer;
 
 import eu.andymel.timecollector.TimeCollector;
 
@@ -15,5 +15,7 @@ public interface Analyzer <ID_TYPE, TC_TYPE extends TimeCollector<ID_TYPE>>{
 	 * 
 	 */
 	void addCollector(TC_TYPE tc);
+
+	long getNumberOfAddedTimeCollectors();
 	
 }

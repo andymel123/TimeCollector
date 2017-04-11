@@ -1,6 +1,8 @@
-package eu.andymel.timecollector.report;
+package eu.andymel.timecollector.util;
 
 import org.junit.Test;
+
+import eu.andymel.timecollector.util.StringTable;
 
 public class StringTableTest {
 

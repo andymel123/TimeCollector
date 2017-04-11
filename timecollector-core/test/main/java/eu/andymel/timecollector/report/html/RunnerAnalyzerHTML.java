@@ -1,18 +1,22 @@
-package eu.andymel.timecollector.performancetests;
+package eu.andymel.timecollector.report.html;
 
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.andymel.timecollector.TestClockIncrementRandom;
 import eu.andymel.timecollector.TestTimeCollectorProvider;
+import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.TimeCollectorWithPath;
-import eu.andymel.timecollector.report.AbstractHTMLFileAnalyzer;
-import eu.andymel.timecollector.report.HTMLAnalyzerStackedBars;
+import eu.andymel.timecollector.performancetests.PerformanceTestsUtils;
+import eu.andymel.timecollector.report.analyzer.Analyzer;
+import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
 import eu.andymel.timecollector.util.NanoClock;
 
 /*
@@ -27,25 +31,18 @@ import eu.andymel.timecollector.util.NanoClock;
  * @author andymatic
  *
  */
-public class PerformanceTestWithHTMLFileAnalyzer {
+public class RunnerAnalyzerHTML {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PerformanceTestWithHTMLFileAnalyzer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RunnerAnalyzerHTML.class);
 	
 	public static void main(String[] args) {
 		
 		int amount = 50_000;
 		
-		NanoClock clock = new NanoClock();
-		
-		AbstractHTMLFileAnalyzer<TestTimeCollectorProvider.TestMilestones> analyzer;
-		
-//		analyzer = HTMLAnalyzerPath.create();
-//		analyzer = HTMLAnalyzerCandlestick.create();
-//		analyzer = HTMLAnalyzerBars.create();
-//		analyzer = HTMLAnalyzerRangeBars.create();
-		analyzer = HTMLAnalyzerStackedBars.create();
-		
-		
+//		Clock clock = new NanoClock();
+		Clock clock = new TestClockIncrementRandom(1, 1000);
+//		Analyzer<TestMilestones, TimeCollectorWithPath<TestMilestones>>  analyzer = AnalyzerAvgPath.create(); 
+		Analyzer<TestMilestones, TimeCollectorWithPath<TestMilestones>>  analyzer = AnalyzerEachPath.create(clock); 
 		
 //		waitForInput();
 		
@@ -80,10 +77,20 @@ public class PerformanceTestWithHTMLFileAnalyzer {
 		}
 		PerformanceTestsUtils.end("Create TimeCollectorWithPath", amount, start);
 		
+		
+		AbstractHTMLFormatter<TestTimeCollectorProvider.TestMilestones> htmlFormatter;
+		
 //		o(analyzer.getHTMLString(TimeUnit.NANOSECONDS));
+		
+//		htmlFormatter = HTMLFormatterPath.create(analyzer);
+//		htmlFormatter = HTMLFormatterCandlestick.create(analyzer);
+//		htmlFormatter = HTMLFormatterBars.create(analyzer);
+//		htmlFormatter = HTMLFormatterRangeBars.create(analyzer);
+		htmlFormatter = HTMLFormatterStackedBars.create(analyzer);
+		
 		try {
 			File f = new File("output.html");
-			analyzer.writeToFile(f, TimeUnit.NANOSECONDS, false);
+			htmlFormatter.writeToFile(f, TimeUnit.MICROSECONDS, false);
 			LOG.info("HTML written to file '"+f.getAbsolutePath()+"'");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

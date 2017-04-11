@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.report;
+package eu.andymel.timecollector.report.html;
 
 import java.io.File;
 import java.util.IdentityHashMap;
@@ -10,15 +10,19 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
+import eu.andymel.timecollector.report.analyzer.Analyzer;
+import eu.andymel.timecollector.report.analyzer.AnalyzerAvgPath;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
 import eu.andymel.timecollector.util.IdentitySet;
+import eu.andymel.timecollector.util.StringTable;
 
-public class HTMLAnalyzerStackedBars<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE> {
+public class HTMLFormatterRangeBars<ID_TYPE> extends AbstractHTMLFormatter<ID_TYPE> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(HTMLAnalyzerStackedBars.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HTMLFormatterRangeBars.class);
 
 	private static String htmlTemplate;
 
@@ -33,30 +37,40 @@ public class HTMLAnalyzerStackedBars<ID_TYPE> extends AbstractHTMLFileAnalyzer<I
 	}
 	
 
-	public static <ID_TYPE> HTMLAnalyzerStackedBars<ID_TYPE> create() {
-		return new HTMLAnalyzerStackedBars<>();
+	public static <ID_TYPE> HTMLFormatterRangeBars<ID_TYPE> create(Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> analyzer) {
+		if(!(analyzer instanceof AnalyzerAvgPath)){
+			throw new IllegalStateException(HTMLFormatterBars.class.getSimpleName()+" is not capable of using "+analyzer.getClass().getSimpleName());
+		}
+		return new HTMLFormatterRangeBars<>(analyzer);
 	}
 
+	private HTMLFormatterRangeBars(Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> analyzer) {
+		super(analyzer);
+	}
+	
 	@Override
 	protected File getTemplateFile() {
-		return new File("templateStackedBar.html");
+		return new File("templateRangeBar.html");
 	}
 	
 	public String getHTMLString(TimeUnit unit) {
 		
-		AllowedPathsGraph<ID_TYPE> allowedGraph = getAllowedGraph();
+		AnalyzerAvgPath<ID_TYPE> analyzer = (AnalyzerAvgPath<ID_TYPE>)getAnalyzer(); // checked in constructor
+		Objects.requireNonNull(analyzer, "'analyzer' is null");
+
+		AllowedPathsGraph<ID_TYPE> allowedGraph = analyzer.getAllowedGraph();
 		Objects.requireNonNull(allowedGraph, "'allowedGraph' is null!");
 		
-		IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> timesPerSpan = getTimesPerSpan();
+		IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> timesPerSpan = analyzer.getTimesPerSpan();
 		Objects.requireNonNull(timesPerSpan, "'timesPerSpan' is null!");
 		
 		Set<GraphNode<ID_TYPE, NodePermissions>> allNodes = allowedGraph.getAllNodes();
 		Set<GraphNode<ID_TYPE, NodePermissions>> nodesUsedByAtLeastOneEdge = new IdentitySet<>(allNodes.size());
 		
 		
-		double totalAvg = getAvgSummedUp();
+		double totalAvg = analyzer.getAvgSummedUp();
 		
-		StringTable table = getAsStringTable(unit);
+		StringTable table = analyzer.getAsStringTable(unit, this);
 		table.sort((String[] row1, String[] row2)->{
 			try{
 				return Integer.compare(Integer.parseInt(row2[2]), Integer.parseInt(row1[2]));	
@@ -119,7 +133,7 @@ public class HTMLAnalyzerStackedBars<ID_TYPE> extends AbstractHTMLFileAnalyzer<I
 		
 		
 		
-		String description = getNumberOfAddedTimeCollectors()+"TimeCollectors analyzed: average time in "+unit;
+		String description = analyzer.getNumberOfAddedTimeCollectors()+"TimeCollectors analyzed: average time in "+unit;
 		
 		String template = getTemplate();
 		template = template.replaceFirst(placeholder._REPLACE_GRAPH_TITLE_.name(), 	description);
@@ -129,9 +143,5 @@ public class HTMLAnalyzerStackedBars<ID_TYPE> extends AbstractHTMLFileAnalyzer<I
 	}
 	
 	
-	@Override
-	protected String getTimeSpanName(GraphNode<ID_TYPE, NodePermissions> from, GraphNode<ID_TYPE, NodePermissions> to) {
-		return from.getId()+" => "+to.getId();
-	}
 	
 }

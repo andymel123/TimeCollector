@@ -2,18 +2,16 @@ package eu.andymel.timecollector.performancetests;
 
 
 
-import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.waitForInput;
-
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Collection;
 
-import eu.andymel.timecollector.TestClock;
+import eu.andymel.timecollector.TestClockIncrementBy1;
 import eu.andymel.timecollector.TestTimeCollectorProvider;
-import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
-import eu.andymel.timecollector.report.AnalyzerEach;
-import eu.andymel.timecollector.report.AnalyzerEachEntry;
+import eu.andymel.timecollector.TimeCollectorWithPath;
+import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
+import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
 import eu.andymel.timecollector.util.NanoClock;
 
 /*
@@ -35,9 +33,9 @@ public class PerformanceTestAnalyzerEach {
 		int amount = 50000;
 		
 		Clock tcClock = new NanoClock();
-		Clock analyzerClock = new TestClock();
+		Clock analyzerClock = new TestClockIncrementBy1();
 		
-		AnalyzerEach<TestMilestones> analyzerEach = AnalyzerEach.create(analyzerClock);
+		AnalyzerEachPath<TestMilestones> analyzerEach = AnalyzerEachPath.create(analyzerClock);
 		
 //		waitForInput();
 		
@@ -73,6 +71,7 @@ public class PerformanceTestAnalyzerEach {
 		PerformanceTestsUtils.end("Create/save on pathTC, add to AnalyzerEach", amount, start);
 		
 		Collection<AnalyzerEachEntry<TestMilestones>> all = analyzerEach.getAll();
+		
 		
 		
 	}

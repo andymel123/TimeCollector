@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.report;
+package eu.andymel.timecollector.report.html;
 
 import java.io.File;
 import java.util.IdentityHashMap;
@@ -10,15 +10,19 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
+import eu.andymel.timecollector.report.analyzer.Analyzer;
+import eu.andymel.timecollector.report.analyzer.AnalyzerAvgPath;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
 import eu.andymel.timecollector.util.IdentitySet;
+import eu.andymel.timecollector.util.StringTable;
 
-public class HTMLAnalyzerBars<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE> {
+public class HTMLFormatterBars<ID_TYPE> extends AbstractHTMLFormatter<ID_TYPE> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(HTMLAnalyzerBars.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HTMLFormatterBars.class);
 
 	private static String htmlTemplate;
 
@@ -33,8 +37,14 @@ public class HTMLAnalyzerBars<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE>
 	}
 	
 
-	public static <ID_TYPE> HTMLAnalyzerBars<ID_TYPE> create() {
-		return new HTMLAnalyzerBars<>();
+	public static <ID_TYPE> HTMLFormatterBars<ID_TYPE> create(Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> analyzer) {
+		if(!(analyzer instanceof AnalyzerAvgPath)){
+			throw new IllegalStateException(HTMLFormatterBars.class.getSimpleName()+" is not capable of using "+analyzer.getClass().getSimpleName());
+		}
+		return new HTMLFormatterBars<>(analyzer);
+	}
+	private HTMLFormatterBars(Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> analyzer) {
+		super(analyzer);
 	}
 
 	@Override
@@ -43,20 +53,23 @@ public class HTMLAnalyzerBars<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE>
 	}
 	
 	public String getHTMLString(TimeUnit unit) {
+		Objects.requireNonNull("'unit' is null!");
+		AnalyzerAvgPath<ID_TYPE> analyzer = (AnalyzerAvgPath<ID_TYPE>)getAnalyzer(); // checked in constructor
+		Objects.requireNonNull(analyzer, "'analyzer' is null");
 		
-		AllowedPathsGraph<ID_TYPE> allowedGraph = getAllowedGraph();
+		AllowedPathsGraph<ID_TYPE> allowedGraph = analyzer.getAllowedGraph();
 		Objects.requireNonNull(allowedGraph, "'allowedGraph' is null!");
 		
-		IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> timesPerSpan = getTimesPerSpan();
+		IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> timesPerSpan = analyzer.getTimesPerSpan();
 		Objects.requireNonNull(timesPerSpan, "'timesPerSpan' is null!");
 		
 		Set<GraphNode<ID_TYPE, NodePermissions>> allNodes = allowedGraph.getAllNodes();
 		Set<GraphNode<ID_TYPE, NodePermissions>> nodesUsedByAtLeastOneEdge = new IdentitySet<>(allNodes.size());
 		
 		
-		double totalAvg = getAvgSummedUp();
+		double totalAvg = analyzer.getAvgSummedUp();
 		
-		StringTable table = getAsStringTable(unit);
+		StringTable table = analyzer.getAsStringTable(unit, this);
 		table.sort((String[] row1, String[] row2)->{
 			try{
 				return Integer.compare(Integer.parseInt(row2[2]), Integer.parseInt(row1[2]));	
@@ -117,7 +130,7 @@ public class HTMLAnalyzerBars<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE>
 		
 		
 		
-		String description = "TimeCollectors analyzed: "+getNumberOfAddedTimeCollectors();
+		String description = "TimeCollectors analyzed: "+analyzer.getNumberOfAddedTimeCollectors();
 		description += "\nEdge labels show 'min | avg | max (count)' in "+unit;
 		
 		String template = getTemplate();
@@ -130,9 +143,7 @@ public class HTMLAnalyzerBars<ID_TYPE> extends AbstractHTMLFileAnalyzer<ID_TYPE>
 	}
 	
 	
-	@Override
-	protected String getTimeSpanName(GraphNode<ID_TYPE, NodePermissions> from, GraphNode<ID_TYPE, NodePermissions> to) {
-		return from.getId()+" => "+to.getId();
-	}
+	
+	
 	
 }

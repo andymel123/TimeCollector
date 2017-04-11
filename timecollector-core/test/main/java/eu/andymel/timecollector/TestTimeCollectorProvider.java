@@ -157,7 +157,9 @@ public class TestTimeCollectorProvider {
 		
 	
 		
-
+	public static AllowedPathsGraph<TestMilestones> getAllowedGraph() {
+		return allowedGraph;
+	}
 	
 	
 	public static TimeCollectorWithPath<TestMilestones> getTC(Clock clock){

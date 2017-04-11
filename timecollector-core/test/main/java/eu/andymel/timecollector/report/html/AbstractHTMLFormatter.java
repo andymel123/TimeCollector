@@ -1,33 +1,32 @@
-package eu.andymel.timecollector.report;
+package eu.andymel.timecollector.report.html;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.andymel.timecollector.TimeCollectorWithPath;
-import eu.andymel.timecollector.graphs.AllowedPathsGraph;
+import eu.andymel.timecollector.graphs.GraphNode;
+import eu.andymel.timecollector.graphs.NodePermissions;
+import eu.andymel.timecollector.report.analyzer.Analyzer;
 
-public abstract class AbstractHTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnalyzerAvg<ID_TYPE> {
+public abstract class AbstractHTMLFormatter<ID_TYPE> implements TimeSpanNameFormatter<ID_TYPE>{
 
-	private static final Logger LOG = LoggerFactory.getLogger(AbstractHTMLFileAnalyzer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractHTMLFormatter.class);
 
-	// TODO hash and save mutliple allowedgraphs for Dashboard views 
-	private AllowedPathsGraph<ID_TYPE> allowedGraph;
+	private final Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> analyzer;
+	
+	public AbstractHTMLFormatter(Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> analyzer) {
+		Objects.requireNonNull(analyzer, "'analyzer' is null");
+		this.analyzer = analyzer;
+	}
 	
 	private static String htmlTemplate;
-
-	@Override
-	public synchronized void addCollector(TimeCollectorWithPath<ID_TYPE> tc) {
-		// TODO make async!
-
-		if(allowedGraph==null)allowedGraph = tc.getAllowedGraph();
-		super.addCollector(tc);
-	}
 
 	protected static String readFile(File file) throws IOException {
 		byte[] encoded = getBytesFromFile(file);
@@ -63,9 +62,13 @@ public abstract class AbstractHTMLFileAnalyzer<ID_TYPE> extends AbstractPathAnal
 
 	protected abstract String getHTMLString(TimeUnit unit);
 	
-	protected AllowedPathsGraph<ID_TYPE> getAllowedGraph() {
-		return allowedGraph;
+	protected Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> getAnalyzer() {
+		return analyzer;
 	}
+
 	
-	
+	public String getTimeSpanName(GraphNode<ID_TYPE, NodePermissions> from, GraphNode<ID_TYPE, NodePermissions> to) {
+		return String.format("%s => %s", from.getId(), to.getId());
+	}
+
 }

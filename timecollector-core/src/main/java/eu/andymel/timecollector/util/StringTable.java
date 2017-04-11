@@ -1,12 +1,16 @@
-package eu.andymel.timecollector.report;
+package eu.andymel.timecollector.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import eu.andymel.timecollector.util.AvgMaxCalcLong;
-
+/**
+ * Utility class to add rows of String[] and get a formatted table with toString afterwards.
+ * This class takes care of formatting the columns in a way that the widest cell determines the width of the column.
+ * 
+ * @author andymatic
+ */
 public class StringTable {
 
 	private static final int DEFAULT_PADDING = 3;

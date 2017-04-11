@@ -17,6 +17,8 @@ public class PathStringBuilder<ID_TYPE, TC_TYPE extends TimeCollector<ID_TYPE>> 
 	/** HashMap in HashMap as outer key is the first milestone, inner key the second */
 	private HashMap<ID_TYPE, HashMap<ID_TYPE, AvgMaxCalcLong>> timesPerSpan;
 	
+	private long numberOfAddedTimeCollectors = 0;
+	
 	public PathStringBuilder() {
 		/* LinkedHashMap to get insertion order, has same performance as HashMap in my measurements */
 		timesPerSpan = new LinkedHashMap<>();
@@ -37,6 +39,7 @@ public class PathStringBuilder<ID_TYPE, TC_TYPE extends TimeCollector<ID_TYPE>> 
 		}
 		
 		calc.add(Duration.between(t1, t2).toNanos());
+		numberOfAddedTimeCollectors++;
 	}
 
 	protected String getTimeSpanName(ID_TYPE from, ID_TYPE to) {
@@ -98,5 +101,8 @@ public class PathStringBuilder<ID_TYPE, TC_TYPE extends TimeCollector<ID_TYPE>> 
 		return toString(TimeUnit.NANOSECONDS);
 	}
 	
+	public long getNumberOfAddedTimeCollectors() {
+		return numberOfAddedTimeCollectors;
+	}
 	
 }
