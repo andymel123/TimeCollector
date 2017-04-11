@@ -63,7 +63,7 @@ public class NodesAndEdgesTest {
 
 //		path.forEach(System.out::println);
 		
-		tcEAS = TimeCollectorWithPath.<TestMilestones>createWithPath(new TestClock(), path);
+		tcEAS = TimeCollectorWithPath.<TestMilestones>createWithPath(new TestClockIncrementBy1(), path);
 //		tcEASMax3 = TimeCollectorWithPath.<TestMilestones>createWithPath(new TestClock(), pathMax3);
 	}
 

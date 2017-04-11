@@ -22,12 +22,12 @@ public class SerialPathFromEnumTest {
 	
 	@Before
 	public void setup(){														//		EnsureOrder AllRequired SingleSet
-		tc 		= TimeCollectorSerial.create(TestMilestones.class, new TestClock(), 	false, 		false, 		false);
-		tcS 	= TimeCollectorSerial.create(TestMilestones.class, new TestClock(), 	false, 		false, 		true);
-		tcE 	= TimeCollectorSerial.create(TestMilestones.class, new TestClock(), 	true, 		false, 		false);
-		tcEA	= TimeCollectorSerial.create(TestMilestones.class, new TestClock(), 	true, 		true, 		false);
-		tcES 	= TimeCollectorSerial.create(TestMilestones.class, new TestClock(), 	true, 		false, 		true);
-		tcEAS	= TimeCollectorSerial.create(TestMilestones.class, new TestClock(), 	true, 		true, 		true);
+		tc 		= TimeCollectorSerial.create(TestMilestones.class, new TestClockIncrementBy1(), 	false, 		false, 		false);
+		tcS 	= TimeCollectorSerial.create(TestMilestones.class, new TestClockIncrementBy1(), 	false, 		false, 		true);
+		tcE 	= TimeCollectorSerial.create(TestMilestones.class, new TestClockIncrementBy1(), 	true, 		false, 		false);
+		tcEA	= TimeCollectorSerial.create(TestMilestones.class, new TestClockIncrementBy1(), 	true, 		true, 		false);
+		tcES 	= TimeCollectorSerial.create(TestMilestones.class, new TestClockIncrementBy1(), 	true, 		false, 		true);
+		tcEAS	= TimeCollectorSerial.create(TestMilestones.class, new TestClockIncrementBy1(), 	true, 		true, 		true);
 		
 		// The permutations tcA and tcAS would make no sense as allRequired is only possible if EnsureOrder is true as well
 

@@ -15,7 +15,7 @@ import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
-import eu.andymel.timecollector.report.TextualPathAnalyzer;
+import eu.andymel.timecollector.report.analyzer.AnalyzerAvgPath;
 
 public class LongPathTest {
 
@@ -23,7 +23,7 @@ public class LongPathTest {
 	
 	@Before
 	public void setup(){
-		tc = TestTimeCollectorProvider.getTC(new TestClock());
+		tc = TestTimeCollectorProvider.getTC(new TestClockIncrementBy1());
 	}
 	
 	@Test
@@ -65,7 +65,7 @@ public class LongPathTest {
 
 		checkRecPath(tc, 23);
 		
-		TextualPathAnalyzer<TestMilestones> analyzer = TextualPathAnalyzer.create();
+		AnalyzerAvgPath<TestMilestones> analyzer = AnalyzerAvgPath.create();
 		analyzer.addCollector(tc);
 		o(analyzer.toString());
 		
@@ -128,7 +128,7 @@ public class LongPathTest {
 
 		checkRecPath(tc, 40);
 		
-		TextualPathAnalyzer<TestMilestones> analyzer = TextualPathAnalyzer.create();
+		AnalyzerAvgPath<TestMilestones> analyzer = AnalyzerAvgPath.create();
 		analyzer.addCollector(tc);
 		o(analyzer.toString());
 		
@@ -191,7 +191,7 @@ public class LongPathTest {
 
 		checkRecPath(tc, 40);
 		
-		TextualPathAnalyzer<TestMilestones> analyzer = TextualPathAnalyzer.create();
+		AnalyzerAvgPath<TestMilestones> analyzer = AnalyzerAvgPath.create();
 		analyzer.addCollector(tc);
 		o(analyzer.toString());
 		
@@ -254,7 +254,7 @@ public class LongPathTest {
 
 		checkRecPath(tc, 40);
 		
-		TextualPathAnalyzer<TestMilestones> analyzer = TextualPathAnalyzer.create();
+		AnalyzerAvgPath<TestMilestones> analyzer = AnalyzerAvgPath.create();
 		analyzer.addCollector(tc);
 		o(analyzer.toString());
 		

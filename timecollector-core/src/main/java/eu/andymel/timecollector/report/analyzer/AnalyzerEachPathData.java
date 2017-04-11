@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.report;
+package eu.andymel.timecollector.report.analyzer;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -18,6 +18,7 @@ import eu.andymel.timecollector.TimeCollector;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
+import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
 
 /**
  * This holds the timespans for all {@link TimeCollector}s that collected 
@@ -29,9 +30,9 @@ import eu.andymel.timecollector.graphs.NodePermissions;
  *
  * @param <ID_TYPE> the milestone type
  */
-class AnalyzerEachRecPathData<ID_TYPE> implements AnalyzerEachEntry{
+class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 
-	private static final Logger LOG = LoggerFactory.getLogger(AnalyzerEachRecPathData.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AnalyzerEachPathData.class);
 	
 	private final List<GraphNode<ID_TYPE, NodePermissions>> recPath;
 	private final AllowedPathsGraph<ID_TYPE> allowedGraph;
@@ -44,7 +45,7 @@ class AnalyzerEachRecPathData<ID_TYPE> implements AnalyzerEachEntry{
 	private final String toStringValue;
 	private final int maxNumberOfCollectedPaths;
 	
-	AnalyzerEachRecPathData(AllowedPathsGraph<ID_TYPE> allowedGraph, List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> recPath, Integer hashOfRecPath, int maxNumberOfCollectedPaths) {
+	AnalyzerEachPathData(AllowedPathsGraph<ID_TYPE> allowedGraph, List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> recPath, Integer hashOfRecPath, int maxNumberOfCollectedPaths) {
 		Objects.requireNonNull(allowedGraph, "'allowedGraph' is null!");
 		Objects.requireNonNull(recPath, "'recPath' is null!");
 		Objects.requireNonNull(hashOfRecPath, "'hashOfRecPath' is null!");

@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.report;
+package eu.andymel.timecollector.report.analyzer;
 
 import static org.junit.Assert.assertEquals;
 
@@ -9,12 +9,14 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.andymel.timecollector.TestClock;
+import eu.andymel.timecollector.TestClockIncrementBy1;
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.graphs.PermissionNode;
+import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
+import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
 
 public class AnalyzerEachTest {
 
@@ -28,7 +30,7 @@ public class AnalyzerEachTest {
 	
 	@Before
 	public void setup(){
-		this.analyzerClock = new TestClock();
+		this.analyzerClock = new TestClockIncrementBy1();
 		
 		PermissionNode<SmallTestMilestones> n1 = PermissionNode.create(SmallTestMilestones.MS1);
 		PermissionNode<SmallTestMilestones> n2 = PermissionNode.create(SmallTestMilestones.MS2);
@@ -41,29 +43,28 @@ public class AnalyzerEachTest {
 			.path(n1,n3,n4)
 			.build();
 		
-		
 	}
 	
 	@Test
-	public void test() {
+	public void test2DifferentPaths() {
 
-		AnalyzerEach<SmallTestMilestones> analyzer = AnalyzerEach.create(analyzerClock);
+		AnalyzerEachPath<SmallTestMilestones> analyzer = AnalyzerEachPath.create(analyzerClock);
 		
 		// path1
-		TimeCollectorWithPath<SmallTestMilestones> tc = TimeCollectorWithPath.createWithPath(new TestClock(), allowedGraph);
+		TimeCollectorWithPath<SmallTestMilestones> tc = TimeCollectorWithPath.createWithPath(new TestClockIncrementBy1(), allowedGraph);
 		tc.saveTime(SmallTestMilestones.MS1);
 		tc.saveTime(SmallTestMilestones.MS2);
 		tc.saveTime(SmallTestMilestones.MS4);
 		analyzer.addCollector(tc);
 		
 		// path2
-		tc = TimeCollectorWithPath.createWithPath(new TestClock(), allowedGraph);
+		tc = TimeCollectorWithPath.createWithPath(new TestClockIncrementBy1(), allowedGraph);
 		tc.saveTime(SmallTestMilestones.MS1);
 		tc.saveTime(SmallTestMilestones.MS3);
 		tc.saveTime(SmallTestMilestones.MS4);
 		analyzer.addCollector(tc);
 		
-		Collection<AnalyzerEachEntry> all = analyzer.getAll();
+		Collection<AnalyzerEachEntry<SmallTestMilestones>> all = analyzer.getAll();
 		
 		assertEquals(2, all.size());
 

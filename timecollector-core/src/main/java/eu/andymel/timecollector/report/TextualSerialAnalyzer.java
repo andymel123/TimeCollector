@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import eu.andymel.timecollector.TimeCollectorSerial;
+import eu.andymel.timecollector.report.analyzer.Analyzer;
 
 public class TextualSerialAnalyzer<ID_TYPE extends Enum<ID_TYPE>> implements Analyzer<ID_TYPE, TimeCollectorSerial<ID_TYPE>> {
 
@@ -50,6 +51,11 @@ public class TextualSerialAnalyzer<ID_TYPE extends Enum<ID_TYPE>> implements Ana
 
 	public String toString(TimeUnit unit) {
 		return pathStringBuilder.toString(unit);
+	}
+
+	@Override
+	public long getNumberOfAddedTimeCollectors() {
+		return pathStringBuilder.getNumberOfAddedTimeCollectors();
 	}
 
 }

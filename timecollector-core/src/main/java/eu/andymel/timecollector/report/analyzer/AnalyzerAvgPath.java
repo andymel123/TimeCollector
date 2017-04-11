@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.report;
+package eu.andymel.timecollector.report.analyzer;
 
 import static eu.andymel.timecollector.util.Preconditions.ne;
 import static eu.andymel.timecollector.util.Preconditions.nn;
@@ -12,12 +12,16 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import eu.andymel.timecollector.TimeCollectorWithPath;
+import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
+import eu.andymel.timecollector.report.html.TimeSpanNameFormatter;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
+import eu.andymel.timecollector.util.StringTable;
 
 /**
  * This analyzer saves the min/avg/max time between two milestones
@@ -26,24 +30,39 @@ import eu.andymel.timecollector.util.AvgMaxCalcLong;
  *
  * @param <ID_TYPE> the milestone type
  */
-public abstract class AbstractPathAnalyzerAvg<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> {
+public class AnalyzerAvgPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> {
 
-	private int countTimeCollectorsAdded = 0;
+	private volatile long countTimeCollectorsAdded = 0;
 
 	/** HashMap in HashMap as outer key is the first milestone, inner key the second */
 	private IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>> timesPerSpan;
+	private AllowedPathsGraph<ID_TYPE> allowedGraph;
 
-	
-	public AbstractPathAnalyzerAvg() {
+	private AnalyzerAvgPath() {
 		/* LinkedHashMap to get insertion order, has same performance as HashMap in my measurements */
 		timesPerSpan = new IdentityHashMap<>();
 	}
 
+	public static <ID_TYPE> AnalyzerAvgPath<ID_TYPE> create(){
+		return new AnalyzerAvgPath<>();
+	}
+	
 	@Override
 	public synchronized void addCollector(TimeCollectorWithPath<ID_TYPE> tc) {
 		// TODO make async!
 		
 		nn(tc, "TimeCollector is null!");
+		
+		AllowedPathsGraph<ID_TYPE> ag = tc.getAllowedGraph();
+		if(allowedGraph==null){
+			allowedGraph = ag;
+		}else{
+			if(allowedGraph!=ag){
+				throw new IllegalStateException("One "+getClass().getSimpleName()+" may only collect paths for "
+						+ "one allowedGraph! The current allowedGraph is "+allowedGraph+". "
+						+ "You want to add a timecollector with allowedGraph "+ag);
+			}
+		}
 		
 		List<List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>>> paths = tc.getRecordedPaths();
 
@@ -94,7 +113,7 @@ public abstract class AbstractPathAnalyzerAvg<ID_TYPE> implements Analyzer<ID_TY
 	}
 
 
-	public int getNumberOfAddedTimeCollectors() {
+	public long getNumberOfAddedTimeCollectors() {
 		return countTimeCollectorsAdded;
 	}
 
@@ -102,11 +121,7 @@ public abstract class AbstractPathAnalyzerAvg<ID_TYPE> implements Analyzer<ID_TY
 		return timesPerSpan;
 	}
 	
-	protected String getTimeSpanName(GraphNode<ID_TYPE, NodePermissions> from, GraphNode<ID_TYPE, NodePermissions> to) {
-		return from.getId()+" -> "+to.getId();
-	}
-
-	protected double getAvgSummedUp(){
+	public double getAvgSummedUp(){
 		return timesPerSpan.values().stream()// get all IdentityHashMap<GraphNode<ID_TYPE, NodePermissions>, AvgMaxCalcLong>
 			.map(IdentityHashMap::values)	// map to Collections of AvgMaxCalcLong
 			.flatMap(Collection::stream)	// combine to one stream of AvgMaxCalcLong
@@ -119,7 +134,10 @@ public abstract class AbstractPathAnalyzerAvg<ID_TYPE> implements Analyzer<ID_TY
 	 * @return a {@link StringTable} either with two columns (timespan name and length of timespan), or 4 columns (name, min, avg, max).
 	 * The 2 column version is returned if less than 2 timeCollectors were added, if multiple time collectors were added -> 4columns
 	 */
-	public StringTable getAsStringTable(TimeUnit unit) {
+	public StringTable getAsStringTable(TimeUnit unit, TimeSpanNameFormatter<ID_TYPE> timeSpanNameFormatter) {
+		
+		Objects.requireNonNull(unit, "'unit' is null!");
+		Objects.requireNonNull(timeSpanNameFormatter, "'timeSpanNameFormatter' is null!");
 		
 		StringTable table = new StringTable();
 		
@@ -141,7 +159,7 @@ public abstract class AbstractPathAnalyzerAvg<ID_TYPE> implements Analyzer<ID_TY
 				AvgMaxCalcLong calc = e.getValue();
 
 				// TODO replace by own implementation that does not round to full numbers (to get 0,001ms)
-				String column1 = getTimeSpanName(node1, node2);
+				String column1 = timeSpanNameFormatter.getTimeSpanName(node1, node2);
 				String column2 = String.valueOf(unit.convert(calc.getMin(),TimeUnit.NANOSECONDS));
 				
 				if(justShowOneValueColumn){
@@ -155,4 +173,18 @@ public abstract class AbstractPathAnalyzerAvg<ID_TYPE> implements Analyzer<ID_TY
 		}
 		return table;
 	}
+	
+	public AllowedPathsGraph<ID_TYPE> getAllowedGraph() {
+		return allowedGraph;
+	}
+	
+	public String toString(TimeUnit unit, TimeSpanNameFormatter<ID_TYPE> timeSpanNameFormatter) {
+		
+		StringTable table = getAsStringTable(unit, timeSpanNameFormatter);
+		if(table.getNumberOfRows()==0){
+			return "";
+		}
+		return table.toString(3,2,2,2);
+	}
+
 }

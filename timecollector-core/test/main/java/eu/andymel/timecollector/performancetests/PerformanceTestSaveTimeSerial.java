@@ -21,7 +21,7 @@ import eu.andymel.timecollector.util.NanoClock;
  * @author andymatic
  *
  */
-public class PerformanceTestSerialWithSaveTime {
+public class PerformanceTestSaveTimeSerial {
 
 	private enum TestMilestones{
 		MS1,
