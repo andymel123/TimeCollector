@@ -13,8 +13,8 @@ import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.TimeCollectorWithPath;
+import eu.andymel.timecollector.report.TimeSpanNameFormatter;
 import eu.andymel.timecollector.report.analyzer.AnalyzerAvgPath;
-import eu.andymel.timecollector.report.html.TimeSpanNameFormatter;
 import eu.andymel.timecollector.util.NanoClock;
 
 /*

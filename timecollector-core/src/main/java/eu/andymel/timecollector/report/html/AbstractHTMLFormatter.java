@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
+import eu.andymel.timecollector.report.TimeSpanNameFormatter;
 import eu.andymel.timecollector.report.analyzer.Analyzer;
 
 public abstract class AbstractHTMLFormatter<ID_TYPE> implements TimeSpanNameFormatter<ID_TYPE>{
@@ -44,10 +45,11 @@ public abstract class AbstractHTMLFormatter<ID_TYPE> implements TimeSpanNameForm
 
 	protected synchronized String getTemplate(){
 		if(htmlTemplate==null){
+			File f = getTemplateFile();
 			try {
-				htmlTemplate = readFile(getTemplateFile());
+				htmlTemplate = readFile(f);
 			} catch (IOException e) {
-				LOG.error("Can't load template!", e);
+				LOG.error("Can't load template '"+f.getAbsolutePath()+"'!", e);
 				htmlTemplate = "";
 			}
 		}
@@ -58,6 +60,9 @@ public abstract class AbstractHTMLFormatter<ID_TYPE> implements TimeSpanNameForm
 
 	public void writeToFile(File f, TimeUnit unit, boolean appendToFileIfExisting) throws IOException{
 		writeFile(f, getHTMLString(unit), appendToFileIfExisting);
+	}
+	public void writeToFile(File f, TimeUnit unit) throws IOException{
+		writeFile(f, getHTMLString(unit), false);
 	}
 
 	protected abstract String getHTMLString(TimeUnit unit);

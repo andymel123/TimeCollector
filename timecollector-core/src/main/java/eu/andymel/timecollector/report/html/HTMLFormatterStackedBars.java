@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -61,12 +62,28 @@ public class HTMLFormatterStackedBars<ID_TYPE> extends AbstractHTMLFormatter<ID_
 		Objects.requireNonNull(recordedPaths, "'recordedPaths' is null!");
 		
 		if(recordedPaths.size()>1){
-			throw new IllegalStateException("not yet implemented to display mutliple different paths!");
+//			TODO
+//			throw new IllegalStateException("not yet implemented to display mutliple different paths!");
+			
 		}
+
+		AnalyzerEachEntry<ID_TYPE> e = null;
+		Iterator<AnalyzerEachEntry<ID_TYPE>> it = recordedPaths.iterator();
+		int maxSize = 0;
+		while(it.hasNext()){
+			AnalyzerEachEntry<ID_TYPE> pathData = it.next();
+			int collectedTCs = pathData.getCollectedTimes().size();
+			if(collectedTCs>maxSize){
+				maxSize = collectedTCs;
+				e = pathData;
+			}
+		}
+
 		
 		// per path
-		for(AnalyzerEachEntry<ID_TYPE> e: recordedPaths){
+//		for(AnalyzerEachEntry<ID_TYPE> e: recordedPaths){
 
+		
 			StringBuilder sbLables = new StringBuilder();
 			StringBuilder sbData = new StringBuilder();
 
@@ -154,10 +171,9 @@ public class HTMLFormatterStackedBars<ID_TYPE> extends AbstractHTMLFormatter<ID_
 			// TODO don't return for multiple paths
 			return template;
 
-		}
-		
-		
-		return null;
+//		}
+//		
+//		return null;
 		
 	}
 

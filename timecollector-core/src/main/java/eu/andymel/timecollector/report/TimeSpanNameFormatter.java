@@ -1,4 +1,4 @@
-package eu.andymel.timecollector.report.html;
+package eu.andymel.timecollector.report;
 
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;

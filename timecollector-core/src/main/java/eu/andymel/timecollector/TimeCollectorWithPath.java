@@ -103,7 +103,7 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 		if(recordedTimes.size()==0){
 			// shortcut this is the first milestone
 			if(!newMilestone.equals(allowedGraph.getStartNode().getId())){
-				throw newMilestoneNotAllowedException(newMilestone);
+				throw newMilestoneNotAllowedException(newMilestone, possibleListsOfWalkedAllowedGraphNodes);
 			}
 			LinkedList<GraphNode<MILESTONE_TYPE, NodePermissions>> l = new LinkedList<>();
 			l.add(allowedGraph.getStartNode());
@@ -113,6 +113,7 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 
 		
 		List<LinkedList<GraphNode<MILESTONE_TYPE, NodePermissions>>> newPossiblePaths = null;
+		LinkedList<LinkedList<GraphNode<MILESTONE_TYPE, NodePermissions>>> removedPaths = null;
 
 		boolean hasFoundPossiblePath = false;
 		
@@ -139,6 +140,8 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 			
 			if(possibleChildren==null){
 				// if no children for this path were found...delete the path
+				if(removedPaths==null)removedPaths = new LinkedList<>();
+				removedPaths.add(possiblePath);
 				it.remove();
 			} else if(possibleChildren.size()==1){
 				// if exactly one child for this path was found...simply add it to that path
@@ -160,7 +163,7 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 		}
 		
 		if(!hasFoundPossiblePath){
-			throw newMilestoneNotAllowedException(newMilestone);
+			throw newMilestoneNotAllowedException(newMilestone, removedPaths);
 		}
 		
 		if(newPossiblePaths!=null && newPossiblePaths.size()>0){
@@ -170,11 +173,11 @@ public class TimeCollectorWithPath<MILESTONE_TYPE> implements TimeCollector<MILE
 	}
 
 	
-	private MilestoneNotAllowedException newMilestoneNotAllowedException(MILESTONE_TYPE newMilestone) {
+	private MilestoneNotAllowedException newMilestoneNotAllowedException(MILESTONE_TYPE newMilestone, LinkedList<LinkedList<GraphNode<MILESTONE_TYPE, NodePermissions>>> previousPossiblePaths) {
 		
 		String mileStones = null;
-		if(possibleListsOfWalkedAllowedGraphNodes.size()>0){
-			mileStones = getMileStoneListAsString(possibleListsOfWalkedAllowedGraphNodes.getFirst());
+		if(previousPossiblePaths.size()>0){
+			mileStones = getMileStoneListAsString(previousPossiblePaths.getFirst());
 		}
 		
 		return new MilestoneNotAllowedException(

@@ -19,7 +19,7 @@ import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
-import eu.andymel.timecollector.report.html.TimeSpanNameFormatter;
+import eu.andymel.timecollector.report.TimeSpanNameFormatter;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
 import eu.andymel.timecollector.util.StringTable;
 
