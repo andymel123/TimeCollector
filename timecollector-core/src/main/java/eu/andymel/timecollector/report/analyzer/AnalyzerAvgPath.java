@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.Temporal;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -174,17 +175,36 @@ public class AnalyzerAvgPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollector
 		return table;
 	}
 	
+	private int[] getDefaultOffsets(StringTable table){
+
+//		first offset 3, all others 2
+		
+		Objects.requireNonNull(table, "'table' is null!");
+		int columns = table.getNumberOfColumns();
+		if(columns<1){
+			return new int[0];
+		}
+		int[] offsets = new int[columns];
+		Arrays.fill(offsets, 2);
+		offsets[0] = 3;
+		return offsets;
+	}
+	
 	public AllowedPathsGraph<ID_TYPE> getAllowedGraph() {
 		return allowedGraph;
 	}
 	
+	public String toString(TimeUnit unit) {
+		return toString(unit, TimeSpanNameFormatter.DEFAULT_TIMESPAN_NAME_FORMATTER);
+	}
+		
 	public String toString(TimeUnit unit, TimeSpanNameFormatter<ID_TYPE> timeSpanNameFormatter) {
 		
 		StringTable table = getAsStringTable(unit, timeSpanNameFormatter);
-		if(table.getNumberOfRows()==0){
+		if(table.getNumberOfRows()==0 || table.getNumberOfColumns()==0){
 			return "";
 		}
-		return table.toString(3,2,2,2);
+		return table.toString(getDefaultOffsets(table));
 	}
 
 }

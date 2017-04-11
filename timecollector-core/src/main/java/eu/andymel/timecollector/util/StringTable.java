@@ -21,14 +21,6 @@ public class StringTable {
 	public StringTable() {
 	}
 	
-	/**
-	 * @return the number of columns of the table or -1 if now row has been added
-	 */
-	public int getNumberOfColumns(){
-		if(rows==null || rows.size()==0)return 0;
-		return rows.get(0).length;
-	}
-	
 	public void sort(Comparator<String[]> comp){
 		rows.sort(comp);
 	}
@@ -82,6 +74,14 @@ public class StringTable {
 		if(rows==null)return 0;
 		return rows.size();
 	}
+	/**
+	 * @return the number of columns of the table or -1 if no row has been added
+	 */
+	public int getNumberOfColumns(){
+		if(rows==null || rows.size()==0)return 0;
+		return rows.get(0).length;
+	}
+	
 
 	public String toString() {
 		return toString(null);
