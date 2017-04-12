@@ -79,6 +79,7 @@ public class HTMLFormatterStackedBars<ID_TYPE> extends AbstractHTMLFormatter<ID_
 			}
 		}
 
+		if(e==null)return "No paths";
 		
 		// per path
 //		for(AnalyzerEachEntry<ID_TYPE> e: recordedPaths){

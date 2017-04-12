@@ -17,6 +17,8 @@ import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.performancetests.PerformanceTestsUtils;
 import eu.andymel.timecollector.report.analyzer.Analyzer;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
+import eu.andymel.timecollector.report.html.AbstractHTMLFormatter;
+import eu.andymel.timecollector.report.html.HTMLFormatterStackedBars;
 
 /*
  * PerformanceTest: Create TimeCollectorWithPath
