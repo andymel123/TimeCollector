@@ -79,11 +79,24 @@ public class TCMonitorServerRunner {
 
 			@Override
 			public String getContextPath() {
-				return "/";
+				// those two work: /foo/ or /foo
+				return "/timecollector";
+			}
+
+			@Override
+			public String getStaticWebContentDir() {
+				return "WebContent";
+			}
+			@Override
+			public String getSubPathStaticWebContent() {
+				// for example "/foo/*"
+				return "/static/*";
 			}
 			
 		};
+		
 		TCMonitorServer s = new TCMonitorServer(cfg);
+//		TCMonitorServer3 s = new TCMonitorServer3(cfg);
 		
 		LOG.info("Starting monitoring server...");
 		try {

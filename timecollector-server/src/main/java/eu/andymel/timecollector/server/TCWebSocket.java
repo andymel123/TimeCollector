@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 
-@ServerEndpoint(value="/events/")
+@ServerEndpoint(value="/ws/v1")
 public class TCWebSocket {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TCWebSocket.class);
