@@ -1,0 +1,155 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style type="text/css">
+			    body{
+			     	color: #333;
+			     	font-family: Arial, Helvetica, sans-serif;
+			    }
+			    #wrapper {
+/* 				  margin-right: 700px; */
+				}
+				#chartContainer{
+					max-height: 90vh;
+				}
+		</style>
+		
+
+		<!-- for painting the chart -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+		<!-- for writing the time-labels (x-axis) -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
+		
+	</head>
+	<body>
+		<p id="pDescription"></p>
+		<div id="wrapper">
+			<div class="row">
+				<canvas id="chartContainer"></canvas>
+			</div>
+		</div>
+		
+		<script type="text/javascript">
+		
+			var websocket;
+			var barchart;
+			
+			initChart();
+			
+			openWebsocket();
+		
+			function openWebsocket(){
+				
+				websocket = new WebSocket(getWebSocketPath());
+
+				websocket.onopen = function(event) {
+					websocket.send("Connected with "+JSON.stringify(get_browser()));
+				};
+
+				websocket.onmessage = function(event) {
+					var msg = JSON.parse(event.data);
+// 					console.log(msg);
+					switch (msg.type) {
+						case "fulldata":
+							document.getElementById("pDescription").innerHTML = msg.description;
+							barchart.data.labels = msg.labels.map(ms => {
+								var d = new Date(ms);
+								var sep=":";
+								var s = d.getUTCHours();
+								s+=sep;
+								s+=d.getUTCMinutes();
+								s+=sep;
+								s+=d.getSeconds();
+								s+=sep;
+								s+=d.getMilliseconds();
+								return s;
+							});
+							barchart.data.datasets = msg.datasets;
+							barchart.update();
+							break;
+					}
+				}
+
+			}
+
+			function getWebSocketPath(){
+				// inspired by http://stackoverflow.com/a/10418013
+				var loc = window.location, new_uri;
+				if (loc.protocol === "https:") {
+				    new_uri = "wss:";
+				} else {
+				    new_uri = "ws:";
+				}
+				new_uri += "//" + loc.host;
+				new_uri += "/ws/v1";
+				return new_uri;
+			}
+			
+			function sendTextToServer(txt) {
+				if(!websocket)return;
+				// Send the msg object as a JSON-formatted string.
+				websocket.send(JSON.stringify({
+					type : "message",
+					text : txt,
+					date : Date.now()
+				}));
+			}
+
+			function closeWebsocket(){
+				if(!websocket)return;
+				websocket.close();
+			}
+			
+			function initChart() {
+				var ctx = document.getElementById("chartContainer").getContext("2d");
+				var data = {
+					labels : [],
+					datasets : []
+				};
+
+				barchart = new Chart(ctx, {
+					type : 'bar',
+					data : data,
+					options : {
+						animation:false,
+						scales : {
+							responsive : true,
+							maintainAspectRatio : false,
+							xAxes : [ {
+								stacked : true
+							} ],
+							yAxes : [ {
+								stacked : true,
+								ticks : {
+									beginAtZero : true
+								}
+							} ]
+						}
+					}
+				});
+			}
+			
+			
+			
+			function get_browser() {
+				// from http://stackoverflow.com/a/16938481
+			    var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || []; 
+			    if(/trident/i.test(M[1])){
+			        tem=/\brv[ :]+(\d+)/g.exec(ua) || []; 
+			        return {name:'IE',version:(tem[1]||'')};
+			        }   
+			    if(M[1]==='Chrome'){
+			        tem=ua.match(/\bOPR|Edge\/(\d+)/)
+			        if(tem!=null)   {return {name:'Opera', version:tem[1]};}
+			        }   
+			    M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+			    if((tem=ua.match(/version\/(\d+)/i))!=null) {M.splice(1,1,tem[1]);}
+			    return {
+			      name: M[0],
+			      version: M[1]
+			    };
+			 }
+			
+		</script>
+	</body>
+</html>
