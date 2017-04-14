@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import eu.andymel.timecollector.TimeCollectorSerial;
 import eu.andymel.timecollector.report.analyzer.Analyzer;
+import eu.andymel.timecollector.report.analyzer.AnalyzerListener;
 
 public class TextualSerialAnalyzer<ID_TYPE extends Enum<ID_TYPE>> implements Analyzer<ID_TYPE, TimeCollectorSerial<ID_TYPE>> {
 
@@ -56,6 +57,11 @@ public class TextualSerialAnalyzer<ID_TYPE extends Enum<ID_TYPE>> implements Ana
 	@Override
 	public long getNumberOfAddedTimeCollectors() {
 		return pathStringBuilder.getNumberOfAddedTimeCollectors();
+	}
+
+	@Override
+	public void addListener(AnalyzerListener listener) {
+		throw new RuntimeException("Not yet implemented!");
 	}
 
 }

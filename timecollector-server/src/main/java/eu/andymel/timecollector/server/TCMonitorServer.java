@@ -12,7 +12,9 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.websocket.server.ServerContainer;
 
@@ -30,13 +32,17 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
 import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
+import eu.andymel.timecollector.TimeCollector;
+import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.report.TimeSpanNameFormatter;
+import eu.andymel.timecollector.report.analyzer.Analyzer;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
+import eu.andymel.timecollector.report.analyzer.AnalyzerListener;
 import eu.andymel.timecollector.util.ColorGenerator;
 
-public class TCMonitorServer{
+public class TCMonitorServer implements AnalyzerListener{
 
 	private static final Logger LOG = LoggerFactory.getLogger(TCMonitorServer.class);
 
@@ -48,8 +54,10 @@ public class TCMonitorServer{
 	private Server jettyServer;
 
 	private AnalyzerEachPath<?> monitoredAnalyzer;
+	private volatile boolean analyzerUpdated;
 	
 	private List<Runnable> serverStoppingHooks;
+	
 	
 	public TCMonitorServer(TCMonitorServerConfig config) {
 		Objects.requireNonNull(config, "'config' is null!");
@@ -145,25 +153,35 @@ public class TCMonitorServer{
 	
 	public synchronized void setTimeCollectorAnalyzer(AnalyzerEachPath<TestMilestones> analyzer) {
 		this.monitoredAnalyzer = analyzer;
+		this.monitoredAnalyzer.addListener(this);
+		this.analyzerUpdated = true;
 		startUpdateThread();
 	}
 
 	private void startUpdateThread() {
 		if(es==null){
-			es = Executors.newSingleThreadScheduledExecutor();
+			ThreadFactory namedThreadFactory = new ThreadFactory() {
+				@Override
+				public Thread newThread(Runnable r) {
+					return new Thread(r, "Monitor Updater Thread");
+				}
+			};
+			es = Executors.newSingleThreadScheduledExecutor(namedThreadFactory);
 		}else{
 			throw new IllegalStateException("Already Started?!");
 		}
 		
 		es.scheduleAtFixedRate(
         	() -> {
-        		try{
-            		Thread.currentThread().setName("Monitor Updater");
-//            		LOG.info("Send monitor update...");
-            		TCWebSocket.send(getAnalyzerStateAsJson(monitoredAnalyzer));
-        		}catch(Exception e){
-        			LOG.error("Exception in monitor thread", e);
-        			stop();
+        		if(analyzerUpdated){
+            		try{
+//            			LOG.info("update");
+                		analyzerUpdated=false;
+                		TCWebSocket.send(getAnalyzerStateAsJson(monitoredAnalyzer));
+            		}catch(Exception e){
+            			LOG.error("Exception in monitor thread", e);
+            			stop();
+            		}
         		}
         	},
         	0, 1, TimeUnit.SECONDS
@@ -209,9 +227,6 @@ public class TCMonitorServer{
 
 		if(e==null)return null;
 		
-//		StringBuilder sbLables = new StringBuilder();
-//		StringBuilder sbData = new StringBuilder();
-
 		JsonArray lables = new JsonArray();
 		JsonArray data = new JsonArray();
 		
@@ -230,9 +245,8 @@ public class TCMonitorServer{
 		}
 		int numberOfRecordedMilestones = recPath.size();
 		
-//		StringBuilder[] dataRows = new StringBuilder[numberOfRecordedMilestones]; // idx0 will be empty like in times[] below
 		JsonArray[] dataArrays = new JsonArray[numberOfRecordedMilestones];
-					// per milestone
+		// per milestone
 		GraphNode lastNode = null;
 		int idx = 0;
 		for(GraphNode node: recPath){
@@ -272,7 +286,6 @@ public class TCMonitorServer{
 			
 			// per milestone
 			for(int t=1; t<times.length; t++){
-//				dataRows[t].append(String.valueOf(unit.convert(times[t], TimeUnit.NANOSECONDS)));
 				dataArrays[t].add(unit.convert(times[t], TimeUnit.NANOSECONDS));
 			}
 
@@ -285,20 +298,20 @@ public class TCMonitorServer{
 		jo.set("datasets", 		data);
 		return jo;
 
-//		return new String[]{
-//			description,
-//			labelString,
-//			dataString
-//			/* take care, also change EMPTY_DATA object 
-//			 * if you change length of this array */
-//		};
 		
 	}
 	
 	private static String getHexColorString(int idx) {
 		Color c = ColorGenerator.getColor(idx);
-		
 		return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
 	}
+
+	@Override
+	public void timeCollectorAddedToAnalyzer(TimeCollector<?> tc, Analyzer<?, ?> analyzer) {
+//		LOG.info("inform new tc");
+		analyzerUpdated = true;
+	}
+
+
 	
 }

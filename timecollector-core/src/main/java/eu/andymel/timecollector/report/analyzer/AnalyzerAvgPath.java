@@ -207,4 +207,9 @@ public class AnalyzerAvgPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollector
 		return table.toString(getDefaultOffsets(table));
 	}
 
+	@Override
+	public void addListener(AnalyzerListener listener) {
+		throw new RuntimeException("Not yet implemeneted!");
+	}
+
 }

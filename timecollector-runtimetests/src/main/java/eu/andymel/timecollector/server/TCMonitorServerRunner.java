@@ -62,7 +62,7 @@ public class TCMonitorServerRunner {
 		};
 		
 		TCMonitorServer s = new TCMonitorServer(cfg);
-		AnalyzerEachPath<TestMilestones> analyzer = AnalyzerEachPath.create(new TestClockIncrementRandom(100, 2000));
+		AnalyzerEachPath<TestMilestones> analyzer = AnalyzerEachPath.create(Clock.systemUTC());
 		s.setTimeCollectorAnalyzer(analyzer);
 
 		LOG.info("Starting monitoring server...");
@@ -79,7 +79,7 @@ public class TCMonitorServerRunner {
 			
 			LOG.info("Start to generate test data...");
 			runTest(
-				0.1, 			// the test adds this amount of timeCollectors per second
+				10, 			// the test adds this amount of timeCollectors per second
 				analyzer,	// the analyzer to add the timeCollectors to
 				stopTest
 			);
@@ -97,7 +97,7 @@ public class TCMonitorServerRunner {
 		Clock tcClock = new NanoClock();
 		
 		while(!stop.get()){
-			LOG.info("new tc...");
+//			LOG.info("new tc...");
 			
 			TimeCollectorWithPath<TestMilestones> tc = TestTimeCollectorProvider.getTC(tcClock);
 			tc.saveTime(TestMilestones.CREATION);

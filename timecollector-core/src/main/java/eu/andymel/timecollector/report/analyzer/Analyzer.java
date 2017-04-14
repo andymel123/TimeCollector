@@ -18,4 +18,5 @@ public interface Analyzer <ID_TYPE, TC_TYPE extends TimeCollector<ID_TYPE>>{
 
 	long getNumberOfAddedTimeCollectors();
 	
+	void addListener(AnalyzerListener listener);
 }

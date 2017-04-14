@@ -3,6 +3,7 @@ package eu.andymel.timecollector.report.analyzer;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,6 +35,8 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 	
 	private volatile int countTimeCollectorsAdded = 0;
 
+	private List<AnalyzerListener> listeners;
+	
 	/**
 	 * @param clock the clock to use to retrieve the time a timecollector was added to this analyzer
 	 */
@@ -65,6 +68,7 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 		AnalyzerEachPathData<ID_TYPE> pathData = dataOfDifferentPaths.computeIfAbsent(hashOfPath, hash->new AnalyzerEachPathData<ID_TYPE>(tc.getAllowedGraph(), path, hash, MAX_NUMBER_OF_COLLECTED_PATHS));
 		pathData.addTimes(path, this.clock);
 		countTimeCollectorsAdded++;
+		informListeners(tc);
 	}
 	
 	/**
@@ -103,5 +107,17 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 	public long getNumberOfAddedTimeCollectors() {
 		return countTimeCollectorsAdded;
 	}
+
+	@Override
+	public synchronized void addListener(AnalyzerListener listener) {
+		if(listeners == null){
+			listeners = new ArrayList<>();
+		}
+		listeners.add(listener);
+	}
 	
+	private void informListeners(TimeCollector<?> tc){
+		if(listeners==null)return;
+		listeners.forEach(l->l.timeCollectorAddedToAnalyzer(tc, this));
+	}
 }

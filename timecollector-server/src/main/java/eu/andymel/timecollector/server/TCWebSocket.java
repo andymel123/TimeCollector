@@ -83,6 +83,6 @@ public class TCWebSocket {
 			count.incrementAndGet();
 		});
 //		LOG.info("Sent "+txt.length()+" chars to "+count.get()+" clients");
-		LOG.info(txt);
+//		LOG.info(txt);
 	}
 }
