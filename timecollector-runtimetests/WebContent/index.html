@@ -27,7 +27,7 @@
 		<div id="wrapper">
 			<div class="row">
 				<div id="chartContainer">
-					<canvas id="cvs" width="1000" height="500"></canvas>
+<!-- 					<canvas id="cvs" width="1000" height="500"></canvas> -->
 				</div>
 			</div>
 		</div>
@@ -53,7 +53,7 @@
 
 				websocket.onmessage = function(event) {
 					var msg = JSON.parse(event.data);
-					console.log(msg);
+// 					console.log(msg);
 					handleServerEvent(msg);
 				}
 
@@ -132,16 +132,16 @@
 				for (i = 0; i < hashesArray.length; ++i) {
 				    var hashId = getIdFromHash(hashesArray[i]);
 					
-				    //var canvas = document.getElementById(hashId);
-// 				    if(canvas){
-// 				    	// we alread have a chart for this path
-// 				    	continue;
-// 				    }else{
-// 				    	var canvas = document.createElement('canvas');
-// 						chartsContainer.appendChild(canvas);
-// 				    	canvas.id = hashId;
-// 				    	canvas.width = 1000;
-// 				    	canvas.height= 500;
+				    var canvas = document.getElementById(hashId);
+				    if(canvas){
+				    	// we alread have a chart for this path
+				    	continue;
+				    }else{
+				    	var canvas = document.createElement('canvas');
+						chartsContainer.appendChild(canvas);
+				    	canvas.id = hashId;
+				    	canvas.width = 1000;
+				    	canvas.height= 500;
 				    	
 						var ctx = canvas.getContext("2d");
 						var data = {
@@ -173,7 +173,7 @@
 						charts[hashId] = barchart;
 						
 						// finally append the new canvas into the chartsContainer
-// 				    }
+				    }
 				}
 			}
 			
