@@ -1,7 +1,6 @@
 package eu.andymel.timecollector.server;
 
 import java.awt.Color;
-import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,7 +13,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.websocket.server.ServerContainer;
 
@@ -23,7 +21,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.websocket.jsr356.annotations.JsrParamIdOnOpen;
+import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
-import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.TimeCollector;
-import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.report.TimeSpanNameFormatter;
 import eu.andymel.timecollector.report.analyzer.Analyzer;
@@ -110,6 +106,34 @@ public class TCMonitorServer implements AnalyzerListener{
         // start to listen on port
         jettyServer.start();
 
+        jettyServer.addLifeCycleListener(new LifeCycle.Listener() {
+			
+			@Override
+			public void lifeCycleStopping(LifeCycle event) {
+				LOG.info("Stopping jetty monitoring server");
+			}
+			
+			@Override
+			public void lifeCycleStopped(LifeCycle event) {
+				LOG.info("Jetty monitoring server stopped");
+			}
+			
+			@Override
+			public void lifeCycleStarting(LifeCycle event) {
+				LOG.info("Starting jetty monitoring server");
+			}
+			
+			@Override
+			public void lifeCycleStarted(LifeCycle event) {
+				LOG.info("Jetty monitoring server started");
+			}
+			
+			@Override
+			public void lifeCycleFailure(LifeCycle event, Throwable cause) {
+				LOG.info("Jetty monitoring server failed");
+			}
+		});
+        
         if(!async){
         	// blocks the calling thread until the server has been shut down
         	jettyServer.join();
@@ -151,7 +175,7 @@ public class TCMonitorServer implements AnalyzerListener{
 		serverStoppingHooks.add(r);
 	}
 	
-	public synchronized void setTimeCollectorAnalyzer(AnalyzerEachPath<TestMilestones> analyzer) {
+	public synchronized void setTimeCollectorAnalyzer(AnalyzerEachPath<?> analyzer) {
 		this.monitoredAnalyzer = analyzer;
 		this.monitoredAnalyzer.addListener(this);
 		this.analyzerUpdated = true;
@@ -235,7 +259,7 @@ public class TCMonitorServer implements AnalyzerListener{
 		if(recPath==null || recPath.size()==0){
 			throw new IllegalStateException("There is no recorded path in this entry?! "+e);
 		}
-		List<long[]> collectedTimes = new ArrayList<>(e.getCollectedTimes());
+		List<long[]> collectedTimes = e.getCollectedTimes(); // returns a copy of the internal array, so no copying is needed here
 		if(collectedTimes==null || collectedTimes.size()==0){
 			throw new IllegalStateException("There is a recpath but no recorded times?! "+Arrays.toString(recPath.toArray()));
 		}

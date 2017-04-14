@@ -4,6 +4,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -42,7 +43,7 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 	/** at idx 0 in those arrays the time when this timecollector was added is saved. In the 
 	 * other indexes the timespan duration in nanoseconds is saved. */
 	private final LinkedList<long[]> collectedSpans;
-	private final List<long[]> collectedSpansView;
+//	private final List<long[]> collectedSpansView;
 	
 	private final int numberOfTimespans;
 	private final String toStringValue;
@@ -62,7 +63,7 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 		this.recPath = Collections.unmodifiableList(listWithoutInstant);
 		this.hashOfRecPath = hashOfRecPath;
 		this.collectedSpans = new LinkedList<>();
-		this.collectedSpansView = Collections.unmodifiableList(collectedSpans);
+//		this.collectedSpansView = Collections.unmodifiableList(collectedSpans);
 		this.numberOfTimespans = recPath.size()-1; // -1 as there are 2 timespans between 3 milestones
 		this.toStringValue = getClass().getSimpleName()+"["+hashOfRecPath+", "+numberOfTimespans+" timeSpans]";
 		this.maxNumberOfCollectedPaths = maxNumberOfCollectedPaths;
@@ -107,7 +108,12 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 		if(collectedSpans.size()==maxNumberOfCollectedPaths){
 			spansRemovedToFreeASlot = collectedSpans.removeFirst();
 		}
-		collectedSpans.add(times);
+		synchronized (this) {
+			// to prevent concurrent modification while copying this 
+			// list in getCollectedTimes()
+			// TODO read/write lock instead?!
+			collectedSpans.add(times);	
+		}
 		return spansRemovedToFreeASlot;
 	}
 	
@@ -120,14 +126,14 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 	}
 	
 	/**
-	 * @return an unmodifiable view of the internal list of collected times. The arrays inside
-	 * are not copies and the inner list can change. So copy if needed to prevent 
-	 * {@link ConcurrentModificationException}s or similar problems!
+	 * @return a shallow copy of the internal list of collected times. 
+	 * Shallow: the arrays inside the list are not copied.
 	 */
-	public List<long[]> getCollectedTimes() {
-		return collectedSpansView;
+	public synchronized List<long[]> getCollectedTimes() {
+		return new ArrayList<>(collectedSpans);
 	}
-	
+
+
 	public AllowedPathsGraph<ID_TYPE> getAllowedGraph() {
 		return allowedGraph;
 	}
