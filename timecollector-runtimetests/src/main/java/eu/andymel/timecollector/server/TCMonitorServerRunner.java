@@ -62,7 +62,10 @@ public class TCMonitorServerRunner {
 		};
 		
 		TCMonitorServer s = new TCMonitorServer(cfg);
-		AnalyzerEachPath<TestMilestones> analyzer = AnalyzerEachPath.create(Clock.systemUTC());
+		AnalyzerEachPath<TestMilestones> analyzer = AnalyzerEachPath.create(
+			Clock.systemUTC(),	// clock to get time for the request time from (x-axis in graph), thats not the clock used in the timeCollectors  
+			100	// max saved number of requests (the monitoring graph will show just them, or has to change old request data on client side)
+		);
 		s.setTimeCollectorAnalyzer(analyzer);
 
 		LOG.info("Starting monitoring server...");

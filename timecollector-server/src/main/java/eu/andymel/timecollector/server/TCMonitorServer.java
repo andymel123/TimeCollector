@@ -184,13 +184,13 @@ public class TCMonitorServer implements AnalyzerListener{
             		}
         		}
         	},
-        	0, 1, TimeUnit.SECONDS
+        	0, 200, TimeUnit.MILLISECONDS
         );
 	}
 
 	private static JsonObject getAnalyzerStateAsJson(AnalyzerEachPath<?> monitoredAnalyzer) {
 
-		return getJsonData(monitoredAnalyzer, TimeUnit.NANOSECONDS);
+		return getJsonData(monitoredAnalyzer, TimeUnit.MICROSECONDS);
 		
 	}
 
@@ -235,7 +235,7 @@ public class TCMonitorServer implements AnalyzerListener{
 		if(recPath==null || recPath.size()==0){
 			throw new IllegalStateException("There is no recorded path in this entry?! "+e);
 		}
-		List<long[]> collectedTimes = e.getCollectedTimes();
+		List<long[]> collectedTimes = new ArrayList<>(e.getCollectedTimes());
 		if(collectedTimes==null || collectedTimes.size()==0){
 			throw new IllegalStateException("There is a recpath but no recorded times?! "+Arrays.toString(recPath.toArray()));
 		}
@@ -291,7 +291,7 @@ public class TCMonitorServer implements AnalyzerListener{
 
 		}
 
-		String description = analyzer.getNumberOfAddedTimeCollectors()+" TimeCollectors analyzed: times written in "+unit;
+		String description = "Showing the last "+collectedTimes.size()+" of "+analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit;
 
 		jo.add("description", 	description);
 		jo.set("labels", 		lables);

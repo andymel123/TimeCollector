@@ -28,7 +28,7 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 
 	private static final Logger LOG = LoggerFactory.getLogger(AnalyzerEachPath.class);
 	
-	private static final int MAX_NUMBER_OF_COLLECTED_PATHS = 1000;			
+	private static final int MAX_NUMBER_OF_COLLECTED_PATHS = 100;			
 	
 	private final HashMap<Integer, AnalyzerEachPathData<ID_TYPE>> dataOfDifferentPaths;
 	private final Clock clock;
@@ -36,13 +36,15 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 	private volatile int countTimeCollectorsAdded = 0;
 
 	private List<AnalyzerListener> listeners;
+	private final int maxNumberCollectors;
 	
 	/**
 	 * @param clock the clock to use to retrieve the time a timecollector was added to this analyzer
 	 */
-	private AnalyzerEachPath(Clock clock) {
+	private AnalyzerEachPath(Clock clock, int maxNumberCollectors) {
 		this.dataOfDifferentPaths = new HashMap<>();
 		this.clock = clock;
+		this.maxNumberCollectors = maxNumberCollectors;
 	}
 
 	/**
@@ -50,7 +52,10 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 	 * @return
 	 */
 	public static <ID_TYPE> AnalyzerEachPath<ID_TYPE> create(Clock clock){
-		return new AnalyzerEachPath<>(clock);
+		return new AnalyzerEachPath<>(clock, MAX_NUMBER_OF_COLLECTED_PATHS);
+	}
+	public static <ID_TYPE> AnalyzerEachPath<ID_TYPE> create(Clock clock, int maxNumberCollectors){
+		return new AnalyzerEachPath<>(clock, maxNumberCollectors);
 	}
 	
 	@Override
@@ -65,7 +70,7 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 		Integer hashOfPath = Integer.valueOf(hashOfPath(path));
 
 		// get data collector for this kind of path or generate a new such container
-		AnalyzerEachPathData<ID_TYPE> pathData = dataOfDifferentPaths.computeIfAbsent(hashOfPath, hash->new AnalyzerEachPathData<ID_TYPE>(tc.getAllowedGraph(), path, hash, MAX_NUMBER_OF_COLLECTED_PATHS));
+		AnalyzerEachPathData<ID_TYPE> pathData = dataOfDifferentPaths.computeIfAbsent(hashOfPath, hash->new AnalyzerEachPathData<ID_TYPE>(tc.getAllowedGraph(), path, hash, maxNumberCollectors));
 		pathData.addTimes(path, this.clock);
 		countTimeCollectorsAdded++;
 		informListeners(tc);

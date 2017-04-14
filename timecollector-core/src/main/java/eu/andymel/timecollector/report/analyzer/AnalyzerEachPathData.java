@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +42,8 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 	/** at idx 0 in those arrays the time when this timecollector was added is saved. In the 
 	 * other indexes the timespan duration in nanoseconds is saved. */
 	private final LinkedList<long[]> collectedSpans;
+	private final List<long[]> collectedSpansView;
+	
 	private final int numberOfTimespans;
 	private final String toStringValue;
 	private final int maxNumberOfCollectedPaths;
@@ -59,6 +62,7 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 		this.recPath = Collections.unmodifiableList(listWithoutInstant);
 		this.hashOfRecPath = hashOfRecPath;
 		this.collectedSpans = new LinkedList<>();
+		this.collectedSpansView = Collections.unmodifiableList(collectedSpans);
 		this.numberOfTimespans = recPath.size()-1; // -1 as there are 2 timespans between 3 milestones
 		this.toStringValue = getClass().getSimpleName()+"["+hashOfRecPath+", "+numberOfTimespans+" timeSpans]";
 		this.maxNumberOfCollectedPaths = maxNumberOfCollectedPaths;
@@ -115,8 +119,13 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 		return recPath;
 	}
 	
+	/**
+	 * @return an unmodifiable view of the internal list of collected times. The arrays inside
+	 * are not copies and the inner list can change. So copy if needed to prevent 
+	 * {@link ConcurrentModificationException}s or similar problems!
+	 */
 	public List<long[]> getCollectedTimes() {
-		return collectedSpans;
+		return collectedSpansView;
 	}
 	
 	public AllowedPathsGraph<ID_TYPE> getAllowedGraph() {
