@@ -15,6 +15,8 @@ import javax.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eclipsesource.json.JsonObject;
+
 /**
  * Inspired by https://github.com/jetty-project/embedded-jetty-websocket-examples/blob/master/javax.websocket-example/src/main/java/org/eclipse/jetty/demo/EventSocket.java
  * 
@@ -71,13 +73,16 @@ public class TCWebSocket {
 		LOG.error("WebSocket Error", cause);
 	}
 	
-	public static void send(String txt){
+	public static void send(JsonObject data){
+		if(data==null)return;
 		if(openSessions==null || openSessions.size()==0)return;
 		AtomicInteger count = new AtomicInteger(0);
+		String txt = data.toString();
 		openSessions.forEach(s->{
 			s.getAsyncRemote().sendText(txt);
 			count.incrementAndGet();
 		});
-		LOG.info("Sent "+txt.length()+" chars to "+count.get()+" clients");
+//		LOG.info("Sent "+txt.length()+" chars to "+count.get()+" clients");
+		LOG.info(txt);
 	}
 }

@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -26,16 +25,11 @@ public class HTMLFormatterStackedBars<ID_TYPE> extends AbstractHTMLFormatter<ID_
 
 	private static final Logger LOG = LoggerFactory.getLogger(HTMLFormatterStackedBars.class);
 
-	private static String htmlTemplate;
-
-	private static Random random = new Random();
-	
 	private static enum placeholder{
 		_REPLACE_LABELS_,
 		_REPLACE_DATA_,
 		_REPLACE_DESCRIPTION_
 	}
-	
 
 	public static <ID_TYPE> HTMLFormatterStackedBars<ID_TYPE> create(Analyzer<ID_TYPE, TimeCollectorWithPath<ID_TYPE>> analyzer) {
 		if(!(analyzer instanceof AnalyzerEachPath)){
