@@ -1,6 +1,7 @@
 package eu.andymel.timecollector.server;
 
 import java.awt.Color;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -83,14 +84,22 @@ public class TCMonitorServer implements AnalyzerListener{
         // static files
         ServletHolder holderHome = new ServletHolder("static-files", DefaultServlet.class);
         String staticFilesHome = config.getStaticWebContentDir();
+        File f = new File(staticFilesHome);
+        if(!f.exists() || !f.isDirectory() || f.listFiles().length==0){
+        	throw new IllegalArgumentException("There is a problem with the given directory for searching "
+        			+ "static files of the time collector monitor server! The absolute path does either "
+        			+ "not exist("+f.exists()+"), is not a directory("+f.isDirectory()+" or is empty("+(f.listFiles().length==0)+"))! '"+f+"'");
+        }
         
-        LOG.info("static home '"+staticFilesHome+"'");
+        LOG.info("static home '"+f.getAbsolutePath()+"' ("+f.listFiles().length+" files "+Arrays.toString(f.listFiles())+")");
         holderHome.setInitParameter("resourceBase", staticFilesHome);
         
         /* I'm not totally sure why I need this but I assume it's needed to be able to 
-         * server my static content from anything else but "/"
+         * serve my static content from anything else but "/"
          * see http://stackoverflow.com/a/20223103 */
         holderHome.setInitParameter("pathInfoOnly","true");
+        
+//        holderHome.setInitParameter("dirAllowed","true");
         
         String staticSubPath = config.getSubPathStaticWebContent();
         context.addServlet(holderHome, staticSubPath);
@@ -101,10 +110,6 @@ public class TCMonitorServer implements AnalyzerListener{
         ServerContainer wscontainer = WebSocketServerContainerInitializer.configureContext(context);
         // Add WebSocket endpoint to javax.websocket layer
         wscontainer.addEndpoint(TCWebSocket.class);
-
-        
-        // start to listen on port
-        jettyServer.start();
 
         jettyServer.addLifeCycleListener(new LifeCycle.Listener() {
 			
@@ -125,7 +130,7 @@ public class TCMonitorServer implements AnalyzerListener{
 			
 			@Override
 			public void lifeCycleStarted(LifeCycle event) {
-				LOG.info("Jetty monitoring server started");
+				LOG.info("Jetty monitoring server started on port "+config.getPort());
 			}
 			
 			@Override
@@ -134,6 +139,10 @@ public class TCMonitorServer implements AnalyzerListener{
 			}
 		});
         
+        // start to listen on port
+        jettyServer.start();
+
+
         if(!async){
         	// blocks the calling thread until the server has been shut down
         	jettyServer.join();
