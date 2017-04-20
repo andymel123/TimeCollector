@@ -19,10 +19,11 @@
 		
 
 		<!-- for painting the chart -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script>
 <!-- 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script> -->
-<!-- 		for writing the time-labels (x-axis) -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
+		<script src="Chart.js"></script>
+<!--	for writing the time-labels (x-axis) -->
+<!-- 		<script src="https://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script> -->
+		<script src="date.min.js"></script>
 		
 	</head>
 	<body>
@@ -49,7 +50,7 @@
 				websocket = new WebSocket(getWebSocketPath());
 
 				websocket.onopen = function(event) {
-					websocket.send("Connected with "+JSON.stringify(get_browser()));
+					sendTextToServer("Connected with "+JSON.stringify(get_browser()));
 				};
 
 				websocket.onmessage = function(event) {
@@ -142,7 +143,7 @@
 						chartsContainer.appendChild(canvas);
 				    	canvas.id = hashId;
 				    	canvas.width = 2000;
-				    	canvas.height= 250;
+				    	canvas.height= 400;
 				    	
 						var ctx = canvas.getContext("2d");
 						var data = {
@@ -155,10 +156,10 @@
 							data : data,
 							options : {
 								legend: {
-							        display: true,
+							        display: false,
 							        position: "left",
 							        labels:{
-							        	fontSize: 9
+							        	fontSize: 8
 							        }
 							    },
 								animation:false,
@@ -186,7 +187,7 @@
 			}
 			
 			function convertLabels(msg_labels){
-				return msg_labels.map(ms => {
+				return msg_labels.map(function(ms){
 					var d = new Date(ms);
 					var sep=":";
 					var s = d.getUTCHours();
