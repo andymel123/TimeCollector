@@ -2,7 +2,6 @@ package eu.andymel.timecollector.server;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
@@ -25,11 +24,16 @@ import com.eclipsesource.json.JsonObject;
  */
 
 @ServerEndpoint(value="/ws/v1")
-public class TCWebSocket {
+
+public class TCWebSocket{
 
 	private static final Logger LOG = LoggerFactory.getLogger(TCWebSocket.class);
 
 	private static final Collection<Session> openSessions = ConcurrentHashMap.newKeySet(); 
+	
+	
+	private static final Object MUTEX = new Object();
+	private static String lastFullDataMsg;
 	
 //	public TCWebSocket(String s) {
 //		LOG.info("TCWebSocket init!!! "+s);
@@ -42,8 +46,12 @@ public class TCWebSocket {
 	@OnOpen
 	public void onWebSocketConnect(Session sess) {
 		LOG.info("Socket Connected: " + sess);
+		sess.setMaxIdleTimeout(0); // never timeout
 		openSessions.add(sess);
 		LOG.info("sessions: "+openSessions.size()+" / "+sess.getOpenSessions().size());
+		synchronized (MUTEX) {
+			if(lastFullDataMsg!=null)sess.getAsyncRemote().sendText(lastFullDataMsg);	
+		}
 	}
 
 	@OnMessage
@@ -73,16 +81,26 @@ public class TCWebSocket {
 		LOG.error("WebSocket Error", cause);
 	}
 	
-	public static void send(JsonObject data){
+	public static void sendAsync(JsonObject data){
 		if(data==null)return;
-		if(openSessions==null || openSessions.size()==0)return;
-		AtomicInteger count = new AtomicInteger(0);
 		String txt = data.toString();
+
+		// save msg for clients that connect later
+		synchronized (MUTEX) {
+			// TODO only save if fullData msg
+			lastFullDataMsg = txt;
+		}
+		
+		// send to currently connected clients
+		if(openSessions==null || openSessions.size()==0)return;
 		openSessions.forEach(s->{
 			s.getAsyncRemote().sendText(txt);
-			count.incrementAndGet();
+//			count.incrementAndGet();
 		});
+		
+		
 //		LOG.info("Sent "+txt.length()+" chars to "+count.get()+" clients");
 //		LOG.info(txt);
 	}
+
 }

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -43,6 +42,9 @@ public class TCMonitorServer implements AnalyzerListener{
 
 	private static final Logger LOG = LoggerFactory.getLogger(TCMonitorServer.class);
 
+	/** every 5 sec */
+	public static final double DEFAULT_UPDATES_PER_MINUTE = 12;
+	
 	private static final String[] EMPTY_DATA = new String[]{"","",""};
     private ScheduledExecutorService es;
 
@@ -55,12 +57,9 @@ public class TCMonitorServer implements AnalyzerListener{
 	
 	private List<Runnable> serverStoppingHooks;
 	
-	private final double updatesPerMinute;
-	
-	public TCMonitorServer(TCMonitorServerConfig config, double updatesPerMinute) {
+	public TCMonitorServer(TCMonitorServerConfig config) {
 		Objects.requireNonNull(config, "'config' is null!");
 		this.config = config;
-		this.updatesPerMinute = updatesPerMinute;
 	}
 	
 	public void start() throws Exception{
@@ -87,10 +86,17 @@ public class TCMonitorServer implements AnalyzerListener{
         ServletHolder holderHome = new ServletHolder("static-files", DefaultServlet.class);
         String staticFilesHome = config.getStaticWebContentDir();
         File f = new File(staticFilesHome);
-        if(!f.exists() || !f.isDirectory() || f.listFiles().length==0){
+        File[] listFiles = f.listFiles();
+    	
+        if(!f.exists() || !f.isDirectory() || listFiles==null || listFiles.length==0){
+        	String files = "-";
+        	if(listFiles!=null){
+        		files = ""+listFiles.length;
+        	}
+        	
         	throw new IllegalArgumentException("There is a problem with the given directory for searching "
         			+ "static files of the time collector monitor server! The absolute path does either "
-        			+ "not exist("+f.exists()+"), is not a directory("+f.isDirectory()+" or is empty("+(f.listFiles().length==0)+"))! '"+f+"'");
+        			+ "not exist("+f.exists()+"), is not a directory("+f.isDirectory()+") or is empty("+(listFiles==null || listFiles.length==0)+")! '"+f+"'");
         }
         
         LOG.info("static home '"+f.getAbsolutePath()+"' ("+f.listFiles().length+" files "+Arrays.toString(f.listFiles())+")");
@@ -187,6 +193,9 @@ public class TCMonitorServer implements AnalyzerListener{
 	}
 	
 	public synchronized void setTimeCollectorAnalyzer(AnalyzerEachPath<?> analyzer) {
+		if(this.monitoredAnalyzer!=null){
+			throw new IllegalStateException("Analyzer already set. Just one analyzer possible at the moment!");
+		}
 		this.monitoredAnalyzer = analyzer;
 		this.monitoredAnalyzer.addListener(this);
 		this.analyzerUpdated = true;
@@ -194,6 +203,13 @@ public class TCMonitorServer implements AnalyzerListener{
 	}
 
 	private void startUpdateThread() {
+	
+		double updatesPerMinute = config.getUpdatesPerMinute();
+		if(updatesPerMinute <= 0){
+			// each 5sec
+			updatesPerMinute = DEFAULT_UPDATES_PER_MINUTE; 
+		}
+		
 		if(es==null){
 			ThreadFactory namedThreadFactory = new ThreadFactory() {
 				@Override
@@ -206,20 +222,28 @@ public class TCMonitorServer implements AnalyzerListener{
 			throw new IllegalStateException("Already Started?!");
 		}
 		
+		long delay = (long)(Math.max(60000/updatesPerMinute, 1));
+		
+		if(LOG.isInfoEnabled()){
+			LOG.info("Updating every {} ms", delay);
+		}
+		
 		es.scheduleAtFixedRate(
         	() -> {
         		if(analyzerUpdated){
             		try{
 //            			LOG.info("update");
-                		analyzerUpdated=false;
-                		TCWebSocket.send(getAnalyzerStateAsJson(monitoredAnalyzer));
+//                		analyzerUpdated=false; commented out as I don't know when a new client connects yet
+                		TCWebSocket.sendAsync(getAnalyzerStateAsJson(monitoredAnalyzer));
             		}catch(Exception e){
             			LOG.error("Exception in monitor thread", e);
             			stop();
             		}
         		}
         	},
-        	0, (long)(Math.max(60000/updatesPerMinute, 1)), TimeUnit.MILLISECONDS
+        	0,							// initial delay 
+        	delay,	// delay between updates 
+        	TimeUnit.MILLISECONDS		// time unit for both 
         );
 	}
 
