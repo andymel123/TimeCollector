@@ -23,6 +23,7 @@
 <!-- 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script> -->
 <!-- 		for writing the time-labels (x-axis) -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
+		<script src="testchartperf.js"></script>
 		
 	</head>
 	<body>
@@ -37,57 +38,10 @@
 		
 			var chartsContainer = document.getElementById("chartContainer"); 
 			var canvas = document.getElementById("cvs"); 
-			var websocket;
 			var charts = {};
 			
-// 			initChart();
-			
-			openWebsocket();
-		
-			function openWebsocket(){
-				
-				websocket = new WebSocket(getWebSocketPath());
+			startData();
 
-				websocket.onopen = function(event) {
-					websocket.send("Connected with "+JSON.stringify(get_browser()));
-				};
-
-				websocket.onmessage = function(event) {
-					var msg = JSON.parse(event.data);
-// 					console.log(msg);
-					handleServerEvent(msg);
-				}
-
-			}
-
-			function getWebSocketPath(){
-				// inspired by http://stackoverflow.com/a/10418013
-				var loc = window.location, new_uri;
-				if (loc.protocol === "https:") {
-				    new_uri = "wss:";
-				} else {
-				    new_uri = "ws:";
-				}
-				new_uri += "//" + loc.host;
-				new_uri += "/ws/v1";
-				return new_uri;
-			}
-			
-			function sendTextToServer(txt) {
-				if(!websocket)return;
-				// Send the msg object as a JSON-formatted string.
-				websocket.send(JSON.stringify({
-					type : "message",
-					text : txt,
-					date : Date.now()
-				}));
-			}
-
-			function closeWebsocket(){
-				if(!websocket)return;
-				websocket.close();
-			}
-			
 			function handleServerEvent(msg){
 				switch (msg.type) {
 					case "fulldata": {

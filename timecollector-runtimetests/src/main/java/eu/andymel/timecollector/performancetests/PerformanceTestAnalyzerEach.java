@@ -6,12 +6,12 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Collection;
 
-import eu.andymel.timecollector.TestClockIncrementBy1;
-import eu.andymel.timecollector.TestTimeCollectorProvider;
-import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
+import eu.andymel.timecollector.teststuff.TestClockIncrementBy1;
+import eu.andymel.timecollector.teststuff.TestTimeCollectorProvider;
+import eu.andymel.timecollector.teststuff.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.util.NanoClock;
 
 /*
@@ -43,28 +43,28 @@ public class PerformanceTestAnalyzerEach {
 		for(int i=0; i<amount; i++){
 			TimeCollectorWithPath<TestMilestones> tc = TestTimeCollectorProvider.getTC(tcClock);
 			tc.saveTime(TestMilestones.CREATION);
-			tc.saveTime(TestMilestones.BEFORE_HANDLER_CONTEXT);
-			tc.saveTime(TestMilestones.BEFORE_SEARCH_HANDLER);
-			tc.saveTime(TestMilestones.AFTER_SEARCH_HANDLER);
-			tc.saveTime(TestMilestones.BEFORE_HANDLER);
-			tc.saveTime(TestMilestones.BEFORE_DAO_GETSTATE);
-			tc.saveTime(TestMilestones.BEFORE_DBPOOL);
-			tc.saveTime(TestMilestones.AFTER_DBPOOL);
-			tc.saveTime(TestMilestones.BEFORE_DB_GETSTATE);
-			tc.saveTime(TestMilestones.AFTER_DB_GETSTATE);
-			tc.saveTime(TestMilestones.AFTER_DAO_GETSTATE);
-			tc.saveTime(TestMilestones.BEFORE_CALC1);
-			tc.saveTime(TestMilestones.AFTER_CALC1);
-			tc.saveTime(TestMilestones.BEFORE_DECIDER);
-			tc.saveTime(TestMilestones.AFTER_DECIDER);
-			tc.saveTime(TestMilestones.BEFORE_DAO_SAVE);
-			tc.saveTime(TestMilestones.BEFORE_DBPOOL);
-			tc.saveTime(TestMilestones.AFTER_DBPOOL);
-			tc.saveTime(TestMilestones.BEFORE_DB_SAVE_DECISION1);
-			tc.saveTime(TestMilestones.AFTER_DB_SAVE_DECISION1);
-			tc.saveTime(TestMilestones.AFTER_DAO_SAVE);
-			tc.saveTime(TestMilestones.AFTER_HANDLER);
-			tc.saveTime(TestMilestones.AFTER_HANDLER_CONTEXT);
+			tc.saveTime(TestMilestones.HANDLER_CTX_S);
+			tc.saveTime(TestMilestones.SEARCH_HANDLER_S);
+			tc.saveTime(TestMilestones.SEARCH_HANDLER_E);
+			tc.saveTime(TestMilestones.HANDLER_S);
+			tc.saveTime(TestMilestones.DAO_GET_S);
+			tc.saveTime(TestMilestones.DBPOOL_S);
+			tc.saveTime(TestMilestones.DBPOOL_E);
+			tc.saveTime(TestMilestones.DB_GET_S);
+			tc.saveTime(TestMilestones.DB_GET_E);
+			tc.saveTime(TestMilestones.DAO_GET_E);
+			tc.saveTime(TestMilestones.CALC1_S);
+			tc.saveTime(TestMilestones.CALC1_E);
+			tc.saveTime(TestMilestones.DECIDER_S);
+			tc.saveTime(TestMilestones.DECIDER_E);
+			tc.saveTime(TestMilestones.DAO_SAVE_S);
+			tc.saveTime(TestMilestones.DBPOOL_S);
+			tc.saveTime(TestMilestones.DBPOOL_E);
+			tc.saveTime(TestMilestones.DB_SAVE1_S);
+			tc.saveTime(TestMilestones.DB_SAVE1_E);
+			tc.saveTime(TestMilestones.DAO_SAVE_E);
+			tc.saveTime(TestMilestones.HANDLER_E);
+			tc.saveTime(TestMilestones.HANDLER_CTX_E);
 
 			analyzerEach.addCollector(tc);	
 		}

@@ -10,15 +10,13 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.andymel.timecollector.TestClockIncrementRandom;
-import eu.andymel.timecollector.TestTimeCollectorProvider;
-import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.performancetests.PerformanceTestsUtils;
 import eu.andymel.timecollector.report.analyzer.Analyzer;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
-import eu.andymel.timecollector.report.html.AbstractHTMLFormatter;
-import eu.andymel.timecollector.report.html.HTMLFormatterStackedBars;
+import eu.andymel.timecollector.teststuff.TestClockIncrementRandom;
+import eu.andymel.timecollector.teststuff.TestTimeCollectorProvider;
+import eu.andymel.timecollector.teststuff.TestTimeCollectorProvider.TestMilestones;
 
 /*
  * PerformanceTest: Create TimeCollectorWithPath
@@ -51,28 +49,28 @@ public class RunnerAnalyzerHTML {
 		for(int i=0; i<amount; i++){
 			TimeCollectorWithPath<TestTimeCollectorProvider.TestMilestones> tc = TestTimeCollectorProvider.getTC(clock);
 			tc.saveTime(TestTimeCollectorProvider.TestMilestones.CREATION);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.BEFORE_HANDLER_CONTEXT);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.BEFORE_SEARCH_HANDLER);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.AFTER_SEARCH_HANDLER);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.BEFORE_HANDLER);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.BEFORE_DAO_GETSTATE);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.BEFORE_DBPOOL);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.AFTER_DBPOOL);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.BEFORE_DB_GETSTATE);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.AFTER_DB_GETSTATE);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.AFTER_DAO_GETSTATE);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.BEFORE_CALC1);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.AFTER_CALC1);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.BEFORE_DECIDER);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.AFTER_DECIDER);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.BEFORE_DAO_SAVE);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.BEFORE_DBPOOL);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.AFTER_DBPOOL);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.BEFORE_DB_SAVE_DECISION1);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.AFTER_DB_SAVE_DECISION1);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.AFTER_DAO_SAVE);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.AFTER_HANDLER);
-			tc.saveTime(TestTimeCollectorProvider.TestMilestones.AFTER_HANDLER_CONTEXT);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.HANDLER_CTX_S);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.SEARCH_HANDLER_S);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.SEARCH_HANDLER_E);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.HANDLER_S);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DAO_GET_S);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DBPOOL_S);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DBPOOL_E);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DB_GET_S);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DB_GET_E);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DAO_GET_E);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.CALC1_S);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.CALC1_E);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DECIDER_S);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DECIDER_E);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DAO_SAVE_S);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DBPOOL_S);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DBPOOL_E);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DB_SAVE1_S);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DB_SAVE1_E);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.DAO_SAVE_E);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.HANDLER_E);
+			tc.saveTime(TestTimeCollectorProvider.TestMilestones.HANDLER_CTX_E);
 
 			analyzer.addCollector(tc);	
 		}

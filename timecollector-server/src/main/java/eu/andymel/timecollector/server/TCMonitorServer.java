@@ -55,10 +55,12 @@ public class TCMonitorServer implements AnalyzerListener{
 	
 	private List<Runnable> serverStoppingHooks;
 	
+	private final double updatesPerMinute;
 	
-	public TCMonitorServer(TCMonitorServerConfig config) {
+	public TCMonitorServer(TCMonitorServerConfig config, double updatesPerMinute) {
 		Objects.requireNonNull(config, "'config' is null!");
 		this.config = config;
+		this.updatesPerMinute = updatesPerMinute;
 	}
 	
 	public void start() throws Exception{
@@ -217,120 +219,117 @@ public class TCMonitorServer implements AnalyzerListener{
             		}
         		}
         	},
-        	0, 200, TimeUnit.MILLISECONDS
+        	0, (long)(Math.max(60000/updatesPerMinute, 1)), TimeUnit.MILLISECONDS
         );
 	}
 
 	private static JsonObject getAnalyzerStateAsJson(AnalyzerEachPath<?> monitoredAnalyzer) {
 
-		return getJsonData(monitoredAnalyzer, TimeUnit.MICROSECONDS);
+		return getFullDataJsonObject(monitoredAnalyzer, TimeUnit.MICROSECONDS);
 		
 	}
 
-	private static JsonObject getJsonData(AnalyzerEachPath analyzer, TimeUnit unit) {
-		
-		JsonObject jo = new JsonObject();
-		jo.add("type", 			"fulldata");
+	private static JsonObject getFullDataJsonObject(AnalyzerEachPath analyzer, TimeUnit unit) {
 
+		Objects.requireNonNull(analyzer, "'analyzer' is null");
+		Collection<AnalyzerEachEntry> recordedPaths = analyzer.getAll();
+		Objects.requireNonNull(recordedPaths, "'recordedPaths' is null!");
+
+		if(recordedPaths.size()==0)return null;
+		
+		JsonObject completeJsonObject = new JsonObject();
+		JsonArray graphData = new JsonArray();
+		JsonArray hashes = new JsonArray();
+		completeJsonObject.add("type", 		"fulldata");
+		completeJsonObject.set("graphData", graphData);
+		completeJsonObject.set("hashes", 	hashes);
 		
 		TimeSpanNameFormatter tsNameFormat = TimeSpanNameFormatter.DEFAULT_TIMESPAN_NAME_FORMATTER;
 		
-		Objects.requireNonNull(analyzer, "'analyzer' is null");
-
-		Collection<AnalyzerEachEntry> recordedPaths = analyzer.getAll();
-		Objects.requireNonNull(recordedPaths, "'recordedPaths' is null!");
-		
-		if(recordedPaths.size()>1){
-//				TODO
-//				throw new IllegalStateException("not yet implemented to display mutliple different paths!");
+		for(AnalyzerEachEntry e: recordedPaths){
 			
-		}
-
-		AnalyzerEachEntry e = null;
-		Iterator<AnalyzerEachEntry> it = recordedPaths.iterator();
-		int maxSize = 0;
-		while(it.hasNext()){
-			AnalyzerEachEntry<?> pathData = it.next();
-			int collectedTCs = pathData.getCollectedTimes().size();
-			if(collectedTCs>maxSize){
-				maxSize = collectedTCs;
-				e = pathData;
-			}
-		}
-
-		if(e==null)return null;
-		
-		JsonArray lables = new JsonArray();
-		JsonArray data = new JsonArray();
-		
-		
-		List<GraphNode> recPath = e.getRecPath();
-		if(recPath==null || recPath.size()==0){
-			throw new IllegalStateException("There is no recorded path in this entry?! "+e);
-		}
-		List<long[]> collectedTimes = e.getCollectedTimes(); // returns a copy of the internal array, so no copying is needed here
-		if(collectedTimes==null || collectedTimes.size()==0){
-			throw new IllegalStateException("There is a recpath but no recorded times?! "+Arrays.toString(recPath.toArray()));
-		}
-		if(!(recPath instanceof ArrayList)){
-			// to ensure a fast call to get(idx) 
-			recPath = new ArrayList<>(recPath);
-		}
-		int numberOfRecordedMilestones = recPath.size();
-		
-		JsonArray[] dataArrays = new JsonArray[numberOfRecordedMilestones];
-		// per milestone
-		GraphNode lastNode = null;
-		int idx = 0;
-		for(GraphNode node: recPath){
-			if(lastNode!=null){
-				idx++;	/* starting with 1 to have similar idx like like in times[] below 
-				(where times[0] is no timespan but the time the timeCollector was added to the analyser)*/
-				String timeSpanName = tsNameFormat.getTimeSpanName(lastNode, node);
-
-				JsonObject dataset = new JsonObject();
-				dataset.set("label", timeSpanName);
-				dataset.set("backgroundColor", getHexColorString(idx));
-				dataset.set("borderColor", "#FFFFFF");
-
-				JsonArray dataArray = new JsonArray();
-				dataset.set("data", dataArray);
-				dataArrays[idx] = dataArray;
-
-				data.add(dataset);
-			}
-			lastNode = node;
-		}
-		
-		int maxView = 300;
-		
-		// per TimeCollector that went this path
-		boolean isFirstTC = true;
-		idx = -1;
-		for(long[] times: collectedTimes){
-			idx++;
-			if(idx>maxView)break;
+			JsonObject singleGraphJsonObject = new JsonObject();
 			
-			if(numberOfRecordedMilestones!=times.length){
-				throw new IllegalStateException("Different number of nodes and times! "+numberOfRecordedMilestones+" nodes, "+times.length+" times!");
-			}
-
-			lables.add(times[0]);
+			JsonArray lables = new JsonArray();
+			JsonArray data = new JsonArray();
 			
+			
+			List<GraphNode> recPath = e.getRecPath();
+			if(recPath==null || recPath.size()==0){
+				throw new IllegalStateException("There is no recorded path in this entry?! "+e);
+			}
+			List<long[]> collectedTimes = e.getCollectedTimes(); // returns a copy of the internal array, so no copying is needed here
+			if(collectedTimes==null || collectedTimes.size()==0){
+				throw new IllegalStateException("There is a recpath but no recorded times?! "+Arrays.toString(recPath.toArray()));
+			}
+			if(!(recPath instanceof ArrayList)){
+				// to ensure a fast call to get(idx) 
+				recPath = new ArrayList<>(recPath);
+			}
+			int numberOfRecordedMilestones = recPath.size();
+			
+			JsonArray[] dataArrays = new JsonArray[numberOfRecordedMilestones];
 			// per milestone
-			for(int t=1; t<times.length; t++){
-				dataArrays[t].add(unit.convert(times[t], TimeUnit.NANOSECONDS));
+			GraphNode lastNode = null;
+			int idx = 0;
+			for(GraphNode node: recPath){
+				if(lastNode!=null){
+					idx++;	/* starting with 1 to have similar idx like like in times[] below 
+					(where times[0] is no timespan but the time the timeCollector was added to the analyser)*/
+					String timeSpanName = tsNameFormat.getTimeSpanName(lastNode, node);
+
+					JsonObject dataset = new JsonObject();
+					dataset.set("label", timeSpanName);
+					dataset.set("backgroundColor", getHexColorString(idx));
+					dataset.set("borderColor", "#FFFFFF");
+
+					JsonArray dataArray = new JsonArray();
+					dataset.set("data", dataArray);
+					dataArrays[idx] = dataArray;
+
+					data.add(dataset);
+				}
+				lastNode = node;
+			}
+			
+			int maxView = 300;
+			
+			// per TimeCollector that went this path
+			idx = -1;
+			for(long[] times: collectedTimes){
+				idx++;
+				if(idx>maxView)break;
+				
+				if(numberOfRecordedMilestones!=times.length){
+					throw new IllegalStateException("Different number of nodes and times! "+numberOfRecordedMilestones+" nodes, "+times.length+" times!");
+				}
+
+				lables.add(times[0]);
+				
+				// per milestone
+				for(int t=1; t<times.length; t++){
+					dataArrays[t].add(unit.convert(times[t], TimeUnit.NANOSECONDS));
+				}
+
 			}
 
+			String description = "Showing the last "+collectedTimes.size()+" of "+analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit;
+
+			int hash = e.getHashOfRecPath();
+			/* I build a string that is already valid to use as id in the html page 
+			 * commented out because I had too many problems with that. is doable, but 
+			 * as it is not logical to do it on the server I skip it*/
+//			hashes.add("#cvs"+hash); 
+			hashes.add(hash); 
+			
+			singleGraphJsonObject.add("hash", 			hash);
+			singleGraphJsonObject.add("description", 	description);
+			singleGraphJsonObject.set("labels", 		lables);
+			singleGraphJsonObject.set("datasets", 		data);
+			graphData.add(singleGraphJsonObject);
 		}
-
-		String description = "Showing the last "+collectedTimes.size()+" of "+analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit;
-
-		jo.add("description", 	description);
-		jo.set("labels", 		lables);
-		jo.set("datasets", 		data);
-		return jo;
-
+		
+		return completeJsonObject;
 		
 	}
 	

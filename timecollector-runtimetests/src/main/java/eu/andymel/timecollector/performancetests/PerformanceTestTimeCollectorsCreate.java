@@ -4,8 +4,9 @@ import static eu.andymel.timecollector.performancetests.PerformanceTestsUtils.wa
 
 import java.time.Instant;
 
-import eu.andymel.timecollector.TestTimeCollectorProvider;
 import eu.andymel.timecollector.TimeCollectorWithPath;
+import eu.andymel.timecollector.teststuff.TestTimeCollectorProvider;
+import eu.andymel.timecollector.teststuff.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.util.NanoClock;
 
 /*
@@ -31,7 +32,7 @@ public class PerformanceTestTimeCollectorsCreate {
 		
 		Instant start = Instant.now();
 		for(int i=0; i<amount; i++){
-			TimeCollectorWithPath<eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones> tc = TestTimeCollectorProvider.getTC(clock);
+			TimeCollectorWithPath<TestMilestones> tc = TestTimeCollectorProvider.getTC(clock);
 		}
 		PerformanceTestsUtils.end("Create TimeCollectorWithPath", amount, start);
 		
