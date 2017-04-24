@@ -21,11 +21,14 @@
 			     	font-family: Arial, Helvetica, sans-serif;
 			    }
 			    #wrapper {
-/* 				  margin-right: 700px; */
 					width: 100%;
 				}
 				#chartContainer{
- 					max-height: 90vh; 
+				}
+				#chartContainer > div{
+					margin-bottom: 0.4em;					
+				} 
+				.divCanvasWrapper{
 				}
 				canvas{
 					
@@ -87,7 +90,7 @@
 
 				websocket.onmessage = function(event) {
 					var msg = JSON.parse(event.data);
-// 					console.log(msg);
+					console.log(msg);
 					handleServerEvent(msg);
 				}
 
@@ -126,7 +129,7 @@
 					case "fulldata": {
 						
 						// website layout (add one canvas per chart data if not already there)
-						initCharts(msg.hashes);
+						initCharts(msg);
 						
 						// update overall description
 						var desc = $("#pDescription");
@@ -145,7 +148,7 @@
 							
 							if(chartDivs[hashId].attr("aria-expanded")=="true"){
 								// only if currently visible
-								console.log("updating "+hashId);
+// 								console.log("updating "+hashId);
 								var chartOfHash = charts[hashId];
 								if(chartOfHash && chartOfHash.data){
 								    chartOfHash.data.labels = convertLabels(graphData.labels);
@@ -168,11 +171,16 @@
 				return "cvs"+hash;
 			}
 			
-			function initCharts(hashesArray) {
+			function initCharts(msg) {
 				
-				for (i = 0; i < hashesArray.length; ++i) {
-				    var hashId = getIdFromHash(hashesArray[i]);
+				var graphsArray = msg.graphData;
+				
+				for (i = 0; i < graphsArray.length; ++i) {
+					var graphData = graphsArray[i];
+					var hashId = getIdFromHash(graphData.hash);
 					
+				    var title = graphData.path.join(" -> ");
+				    
 				    var canvas = document.getElementById(hashId);
 				    if(canvas){
 				    	// we alread have a chart for this path
@@ -186,6 +194,7 @@
 						        type: "button",
 						        id: "btn_"+hashId,
 						        value: hashId,
+						        title: title,
 						        "data-toggle": "collapse",
 						        "data-target": "#div_"+hashId
 						    })
@@ -194,12 +203,18 @@
 
 					    
 					    // div
-				    	var divRow = $('<div/>', {'class':'row'}).appendTo(chartsContainer);
+				    	var divRow = $('<div/>', {'class':'row'})
+				    		.attr({
+								title: title
+							})
+					    	.appendTo(chartsContainer);
 					    var divChartMetaData = $('<div/>', {'class':'col-sm-12'})
-							.attr("id", "meta_"+hashId)
+							.attr({
+								id: "meta_"+hashId
+							})
 					    	.appendTo(divRow);
 				    	
-					    var divCvs = $('<div/>', {'class':'collapse col-sm-12'})
+					    var divCvs = $('<div/>', {'class':'collapse col-sm-12 divCanvasWrapper'})
 							.attr("id", "div_"+hashId)
 						    .appendTo(divRow);
 				    	

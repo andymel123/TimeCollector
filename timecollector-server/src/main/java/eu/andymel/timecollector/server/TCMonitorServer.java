@@ -27,8 +27,10 @@ import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainer
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import eu.andymel.timecollector.TimeCollector;
 import eu.andymel.timecollector.graphs.GraphNode;
@@ -299,12 +301,17 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 			// per milestone
 			GraphNode lastNode = null;
 			int idx = 0;
+			StringBuilder sbPath = new StringBuilder("[");
 			for(GraphNode node: recPath){
 				if(lastNode!=null){
 					idx++;	/* starting with 1 to have similar idx like like in times[] below 
 					(where times[0] is no timespan but the time the timeCollector was added to the analyser)*/
 					String timeSpanName = tsNameFormat.getTimeSpanName(lastNode, node);
 
+					sbPath.append('"');
+					sbPath.append(lastNode.getId());
+					sbPath.append("\",");
+					
 					JsonObject dataset = new JsonObject();
 					dataset.set("label", timeSpanName);
 					dataset.set("backgroundColor", getHexColorString(idx));
@@ -318,6 +325,12 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 				}
 				lastNode = node;
 			}
+			if(lastNode!=null){
+				sbPath.append('"');
+				sbPath.append(lastNode.getId());
+				sbPath.append('"');
+			}
+			sbPath.append(']');
 			
 			int maxView = 300;
 			
@@ -351,6 +364,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 //			String description = "Showing the last "+collectedTimes.size()+" of "+analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit;
 			String description = String.format("%s, bars: %s, milestones: %s", hash, lables.size(), numberOfRecordedMilestones);
 
+			singleGraphJsonObject.set("path", 			Json.parse(sbPath.toString()));
 			singleGraphJsonObject.add("hash", 			hash);
 			singleGraphJsonObject.add("description", 	description);
 			singleGraphJsonObject.set("labels", 		lables);
