@@ -129,11 +129,13 @@
 						initCharts(msg.hashes);
 						
 						// update overall description
-						document.getElementById("pDescription").innerHTML = msg.description;
+						var desc = $("#pDescription");
+						desc.html(msg.description);
 						
  						// update all charts
 						var graphsArray = msg.graphData;
-						for (i = 0; i < graphsArray.length; ++i) {
+						var start = performance.now();
+ 						for (i = 0; i < graphsArray.length; ++i) {
 						    var graphData = graphsArray[i];
 					
 							// update the right chart
@@ -141,8 +143,9 @@
 							
 							$("#meta_"+hashId).html(graphData.description);
 							
-							if(chartDivs[hashId].attr("aria-expanded")){
+							if(chartDivs[hashId].attr("aria-expanded")=="true"){
 								// only if currently visible
+								console.log("updating "+hashId);
 								var chartOfHash = charts[hashId];
 								if(chartOfHash && chartOfHash.data){
 								    chartOfHash.data.labels = convertLabels(graphData.labels);
@@ -152,7 +155,9 @@
 									console.error("chart of hash '"+hashId+" is not valid!", chartOfHash);
 								}
 							}
-						}		
+						}
+ 						var time = (performance.now()-start).toFixed(2);
+						desc.append(" (graph update time: "+time+"ms)");
 						break;
 					}
 				}
