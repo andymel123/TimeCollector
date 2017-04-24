@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import javax.websocket.server.ServerContainer;
 
@@ -38,7 +39,7 @@ import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEnt
 import eu.andymel.timecollector.report.analyzer.AnalyzerListener;
 import eu.andymel.timecollector.util.ColorGenerator;
 
-public class TCMonitorServer implements AnalyzerListener{
+public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 
 	private static final Logger LOG = LoggerFactory.getLogger(TCMonitorServer.class);
 
@@ -60,6 +61,7 @@ public class TCMonitorServer implements AnalyzerListener{
 	public TCMonitorServer(TCMonitorServerConfig config) {
 		Objects.requireNonNull(config, "'config' is null!");
 		this.config = config;
+		TCWebsocketDataMgr.INSTANCE.setWebSocketDispatcher(this);
 	}
 	
 	public void start() throws Exception{
@@ -366,6 +368,12 @@ public class TCMonitorServer implements AnalyzerListener{
 	public void timeCollectorAddedToAnalyzer(TimeCollector<?> tc, Analyzer<?, ?> analyzer) {
 //		LOG.info("inform new tc");
 		analyzerUpdated = true;
+	}
+
+	@Override
+	public void dispatch(String command, Consumer<String> answerConsumer) {
+//		CompletableFuture.supplyAsync(supplier)
+//		answerConsumer.accept(t);
 	}
 
 

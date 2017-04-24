@@ -56,6 +56,7 @@
 			var canvas = document.getElementById("cvs"); 
 			var websocket;
 			var charts = {};
+			var chartDivs = {};
 			
 // 			initChart();
 			
@@ -67,6 +68,7 @@
 
 				websocket.onopen = function(event) {
 					sendTextToServer("Connected with "+JSON.stringify(get_browser()));
+					sendTextToServer("GetAllHashes");
 				};
 
 				websocket.onmessage = function(event) {
@@ -126,13 +128,17 @@
  							   
 							// update the right chart
 							var hashId = getIdFromHash(graphData.hash);
-							var chartOfHash = charts[hashId];
-							if(chartOfHash && chartOfHash.data){
-							    chartOfHash.data.labels = convertLabels(graphData.labels);
-								chartOfHash.data.datasets = graphData.datasets;
-								chartOfHash.update();
-							}else{
-								console.error("chart of hash '"+hashId+" is not valid!", chartOfHash);
+							
+							if(chartDivs[hashId].attr("aria-expanded")){
+								// only if currently visible
+								var chartOfHash = charts[hashId];
+								if(chartOfHash && chartOfHash.data){
+								    chartOfHash.data.labels = convertLabels(graphData.labels);
+									chartOfHash.data.datasets = graphData.datasets;
+									chartOfHash.update();
+								}else{
+									console.error("chart of hash '"+hashId+" is not valid!", chartOfHash);
+								}
 							}
 						}		
 						break;
@@ -235,6 +241,7 @@
 						});
 						// save chart in dictonary
 						charts[hashId] = barchart;
+						chartDivs[hashId] = divCvs;
 						
 						// finally append the new canvas into the chartsContainer
 				    }
