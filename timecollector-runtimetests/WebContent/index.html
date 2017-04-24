@@ -1,6 +1,20 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
+		<!-- for painting the charts -->
+		<script src="js/Chart.js"></script>
+		
+		<!-- for writing the time-labels in the chart (x-axis) -->
+		<script src="js/date.min.js"></script>
+		
+		<!-- jquery for bootstrap -->
+		<script src="js/jquery-3.2.1.js"></script>
+
+		<!-- bootstrap (for folding) -->
+		<link href="css/bootstrap.css" rel="stylesheet">
+   		<script src="js/bootstrap.js"></script>
+
+
 		<style type="text/css">
 			    body{
 			     	color: #333;
@@ -8,6 +22,7 @@
 			    }
 			    #wrapper {
 /* 				  margin-right: 700px; */
+					width: 100%;
 				}
 				#chartContainer{
  					max-height: 90vh; 
@@ -15,28 +30,29 @@
 				canvas{
 					
 				}
+				#menuContainer{
+					background-color: #CCC;
+				}
 		</style>
 		
-
-		<!-- for painting the chart -->
-<!-- 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script> -->
-		<script src="Chart.js"></script>
-<!--	for writing the time-labels (x-axis) -->
-<!-- 		<script src="https://cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script> -->
-		<script src="date.min.js"></script>
-		
 	</head>
+	
 	<body>
 		<p id="pDescription"></p>
-		<div id="wrapper">
+		<div class="container" id="wrapper">
 			<div class="row">
-				<div id="chartContainer"></div>
+				<div id="menuContainer" class="col-sm-2">
+					<ul id="chartsMenu"></ul>
+				</div>
+				<div id="chartContainer" class="col-sm-10"></div>
 			</div>
 		</div>
 		
 		<script type="text/javascript">
 		
-			var chartsContainer = document.getElementById("chartContainer"); 
+			var chartsContainer = document.getElementById("chartContainer");
+			var ulChartsMenu = document.getElementById("chartsMenu");
+	    	
 			var canvas = document.getElementById("cvs"); 
 			var websocket;
 			var charts = {};
@@ -139,12 +155,51 @@
 				    	// we alread have a chart for this path
 				    	continue;
 				    }else{
-				    	var canvas = document.createElement('canvas');
-						chartsContainer.appendChild(canvas);
-				    	canvas.id = hashId;
-				    	canvas.width = 2000;
-				    	canvas.height= 400;
+
+				    	// menu
+						var li = document.createElement("li");
+// 						var cbId = "cb_"+hashId;
+// 						var cb = $('<input />', { type: 'checkbox', id: cbId, value: hashId });
+// 						cb.attr("data-toggle", "collapse");
+// 						cb.attr("data-target", hashId);
+// 						cb.appendTo(li);
+// 						$('<label />', { 'for': cbId, text: hashId }).appendTo(li);
+						$('<input/>')
+							.attr({
+						        type: "button",
+						        id: "btn_"+hashId,
+						        value: hashId,
+						        "data-toggle": "collapse",
+						        "data-target": "#div_"+hashId
+						    })
+						    .appendTo(li);
+					    ulChartsMenu.appendChild(li);
+
+					    
+					    // div
+				    	var divCvs = $('<div/>', {'class':'collapse in'})
+							.attr({
+						        id: "div_"+hashId
+						    })
+						    .appendTo(chartsContainer);
 				    	
+				    	var newCanvas = 
+				    	    $('<canvas/>')
+				    	    .attr("id", hashId)
+				    	    .width(2000)
+				    	    .height(400)
+				    		.appendTo(divCvs);
+				    	
+				    	var canvas = newCanvas[0];
+				    	
+// 				    	var canvas = document.createElement('canvas');
+// 						chartsContainer.appendChild(canvas);
+// 				    	canvas.id = hashId;
+// 				    	canvas.width = 2000;
+// 				    	canvas.height= 400;
+				    	
+// 				    	 class="collapse"
+				    	 
 						var ctx = canvas.getContext("2d");
 						var data = {
 							labels: ["588240774","588255460","588267871","588281084","588292538","588304214","588313542","588322610","588334797","588347127","588358898","588370651","588381989","588395061","588408192","588420662","588430957","588444045","588454444","588465749","588478186","588487950","588499212","588510241","588522328","588536270","588548884","588563616","588577445","588587721","588599567","588611610","588620783","588632390","588644165","588655312","588668109","588680763","588692906","588704188","588718035","588726038","588737938","588751213","588765867","588777806","588788115","588801446","588812409","588825510","588836977","588850478","588863428","588875347","588888715","588897507","588907242","588917966","588929088","588940178","588952091","588963218","588974808","588985314","588998478","589010158","589020899","589033463","589046232","589057872","589073225","589087272","589100064","589112188","589124954","589137391","589152941","589164618","589176178","589190027","589202130","589214389","589225143","589235843","589246830","589258110","589270753","589282675","589295619","589308737","589322531","589336478","589346240","589358711","589370428","589381633","589392330","589404366","589416188","589427793","589442359"],
