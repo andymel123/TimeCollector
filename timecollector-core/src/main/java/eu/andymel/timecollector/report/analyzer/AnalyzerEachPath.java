@@ -93,7 +93,11 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 	}
 
 	public Collection<AnalyzerEachEntry<ID_TYPE>> getAll(){
-		return Collections.unmodifiableCollection(dataOfDifferentPaths.values());
+//		return Collections.unmodifiableCollection(dataOfDifferentPaths.values());
+		/*
+		 * I return a copy as the list can change very frequently
+		 */
+		return new ArrayList<>(dataOfDifferentPaths.values());
 	}
 	
 	public interface AnalyzerEachEntry<ID_TYPE> {
