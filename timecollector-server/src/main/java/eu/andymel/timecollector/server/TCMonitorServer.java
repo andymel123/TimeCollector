@@ -266,9 +266,10 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 		JsonObject completeJsonObject = new JsonObject();
 		JsonArray graphData = new JsonArray();
 		JsonArray hashes = new JsonArray();
-		completeJsonObject.add("type", 		"fulldata");
-		completeJsonObject.set("graphData", graphData);
-		completeJsonObject.set("hashes", 	hashes);
+		completeJsonObject.add("type", 			"fulldata");
+		completeJsonObject.set("graphData", 	graphData);
+		completeJsonObject.set("hashes", 		hashes);
+		completeJsonObject.set("description", 	analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit);
 		
 		TimeSpanNameFormatter tsNameFormat = TimeSpanNameFormatter.DEFAULT_TIMESPAN_NAME_FORMATTER;
 		
@@ -339,15 +340,17 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 
 			}
 
-			String description = "Showing the last "+collectedTimes.size()+" of "+analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit;
-
+			
 			int hash = e.getHashOfRecPath();
 			/* I build a string that is already valid to use as id in the html page 
 			 * commented out because I had too many problems with that. is doable, but 
 			 * as it is not logical to do it on the server I skip it*/
 //			hashes.add("#cvs"+hash); 
 			hashes.add(hash); 
-			
+
+//			String description = "Showing the last "+collectedTimes.size()+" of "+analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit;
+			String description = String.format("%s, bars: %s, milestones: %s", hash, lables.size(), numberOfRecordedMilestones);
+
 			singleGraphJsonObject.add("hash", 			hash);
 			singleGraphJsonObject.add("description", 	description);
 			singleGraphJsonObject.set("labels", 		lables);

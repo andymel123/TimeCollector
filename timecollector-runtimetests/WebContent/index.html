@@ -32,8 +32,16 @@
 				}
 				#menuContainer{
 					background-color: #CCC;
+					padding: 0px;
 				}
-				
+				#menuContainer ul{
+					list-style-type: none;
+					padding: 0px;
+					margin: 0px;
+				}
+				#menuContainer input{
+					width: 100%;
+				}
 				input[aria-expanded="true"]{
 					font-weight: bold;
 					background-color: #90ff90;
@@ -128,12 +136,10 @@
 						for (i = 0; i < graphsArray.length; ++i) {
 						    var graphData = graphsArray[i];
 					
- 						    // TODO write/update chart description
-
- 						    document.getElementById("pDescription").innerHTML = graphData.description;  
- 							   
 							// update the right chart
 							var hashId = getIdFromHash(graphData.hash);
+							
+							$("#meta_"+hashId).html(graphData.description);
 							
 							if(chartDivs[hashId].attr("aria-expanded")){
 								// only if currently visible
@@ -170,12 +176,6 @@
 
 				    	// menu
 						var li = document.createElement("li");
-// 						var cbId = "cb_"+hashId;
-// 						var cb = $('<input />', { type: 'checkbox', id: cbId, value: hashId });
-// 						cb.attr("data-toggle", "collapse");
-// 						cb.attr("data-target", hashId);
-// 						cb.appendTo(li);
-// 						$('<label />', { 'for': cbId, text: hashId }).appendTo(li);
 						$('<input/>')
 							.attr({
 						        type: "button",
@@ -189,12 +189,17 @@
 
 					    
 					    // div
-				    	var divCvs = $('<div/>', {'class':'collapse'})
-							.attr({
-						        id: "div_"+hashId
-						    })
-						    .appendTo(chartsContainer);
+				    	var divRow = $('<div/>', {'class':'row'}).appendTo(chartsContainer);
+					    var divChartMetaData = $('<div/>', {'class':'col-sm-12'})
+							.attr("id", "meta_"+hashId)
+					    	.appendTo(divRow);
 				    	
+					    var divCvs = $('<div/>', {'class':'collapse col-sm-12'})
+							.attr("id", "div_"+hashId)
+						    .appendTo(divRow);
+				    	
+					    
+					    // canvas
 				    	var newCanvas = 
 				    	    $('<canvas/>')
 				    	    .attr("id", hashId)
@@ -204,14 +209,6 @@
 				    	
 				    	var canvas = newCanvas[0];
 				    	
-// 				    	var canvas = document.createElement('canvas');
-// 						chartsContainer.appendChild(canvas);
-// 				    	canvas.id = hashId;
-// 				    	canvas.width = 2000;
-// 				    	canvas.height= 400;
-				    	
-// 				    	 class="collapse"
-				    	 
 						var ctx = canvas.getContext("2d");
 						var data = {
 							labels: [],
