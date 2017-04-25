@@ -144,31 +144,31 @@
 						desc.html(msg.description);
 						
  						// update all charts
-						var graphsArray = msg.graphData;
-						var start = performance.now();
- 						for (i = 0; i < graphsArray.length; ++i) {
-						    var graphData = graphsArray[i];
-					
-							// update the right chart
-							var hashId = getIdFromHash(graphData.hash);
-							
-							$("#meta_"+hashId).attr("value", graphData.description);
-							
-							var bc = pauseCBs[hashId];
-							var b = pauseCBs[hashId].checked;
-							var b2 = pauseCBs[hashId].prop('checked');
-							var b3 = chartDivs[hashId].attr("aria-expanded")=="true";
-							if(chartDivs[hashId].attr("aria-expanded")=="true" && 
-								pauseCBs[hashId].prop('checked')){
-								// only if currently visible
-// 								console.log("updating "+hashId);
-								var chartOfHash = charts[hashId];
-								if(chartOfHash && chartOfHash.data){
-								    chartOfHash.data.labels = convertLabels(graphData.labels);
-									chartOfHash.data.datasets = graphData.datasets;
-									chartOfHash.update();
-								}else{
-									console.error("chart of hash '"+hashId+" is not valid!", chartOfHash);
+						var graphsDataArray = msg.graphsData;
+						for (i = 0; i < graphsDataArray.length; ++i) {
+							var graphData = graphsDataArray[i];
+	 						var recPathsArray = graphData.recPaths;
+							var start = performance.now();
+	 						for (i = 0; i < recPathsArray.length; ++i) {
+							    var recPath = recPathsArray[i];
+						
+								// update the right chart
+								var hashId = getIdFromHash(recPath.hash);
+								
+								$("#meta_"+hashId).attr("value", recPath.description);
+								
+								if(chartDivs[hashId].attr("aria-expanded")=="true" && 
+									pauseCBs[hashId].prop('checked')){
+									// only if currently visible
+	// 								console.log("updating "+hashId);
+									var chartOfHash = charts[hashId];
+									if(chartOfHash && chartOfHash.data){
+									    chartOfHash.data.labels = convertLabels(recPath.labels);
+										chartOfHash.data.datasets = recPath.datasets;
+										chartOfHash.update();
+									}else{
+										console.error("chart of hash '"+hashId+" is not valid!", chartOfHash);
+									}
 								}
 							}
 						}
@@ -184,15 +184,22 @@
 				return "cvs"+hash;
 			}
 			
+			
 			function initCharts(msg) {
+				var graphsDataArray = msg.graphsData;
+				for (i = 0; i < graphsDataArray.length; ++i) {
+					initChartsForRecPaths(graphsDataArray[i]);
+				}
+			}
+
+			function initChartsForRecPaths(graphData){
+				var recPathsArray = graphData.recPaths;
 				
-				var graphsArray = msg.graphData;
-				
-				for (i = 0; i < graphsArray.length; ++i) {
-					var graphData = graphsArray[i];
-					var hashId = getIdFromHash(graphData.hash);
+				for (i = 0; i < recPathsArray.length; ++i) {
+					var recPath = recPathsArray[i];
+					var hashId = getIdFromHash(recPath.hash);
 					
-				    var title = graphData.path.join(" -> ");
+				    var title = recPath.path.join(" -> ");
 				    
 				    var canvas = document.getElementById(hashId);
 				    if(canvas){
@@ -304,6 +311,7 @@
 						// finally append the new canvas into the chartsContainer
 				    }
 				}
+
 			}
 			
 			function convertLabels(msg_labels){

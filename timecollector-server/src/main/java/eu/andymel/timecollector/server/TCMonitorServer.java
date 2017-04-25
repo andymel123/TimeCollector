@@ -265,13 +265,26 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 
 		if(recordedPaths.size()==0)return null;
 		
+		// per message
 		JsonObject completeJsonObject = new JsonObject();
-		JsonArray graphData = new JsonArray();
-		JsonArray hashes = new JsonArray();
+		JsonArray graphsData = new JsonArray();
 		completeJsonObject.add("type", 			"fulldata");
-		completeJsonObject.set("graphData", 	graphData);
-		completeJsonObject.set("hashes", 		hashes);
-		completeJsonObject.set("description", 	analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit);
+		completeJsonObject.add("description", 	analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit);
+		completeJsonObject.add("graphsData", graphsData);
+		
+		
+		
+		// per allowed graph
+		JsonObject graphData = new JsonObject();
+		graphsData.add(graphData);
+		
+		JsonArray allowedGraphNodes = new JsonArray();
+		JsonArray allowedGraphEdges = new JsonArray();
+		JsonArray recPathsJson = new JsonArray();
+		
+		graphData.add("nodes", allowedGraphNodes);
+		graphData.add("edges", allowedGraphEdges);
+		graphData.add("recPaths", 	recPathsJson);
 		
 		TimeSpanNameFormatter tsNameFormat = TimeSpanNameFormatter.DEFAULT_TIMESPAN_NAME_FORMATTER;
 		
@@ -313,12 +326,12 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 					sbPath.append("\",");
 					
 					JsonObject dataset = new JsonObject();
-					dataset.set("label", timeSpanName);
-					dataset.set("backgroundColor", getHexColorString(idx));
-					dataset.set("borderColor", "#FFFFFF");
+					dataset.add("label", timeSpanName);
+					dataset.add("backgroundColor", getHexColorString(idx));
+					dataset.add("borderColor", "#FFFFFF");
 
 					JsonArray dataArray = new JsonArray();
-					dataset.set("data", dataArray);
+					dataset.add("data", dataArray);
 					dataArrays[idx] = dataArray;
 
 					data.add(dataset);
@@ -359,17 +372,17 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 			 * commented out because I had too many problems with that. is doable, but 
 			 * as it is not logical to do it on the server I skip it*/
 //			hashes.add("#cvs"+hash); 
-			hashes.add(hash); 
+//			hashes.add(hash); 
 
 //			String description = "Showing the last "+collectedTimes.size()+" of "+analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit;
 			String description = String.format("%s, bars: %s, milestones: %s", hash, lables.size(), numberOfRecordedMilestones);
 
-			singleGraphJsonObject.set("path", 			Json.parse(sbPath.toString()));
+			singleGraphJsonObject.add("path", 			Json.parse(sbPath.toString()));
 			singleGraphJsonObject.add("hash", 			hash);
 			singleGraphJsonObject.add("description", 	description);
-			singleGraphJsonObject.set("labels", 		lables);
-			singleGraphJsonObject.set("datasets", 		data);
-			graphData.add(singleGraphJsonObject);
+			singleGraphJsonObject.add("labels", 		lables);
+			singleGraphJsonObject.add("datasets", 		data);
+			recPathsJson.add(singleGraphJsonObject);
 		}
 		
 		return completeJsonObject;
