@@ -14,7 +14,10 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
    		<script src="js/bootstrap.js"></script>
 
-
+		<!-- toggle buttons -->
+		<link href="css/bootstrap-toggle.min.css" rel="stylesheet">
+		<script src="js/bootstrap-toggle.min.js"></script>
+		
 		<style type="text/css">
 			    body{
 			     	color: #333;
@@ -74,6 +77,7 @@
 			var websocket;
 			var charts = {};
 			var chartDivs = {};
+			var pauseCBs = {};
 			
 // 			initChart();
 			
@@ -146,7 +150,12 @@
 							
 							$("#meta_"+hashId).html(graphData.description);
 							
-							if(chartDivs[hashId].attr("aria-expanded")=="true"){
+							var bc = pauseCBs[hashId];
+							var b = pauseCBs[hashId].checked;
+							var b2 = pauseCBs[hashId].prop('checked');
+							var b3 = chartDivs[hashId].attr("aria-expanded")=="true";
+							if(chartDivs[hashId].attr("aria-expanded")=="true" && 
+								pauseCBs[hashId].prop('checked')){
 								// only if currently visible
 // 								console.log("updating "+hashId);
 								var chartOfHash = charts[hashId];
@@ -202,23 +211,32 @@
 					    ulChartsMenu.appendChild(li);
 
 					    
-					    // div
+					    // div row
 				    	var divRow = $('<div/>', {'class':'row'})
 				    		.attr({
 								title: title
 							})
 					    	.appendTo(chartsContainer);
-					    var divChartMetaData = $('<div/>', {'class':'col-sm-12'})
+				    	var divRowMeta = $('<div/>', {'class':'row'}).appendTo(divRow);
+				    	var divRowChart = $('<div/>', {'class':'row'}).appendTo(divRow);
+					    
+				    	// meta row
+					    var divChartMetaData = $('<div/>', {'class':'col-xs-11'})
 							.attr({
 								id: "meta_"+hashId
 							})
-					    	.appendTo(divRow);
+					    	.appendTo(divRowMeta);
+				    	var pauseButton = $('<input type="checkbox" checked data-toggle="toggle">', {'class':'col-xs-1'})
+							.attr({
+								id: "pause_"+hashId
+							})
+					    	.appendTo(divRowMeta);
 				    	
+					    // chart row
 					    var divCvs = $('<div/>', {'class':'collapse col-sm-12 divCanvasWrapper'})
 							.attr("id", "div_"+hashId)
-						    .appendTo(divRow);
+						    .appendTo(divRowChart);
 				    	
-					    
 					    // canvas
 				    	var newCanvas = 
 				    	    $('<canvas/>')
@@ -265,7 +283,7 @@
 						// save chart in dictonary
 						charts[hashId] = barchart;
 						chartDivs[hashId] = divCvs;
-						
+						pauseCBs[hashId] = pauseButton;
 						// finally append the new canvas into the chartsContainer
 				    }
 				}
