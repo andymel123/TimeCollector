@@ -1,7 +1,5 @@
 package eu.andymel.timecollector.server;
 
-import java.util.Objects;
-
 public enum TCWebsocketDataMgr {
 
 	INSTANCE;

@@ -15,7 +15,6 @@ import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.graphs.PermissionNode;
-import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
 
 public class AnalyzerEachTest {

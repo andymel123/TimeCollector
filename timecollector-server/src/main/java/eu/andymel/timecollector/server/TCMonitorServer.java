@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
 
 import eu.andymel.timecollector.TimeCollector;
 import eu.andymel.timecollector.graphs.GraphNode;

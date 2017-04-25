@@ -1,7 +1,6 @@
 package eu.andymel.timecollector.server;
 
 import java.time.Clock;
-import java.util.EnumSet;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
