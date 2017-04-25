@@ -29,12 +29,15 @@
 				#chartContainer{
 				}
 				#chartContainer > div{
-					margin-bottom: 0.4em;					
+/* 					margin-bottom: 0.4em;					 */
 				} 
 				.divCanvasWrapper{
 				}
 				canvas{
 					
+				}
+				input[type="button"] {
+					text-align: left;
 				}
 				#menuContainer{
 					background-color: #CCC;
@@ -61,10 +64,11 @@
 		<p id="pDescription"></p>
 		<div class="container" id="wrapper">
 			<div class="row">
-				<div id="menuContainer" class="col-sm-2">
-					<ul id="chartsMenu"></ul>
-				</div>
-				<div id="chartContainer" class="col-sm-10"></div>
+<!-- 				<div id="menuContainer" class="col-sm-2"> -->
+<!-- 					<ul id="chartsMenu"></ul> -->
+<!-- 				</div> -->
+<!-- 				<div id="chartContainer" class="col-sm-10"></div> -->
+				<div id="chartContainer" class="col-sm-12"></div>
 			</div>
 		</div>
 		
@@ -148,7 +152,7 @@
 							// update the right chart
 							var hashId = getIdFromHash(graphData.hash);
 							
-							$("#meta_"+hashId).html(graphData.description);
+							$("#meta_"+hashId).attr("value", graphData.description);
 							
 							var bc = pauseCBs[hashId];
 							var b = pauseCBs[hashId].checked;
@@ -197,18 +201,18 @@
 				    }else{
 
 				    	// menu
-						var li = document.createElement("li");
-						$('<input/>')
-							.attr({
-						        type: "button",
-						        id: "btn_"+hashId,
-						        value: hashId,
-						        title: title,
-						        "data-toggle": "collapse",
-						        "data-target": "#div_"+hashId
-						    })
-						    .appendTo(li);
-					    ulChartsMenu.appendChild(li);
+// 						var li = document.createElement("li");
+// 						$('<input/>')
+// 							.attr({
+// 						        type: "button",
+// 						        id: "btn_"+hashId,
+// 						        value: hashId,
+// 						        title: title,
+// 						        "data-toggle": "collapse",
+// 						        "data-target": "#div_"+hashId
+// 						    })
+// 						    .appendTo(li);
+// 					    ulChartsMenu.appendChild(li);
 
 					    
 					    // div row
@@ -221,11 +225,24 @@
 				    	var divRowChart = $('<div/>', {'class':'row'}).appendTo(divRow);
 					    
 				    	// meta row
-					    var divChartMetaData = $('<div/>', {'class':'col-xs-11'})
-							.attr({
-								id: "meta_"+hashId
-							})
-					    	.appendTo(divRowMeta);
+// 					    var divChartMetaData = $('<div/>', {'class':'col-xs-11'})
+// 							.attr({
+// 								id: "meta_"+hashId
+// 							})
+// 					    	.appendTo(divRowMeta);
+				    	
+						$('<input/>', {'class':'col-xs-11'})
+						.attr({
+					        type: "button",
+					        id: "meta_"+hashId,
+					        value: hashId,
+					        title: title,
+					        "data-toggle": "collapse",
+					        "data-target": "#div_"+hashId
+					    })
+					    .appendTo(divRowMeta);
+				    	
+				    	
 				    	var pauseButton = $('<input type="checkbox" checked data-toggle="toggle">', {'class':'col-xs-1'})
 							.attr({
 								id: "pause_"+hashId
