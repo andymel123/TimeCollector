@@ -9,6 +9,8 @@ import java.util.Set;
 
 public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> {
 	
+	private final AllowedPathsLayoutHelpData layoutHelpInfo; 
+	
 //	AllowedPathsGraph(ID_TYPE idOfStartNode, NodePermissions nodePermissionsOfStartNode, Mutable mutable) {
 //		super(
 //			idOfStartNode, 
@@ -17,13 +19,14 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 //			mutable
 //		);
 //	}
-	AllowedPathsGraph(Set<GraphNode<ID_TYPE, NodePermissions>> nodes, GraphNode<ID_TYPE, NodePermissions> startNode, Mutable mutable) {
+	AllowedPathsGraph(Set<GraphNode<ID_TYPE, NodePermissions>> nodes, GraphNode<ID_TYPE, NodePermissions> startNode, Mutable mutable, AllowedPathsLayoutHelpData layoutHelpInfo) {
 		super(
 			nodes,
 			startNode,
 			true, // allow multiedges, circles,...
 			mutable
 		);
+		this.layoutHelpInfo = layoutHelpInfo;
 	}
 	
 	public final static <ID_TYPE extends Enum<ID_TYPE>> AllowedPathBuilderNodesAndEdges<ID_TYPE> nodes(GraphNode<ID_TYPE, NodePermissions> startNode, GraphNode<ID_TYPE, NodePermissions>... otherNodes){
@@ -93,4 +96,7 @@ public class AllowedPathsGraph<ID_TYPE> extends Graph<ID_TYPE, NodePermissions> 
 		return copy;
 	}
 	
+	public AllowedPathsLayoutHelpData getLayoutHelpInfo() {
+		return layoutHelpInfo;
+	}
 }

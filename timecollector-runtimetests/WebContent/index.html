@@ -135,7 +135,8 @@
 			function handleServerEvent(msg){
 				switch (msg.type) {
 					case "fulldata": {
-						
+						var start = performance.now();
+ 						
 						// website layout (add one canvas per chart data if not already there)
 						initCharts(msg);
 						
@@ -148,8 +149,7 @@
 						for (i = 0; i < graphsDataArray.length; ++i) {
 							var graphData = graphsDataArray[i];
 	 						var recPathsArray = graphData.recPaths;
-							var start = performance.now();
-	 						for (i = 0; i < recPathsArray.length; ++i) {
+							for (i = 0; i < recPathsArray.length; ++i) {
 							    var recPath = recPathsArray[i];
 						
 								// update the right chart
@@ -173,7 +173,7 @@
 							}
 						}
  						var time = (performance.now()-start).toFixed(2);
-						desc.append(" (graph update time: "+time+"ms)");
+						desc.append(" (server side time: "+msg.time+"ms, graph update time: "+time+"ms)");
 						break;
 					}
 				}

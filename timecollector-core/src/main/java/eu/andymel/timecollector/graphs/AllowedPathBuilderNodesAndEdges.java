@@ -28,7 +28,8 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 	private final Set<GraphNode<ID_TYPE, NodePermissions>> nodes;
 	private final List<Edge<GraphNode<ID_TYPE, NodePermissions>>> edges;
 	private final SimpleMutable simpleMutable = new SimpleMutable(true);
-	 
+	private final AllowedPathsLayoutHelpData layoutHelpInfo;
+	
 	AllowedPathBuilderNodesAndEdges(GraphNode<ID_TYPE, NodePermissions> startNode, List<GraphNode<ID_TYPE, NodePermissions>> otherNodes) {
 		
 		// preconditions
@@ -60,6 +61,13 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		}
 		this.edges = new LinkedList<>();
 		
+		
+		layoutHelpInfo = new AllowedPathsLayoutHelpData(
+			nodes.stream()
+			.map(n->""+System.identityHashCode(n))
+			.collect(Collectors.toList())
+		);
+		
 	}
 	
 	
@@ -89,7 +97,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		
 		int idx = edges.indexOf(newEdge);
 		if(idx!=-1){
-			// don't add equal edges (equal means connecting the same INSTANCES of nodes, not equal nodes)
+			// don't add equal edges (identity!!, so equal means connecting the same INSTANCES of nodes, not different nodes with same values)
 			String msg = "This edge was saved earlier! '"+newEdge+"'";
 			if(THROW_ERROR_IF_EDGE_IS_ADDED_MULTIPLE_TIMES){
 				throw new IllegalStateException(msg);
@@ -120,7 +128,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 			throw new IllegalStateException("You have already build this path! Use the previously returned instance.");
 		}
 		
-		// copy to be able to remove waht I added, to see if something is left after adding everything I get
+		// copy to be able to remove what I added, to see if something is left after adding everything I get
 		List<GraphNode<ID_TYPE, NodePermissions>> copyOfNodes = new ArrayList<>(nodes);
 		List<Edge<GraphNode<ID_TYPE, NodePermissions>>> copyOfEdges = new ArrayList<>(edges);
 		
@@ -169,7 +177,7 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 
 		simpleMutable.setImmutable();
 		
-		return new AllowedPathsGraph<ID_TYPE>(nodes, startNode, simpleMutable);
+		return new AllowedPathsGraph<ID_TYPE>(nodes, startNode, simpleMutable, layoutHelpInfo);
 	}
 	
 	public AllowedPathBuilderNodesAndEdges<ID_TYPE> path(GraphNode<ID_TYPE, NodePermissions>... nodes) {
@@ -177,7 +185,9 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 		// preconditiions
 		nn(nodes, "You need to provide nodes for this call!");
 		
-		Iterator<GraphNode<ID_TYPE, NodePermissions>> it = Arrays.asList(nodes).iterator();
+		List<GraphNode<ID_TYPE, NodePermissions>> nodeList = Arrays.asList(nodes);
+		
+		Iterator<GraphNode<ID_TYPE, NodePermissions>> it = nodeList.iterator();
 		if(!it.hasNext())return this;
 		GraphNode<ID_TYPE, NodePermissions> node1 = it.next();
 		checkInNodes(node1);
@@ -191,6 +201,16 @@ public class AllowedPathBuilderNodesAndEdges<ID_TYPE> {
 			edge(node1, node2);
 			node1 = node2;
 		}
+
+		// I save some data to now how to visualize this allowedGraph(in the way the user used the path method)
+		if(this.layoutHelpInfo!=null){
+			this.layoutHelpInfo.addPath(
+				nodeList.stream()
+				.map(n->""+System.identityHashCode(n))
+				.collect(Collectors.toList())
+			);
+		}
+		
 		return this;
 	}
 

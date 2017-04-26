@@ -3,6 +3,7 @@ package eu.andymel.timecollector.report.analyzer;
 import static org.junit.Assert.assertEquals;
 
 import java.time.Clock;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.graphs.PermissionNode;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
+import eu.andymel.timecollector.report.analyzer.AnalyzerEachTest.SmallTestMilestones;
 
 public class AnalyzerEachTest {
 
@@ -63,10 +65,14 @@ public class AnalyzerEachTest {
 		tc.saveTime(SmallTestMilestones.MS4);
 		analyzer.addCollector(tc);
 		
-		Collection<AnalyzerEachEntry<SmallTestMilestones>> all = analyzer.getAll();
-		
-		assertEquals(2, all.size());
+		Collection<SimpleEntry<AllowedPathsGraph<SmallTestMilestones>,List<AnalyzerEachEntry<SmallTestMilestones>>>> data = analyzer.getCopyOFData();
 
+		if(data.size()!=1){
+			throw new RuntimeException("Not yet implemented!");
+		}
+		List<AnalyzerEachEntry<SmallTestMilestones>> all = data.iterator().next().getValue();
+		assertEquals(2, all.size());
+		
 		long sumofInsertionTimes = 0;
 		// iterate through recorded paths  
 		for(AnalyzerEachEntry<SmallTestMilestones> e:all){

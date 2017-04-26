@@ -2,12 +2,16 @@ package eu.andymel.timecollector.server;
 
 import java.awt.Color;
 import java.io.File;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -32,13 +36,17 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
 import eu.andymel.timecollector.TimeCollector;
+import eu.andymel.timecollector.graphs.AllowedPathsGraph;
+import eu.andymel.timecollector.graphs.AllowedPathsLayoutHelpData;
 import eu.andymel.timecollector.graphs.GraphNode;
+import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.report.TimeSpanNameFormatter;
 import eu.andymel.timecollector.report.analyzer.Analyzer;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
 import eu.andymel.timecollector.report.analyzer.AnalyzerListener;
 import eu.andymel.timecollector.util.ColorGenerator;
+import eu.andymel.timecollector.util.NanoClock;
 
 public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 
@@ -59,9 +67,15 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 	
 	private List<Runnable> serverStoppingHooks;
 	
+	private final Clock clock;
+	
 	public TCMonitorServer(TCMonitorServerConfig config) {
+		this(config, new NanoClock());
+	}
+	public TCMonitorServer(TCMonitorServerConfig config, Clock clock) {
 		Objects.requireNonNull(config, "'config' is null!");
 		this.config = config;
+		this.clock = clock;
 		TCWebsocketDataMgr.INSTANCE.setWebSocketDispatcher(this);
 	}
 	
@@ -237,7 +251,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
             		try{
 //            			LOG.info("update");
 //                		analyzerUpdated=false; commented out as I don't know when a new client connects yet
-                		TCWebSocket.sendAsync(getAnalyzerStateAsJson(monitoredAnalyzer));
+                		TCWebSocket.sendAsync(getAnalyzerStateAsJson(monitoredAnalyzer, clock));
             		}catch(Exception e){
             			LOG.error("Exception in monitor thread", e);
             			stop();
@@ -250,45 +264,85 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
         );
 	}
 
-	private static JsonObject getAnalyzerStateAsJson(AnalyzerEachPath<?> monitoredAnalyzer) {
+	private static JsonObject getAnalyzerStateAsJson(AnalyzerEachPath<?> monitoredAnalyzer, Clock clock) {
 
-		return getFullDataJsonObject(monitoredAnalyzer, TimeUnit.MICROSECONDS);
+		return getFullDataJsonObject(monitoredAnalyzer, TimeUnit.MICROSECONDS, clock);
 		
 	}
 
-	private static JsonObject getFullDataJsonObject(AnalyzerEachPath analyzer, TimeUnit unit) {
+	private static JsonObject getFullDataJsonObject(AnalyzerEachPath analyzer, TimeUnit unit, Clock clock) {
 
 		Objects.requireNonNull(analyzer, "'analyzer' is null");
-		Collection<AnalyzerEachEntry> recordedPaths = analyzer.getAll();
-		Objects.requireNonNull(recordedPaths, "'recordedPaths' is null!");
-
-		if(recordedPaths.size()==0)return null;
+		Objects.requireNonNull(unit, "'unit' is null!");
 		
-		// per message
+		Instant start = null;
+		
+		if(clock!=null){
+			start = clock.instant();
+		}
+		
+		List<SimpleEntry<AllowedPathsGraph<?>, List<AnalyzerEachEntry<?>>>> dataFull = analyzer.getCopyOFData();
+		
+		if(dataFull.size()==0)return null;
+
 		JsonObject completeJsonObject = new JsonObject();
+
+		// per message
 		JsonArray graphsData = new JsonArray();
 		completeJsonObject.add("type", 			"fulldata");
 		completeJsonObject.add("description", 	analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit);
 		completeJsonObject.add("graphsData", graphsData);
 		
-		
-		
 		// per allowed graph
-		JsonObject graphData = new JsonObject();
-		graphsData.add(graphData);
+		for(SimpleEntry<AllowedPathsGraph<?>, List<AnalyzerEachEntry<?>>> allowedGraphData: dataFull){
+			
+			AllowedPathsGraph<?> allowedGraph = allowedGraphData.getKey();
+			List<AnalyzerEachEntry<?>> recPathData = allowedGraphData.getValue();
+			
+			JsonObject graphData = new JsonObject();
+			graphsData.add(graphData);
+			
+			JsonArray allowedGraphNodes = new JsonArray();
+			JsonArray allowedGraphPaths = new JsonArray();
+			
+			graphData.add("nodes", allowedGraphNodes);
+			graphData.add("paths", allowedGraphPaths);
+			
+			AllowedPathsLayoutHelpData layoutHelpInfo = allowedGraph.getLayoutHelpInfo();
+			
+			for(String nodeHash:layoutHelpInfo.getNodes()){
+				allowedGraphNodes.add(nodeHash);
+			}
+			for(List<String> path: layoutHelpInfo.getPaths()){
+				JsonArray pathJsonArray = new JsonArray();
+				for(String hash:path){
+					pathJsonArray.add(hash);
+				}
+				allowedGraphPaths.add(pathJsonArray);
+			}
+			
+			appendFullDataOfRecPaths(recPathData, graphData, unit);
+		}
+
+		if(start!=null && clock!=null){
+			completeJsonObject.add("time", Duration.between(start, clock.instant()).toNanos()/1_000_000d);
+		}
+		return completeJsonObject;
+	}
+	
+	private static void appendFullDataOfRecPaths(List<AnalyzerEachEntry<?>> recordedPaths, JsonObject graphData, TimeUnit unit) {
 		
-		JsonArray allowedGraphNodes = new JsonArray();
-		JsonArray allowedGraphEdges = new JsonArray();
+		Objects.requireNonNull(recordedPaths, "'recordedPaths' is null!");
+		Objects.requireNonNull(graphData, "'graphsData' is null!");
+		Objects.requireNonNull(unit, "'unit' is null!");
+		
 		JsonArray recPathsJson = new JsonArray();
-		
-		graphData.add("nodes", allowedGraphNodes);
-		graphData.add("edges", allowedGraphEdges);
 		graphData.add("recPaths", 	recPathsJson);
 		
 		TimeSpanNameFormatter tsNameFormat = TimeSpanNameFormatter.DEFAULT_TIMESPAN_NAME_FORMATTER;
 		
 		for(AnalyzerEachEntry e: recordedPaths){
-			
+		
 			JsonObject singleGraphJsonObject = new JsonObject();
 			
 			JsonArray lables = new JsonArray();
@@ -384,10 +438,8 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 			recPathsJson.add(singleGraphJsonObject);
 		}
 		
-		return completeJsonObject;
-		
 	}
-	
+
 	private static String getHexColorString(int idx) {
 		Color c = ColorGenerator.getColor(idx);
 		return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());

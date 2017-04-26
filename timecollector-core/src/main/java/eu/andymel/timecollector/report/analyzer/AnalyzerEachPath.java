@@ -2,11 +2,14 @@ package eu.andymel.timecollector.report.analyzer;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +31,16 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 	
 	private static final int MAX_NUMBER_OF_COLLECTED_PATHS = 100;			
 	
-	private final HashMap<Integer, AnalyzerEachPathData<ID_TYPE>> dataOfDifferentPaths;
+//	private final HashMap<Integer, AnalyzerEachPathData<ID_TYPE>> dataOfDifferentPaths;
+	
+	/** 
+	 * A {@link HashMap} that hols {@link HashMap}s
+	 * The outer Hashmap maps one HashMap to each {@link AllowedPathsGraph}
+	 * In the inner Hashmap a {@link AnalyzerEachPathData} object is mapped to the hash of recorded paths.
+	 * All findings of the timestamps that went the exact same way through the code are saved in that
+	 * {@link AnalyzerEachPathData} 
+	 */
+	private final HashMap<AllowedPathsGraph<ID_TYPE>, HashMap<Integer, AnalyzerEachPathData<ID_TYPE>>> data;
 	private final Clock clock;
 	
 	private volatile int countTimeCollectorsAdded = 0;
@@ -40,7 +52,8 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 	 * @param clock the clock to use to retrieve the time a timecollector was added to this analyzer
 	 */
 	private AnalyzerEachPath(Clock clock, int maxNumberCollectors) {
-		this.dataOfDifferentPaths = new HashMap<>();
+//		this.dataOfDifferentPaths = new HashMap<>();
+		data = new HashMap<>();
 		this.clock = clock;
 		this.maxNumberCollectors = maxNumberCollectors;
 	}
@@ -67,8 +80,22 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 		List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> path = recordedPaths.get(0);
 		Integer hashOfPath = Integer.valueOf(hashOfPath(path));
 
+		// get the HashMap to collect data for this allowedGraph or generate a new hashmap
+		HashMap<Integer, AnalyzerEachPathData<ID_TYPE>> dataOfDifferentPathsOfSameAllowedGraph = data.computeIfAbsent(
+			tc.getAllowedGraph(), 
+			allowedGraph -> new HashMap<>()
+		);
+		
 		// get data collector for this kind of path or generate a new such container
-		AnalyzerEachPathData<ID_TYPE> pathData = dataOfDifferentPaths.computeIfAbsent(hashOfPath, hash->new AnalyzerEachPathData<ID_TYPE>(tc.getAllowedGraph(), path, hash, maxNumberCollectors));
+		AnalyzerEachPathData<ID_TYPE> pathData = dataOfDifferentPathsOfSameAllowedGraph.computeIfAbsent(
+			hashOfPath, 
+			hash -> new AnalyzerEachPathData<ID_TYPE>(
+				tc.getAllowedGraph(), 
+				path, 
+				hash, 
+				maxNumberCollectors
+			)
+		);
 		pathData.addTimes(path, this.clock);
 		countTimeCollectorsAdded++;
 		informListeners(tc);
@@ -90,12 +117,22 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
         return hashCode;
 	}
 
-	public Collection<AnalyzerEachEntry<ID_TYPE>> getAll(){
-//		return Collections.unmodifiableCollection(dataOfDifferentPaths.values());
-		/*
-		 * I return a copy as the list can change very frequently
-		 */
-		return new ArrayList<>(dataOfDifferentPaths.values());
+	public synchronized List<SimpleEntry<AllowedPathsGraph<ID_TYPE>, List<AnalyzerEachEntry<ID_TYPE>>>> getCopyOFData(){
+		/* I copy the actual state of the data synchronized and return it so no 
+		 * concurrent modifications can happen while the caller of this method 
+		 * reads the returned data. I return it as a list, not as a List, not as 
+		 * HashMap as (at least for me at the moment) fast copy is more important 
+		 * than finding some data for one specific entry */
+		
+		ArrayList<SimpleEntry<AllowedPathsGraph<ID_TYPE>, List<AnalyzerEachEntry<ID_TYPE>>>> result = new ArrayList<>(data.size());
+		
+		for(Entry<AllowedPathsGraph<ID_TYPE>, HashMap<Integer, AnalyzerEachPathData<ID_TYPE>>> e: data.entrySet()){
+			result.add(new SimpleEntry<>(
+				e.getKey(),	// no copy but the real graph (should be immutable) 
+				new ArrayList<>(e.getValue().values()))	// copy if the inner list as well as it changes frequently
+			);
+		}
+		return result;
 	}
 	
 	public interface AnalyzerEachEntry<ID_TYPE> {

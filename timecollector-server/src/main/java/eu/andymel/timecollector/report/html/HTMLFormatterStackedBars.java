@@ -2,6 +2,7 @@ package eu.andymel.timecollector.report.html;
 
 import java.awt.Color;
 import java.io.File;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.andymel.timecollector.TimeCollectorWithPath;
+import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.report.analyzer.Analyzer;
@@ -52,7 +54,13 @@ public class HTMLFormatterStackedBars<ID_TYPE> extends AbstractHTMLFormatter<ID_
 		AnalyzerEachPath<ID_TYPE> analyzer = (AnalyzerEachPath<ID_TYPE>)getAnalyzer(); // checked in constructor
 		Objects.requireNonNull(analyzer, "'analyzer' is null");
 
-		Collection<AnalyzerEachEntry<ID_TYPE>> recordedPaths = analyzer.getAll();
+		Collection<SimpleEntry<AllowedPathsGraph<ID_TYPE>,List<AnalyzerEachEntry<ID_TYPE>>>> data = analyzer.getCopyOFData();
+		
+		if(data.size()!=1){
+			throw new RuntimeException("Not yet implemented!");
+		}
+		
+		List<AnalyzerEachEntry<ID_TYPE>> recordedPaths = data.iterator().next().getValue();
 		Objects.requireNonNull(recordedPaths, "'recordedPaths' is null!");
 		
 		if(recordedPaths.size()>1){
