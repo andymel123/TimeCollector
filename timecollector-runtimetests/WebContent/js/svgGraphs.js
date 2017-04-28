@@ -280,18 +280,20 @@ function drawAllowedPath(svgId, paths, config, recPath){
 		console.error(n + " nodes should have "+n-1+" edges, but there are " +e+" edges!");
 	}
 	
-	//recPath.datasets.length
-	
 	// add class to each 'line' svg element that represents 
 	// an edge in the recorded path
 	var count = 0;
-	for(var edgeHash in allEdges){
-		
-		
+//	for(var edgeHash in allEdges){
+	for(var i=0; i<recEdges.length; i++){
+		var edgeHash = recEdges[i];
 		var line = allEdges[edgeHash];
+		var color = recPath.datasets[i].backgroundColor;
 		if(recEdges.includes(edgeHash)){
 			var classes = line.getAttribute("class");
 			line.setAttribute("class", classes+" recEdge");
+			line.setAttribute("stroke", color);
+			var sw = parseInt(line.getAttribute("stroke-width"));
+			line.setAttribute("stroke-width", sw*2);
 			count++;
 		}
 	}
