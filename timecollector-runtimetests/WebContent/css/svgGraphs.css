@@ -1,0 +1,6 @@
+.node:hover {
+  fill: blue;
+}
+.edge:hover {
+  stroke: blue;
+}
