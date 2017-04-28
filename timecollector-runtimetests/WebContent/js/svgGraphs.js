@@ -4,35 +4,38 @@
  * https://github.com/andymel123/TimeCollector
  */
 
-function drawAllowedPath(paths, config){
+function drawAllowedPath(svgId, paths, config){
 	if(!config)config={};
 	var numberOfPaths = paths.length;
 
-	var circleColor = "#999999";
-	var edgeColor = "#bbbbbb"
-	var edgeColorAlternative = "#aaaaaa";
+	var circleColor = 	config.nodeColor 	|| "#999999";
+	var edgeColor = 	config.edgeColor 	|| "#bbbbbb"
+	var edgeColor2 = 	config.edgeColor2	|| "#aaaaaa";
 	
+	var hPerPath = 		config.hperPath		|| 50;
 	var w = 			config.w 			|| 2000;
-	var h = 			config.h 			|| 50 * numberOfPaths;
+	var h = 			config.h 			|| hPerPath * numberOfPaths;
 	var nodeRadius  = 	config.nodeRadius 	|| 12;
 	var strokeWidth = 	config.strokeWidth 	|| 5;
 	var paddingX = 		config.paddingX 	|| 15;
 	var paddingY = 		config.paddingY 	|| 15;
 	
 	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	svg.setAttribute("id", svgId);
 	svg.setAttribute("width", "100%");
 	svg.setAttribute("height", "100%");
 	svg.setAttribute("viewBox", "0 0 " + w + " " + h);
 	svg.setAttribute("preserveAspectRatio", "xMinYMin meet");
 
-	var backgroundRect = buildNode(svg, 'rect', {
-		width : w,
-		height : h,
-		fill : '#ffffff',
-		"stroke-width" : 1,
-		stroke : "rgb(0,0,0)"
-	});
-	svg.appendChild(backgroundRect);
+//	better per css
+//	var backgroundRect = buildNode(svg, 'rect', {
+//		width : w,
+//		height : h,
+//		fill : '#ffffff',
+//		"stroke-width" : 1,
+//		stroke : "rgb(0,0,0)"
+//	});
+//	svg.appendChild(backgroundRect);
 
 	var paddingX = nodeRadius + paddingX;
 	var paddingY = nodeRadius + paddingY;
@@ -87,7 +90,7 @@ function drawAllowedPath(paths, config){
 		var lastNodeDidAlreadyExist = false;
 		for (var n = 0; n < nodesInThisPath; n++) {
 			var nodeHash = path[n];
-			var id = "node" + nodeHash;
+			var nodeId = "n_" + svgId +"_"+nodeHash;
 			var circ = allNodes[nodeHash];
 			if(circ==nextExistingNode){
 				nextExistingNode = null;
@@ -126,14 +129,14 @@ function drawAllowedPath(paths, config){
 						y1 : lastY,
 						x2 : x,
 						y2 : y,
-						stroke : edgeColorAlternative,
+						stroke : edgeColor2,
 						strokeWidth : strokeWidth,
 						//style:"stroke:#77de68;stroke-width:2",
-						class : "edge"
+						class : "edge edge2"
 					});
 					svg.appendChild(line);
-					addTitle(line, lastNode.getAttribute("id")
-							+ " -> " + id);
+					// TODO milestone name as title!
+					addTitle(line, lastNode.getAttribute("id")+ " -> " + nodeId);
 				
 				}
 				lastNodeDidAlreadyExist = true;
@@ -200,8 +203,7 @@ function drawAllowedPath(paths, config){
 					svg.appendChild(line);
 					
 					//console.log("", line);
-					addTitle(line, lastNode.getAttribute("id") + " -> "
-							+ id);
+					addTitle(line, lastNode.getAttribute("id") + " -> " + nodeId);
 				} else {
 					// this is the first node in this path
 					// this is only possible for the first path
@@ -216,7 +218,7 @@ function drawAllowedPath(paths, config){
 					cy : y,
 					r : nodeRadius,
 					fill : circleColor,
-					id : id,
+					id : nodeId,
 					pathidx : p,
 					class : "node"
 				});
@@ -234,12 +236,6 @@ function drawAllowedPath(paths, config){
 			//if (n == 0) console.log(nodeHash, circ);
 		}
 		
-		
-		if(p==2){
-			for(var i=0; i<path.length; i++){
-				console.log("alternative path:", allNodes[path[i]]);	
-			}
-		}
 	}
 	
 	// I append lines(edges) immediately, but the nodes at the end

@@ -1,12 +1,6 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<!-- for painting the charts -->
-		<script src="js/Chart.js"></script>
-		
-		<!-- for writing the time-labels in the chart (x-axis) -->
-		<script src="js/date.min.js"></script>
-		
 		<!-- jquery for bootstrap -->
 		<script src="js/jquery-3.2.1.js"></script>
 
@@ -14,13 +8,19 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
    		<script src="js/bootstrap.js"></script>
 
-		<!-- toggle buttons -->
-		<link href="css/bootstrap-toggle.min.css" rel="stylesheet">
-		<script src="js/bootstrap-toggle.min.js"></script>
+		<!-- for painting the charts -->
+		<script src="js/Chart.js"></script>
 		
+		<!-- for writing the time-labels in the chart (x-axis) -->
+		<script src="js/date.min.js"></script>
+
 		<!-- my own svg graph drawing -->
 		<script src="js/svgGraphs.js"></script>
 		<link href="css/svgGraphs.css" rel="stylesheet">
+		
+		<!-- toggle buttons -->
+		<link href="css/bootstrap-toggle.min.css" rel="stylesheet">
+		<script src="js/bootstrap-toggle.min.js"></script>
 		
 		
 		<style type="text/css">
@@ -103,7 +103,7 @@
 
 				websocket.onmessage = function(event) {
 					var msg = JSON.parse(event.data);
-					console.log(msg);
+// 					console.log(msg);
 					handleServerEvent(msg);
 				}
 
@@ -200,11 +200,13 @@
 			}
 
 			function initChartsForRecPaths(graphData){
-				var recPathsArray = graphData.recPaths;
 				
+				var recPathsArray = graphData.recPaths;
+
 				for (i = 0; i < recPathsArray.length; ++i) {
 					var recPath = recPathsArray[i];
-					var hashId = getIdFromHash(recPath.hash);
+					var pathHash = recPath.hash;
+					var hashId = getIdFromHash(pathHash);
 					
 				    var title = recPath.path.join(" -> ");
 				    
@@ -223,36 +225,40 @@
 
 					    var divRowMeta = $('<div/>', {'class':'row'}).appendTo(divRow);
 				    	var divRowCollapse = $('<div/>', {'class':'row'}).appendTo(divRow);
-
+					    
+				    	var divButtons = $('<div/>', {'class':'col-sm-2'}).appendTo(divRowMeta);
+						
 				    	/// button
-						$('<input/>', {'class':'col-sm-1'})
+						$('<input/>', {'class':''})
 						.attr({
 					        type: "button",
 					        id: "meta_"+hashId,
-					        value: hashId,
+// 					        value: hashId,
 					        title: title,
 					        "data-toggle": "collapse",
 					        "data-target": "#div_"+hashId
 					    })
-					    .appendTo(divRowMeta);
+					    .appendTo(divButtons);
 				    	
-				    	var pauseButton = $('<input type="checkbox" checked data-toggle="toggle">', {'class':'col-sm-1'})
+				    	var pauseButton = $('<input type="checkbox" checked data-toggle="toggle">', {'class':''})
 							.attr({
 								id: "pause_"+hashId
 							})
-					    	.appendTo(divRowMeta);
+					    	.appendTo(divButtons);
 
 				    	// paint an allowedGraphs svg to use as background for the recorded graphs
 						var divSVG = $('<div/>', {'class':'col-sm-5'}).appendTo(divRowMeta);
-				    	var allowedGraphSVG = drawAllowedPath(
-				    		graphData.paths,
-				    		{
-				    			h: 180,
-				    			nodeRadius: 12,
-				    			strokeWidth: 6,
-				    			paddingY: 20
-				    		}
-				    	);
+						var allowedGraphSVG = drawAllowedPath(
+								"svg_"+pathHash,
+					    		graphData.paths,
+					    		{
+//		 			    			h: 150,
+									hperPath: 50,
+									nodeRadius: 12,
+					    			strokeWidth: 6,
+					    			paddingY: 20
+					    		}
+					    	);
 				    	divSVG.append(allowedGraphSVG);
 				    	
 
