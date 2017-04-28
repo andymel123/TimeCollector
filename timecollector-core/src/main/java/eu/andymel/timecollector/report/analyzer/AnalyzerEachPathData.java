@@ -104,13 +104,13 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 		}
 		
 		long[] spansRemovedToFreeASlot = null;
-		if(collectedSpans.size()==maxNumberOfCollectedPaths){
-			spansRemovedToFreeASlot = collectedSpans.removeFirst();
-		}
 		synchronized (this) {
 			// to prevent concurrent modification while copying this 
 			// list in getCollectedTimes()
 			// TODO read/write lock instead?!
+			if(collectedSpans.size()==maxNumberOfCollectedPaths){
+				spansRemovedToFreeASlot = collectedSpans.removeFirst();
+			}
 			collectedSpans.add(times);	
 		}
 		return spansRemovedToFreeASlot;
