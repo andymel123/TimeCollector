@@ -260,7 +260,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 			var classes = node.getAttribute("class");
 			node.setAttribute("class", classes+" recNode");
 			if(lastHash!=null){
-				recEdges.push(lastHash+"-"+hash);
+				recEdges.push(lastHash+" -> "+hash);
 			}
 			lastHash = hash;
 		}
@@ -280,9 +280,14 @@ function drawAllowedPath(svgId, paths, config, recPath){
 		console.error(n + " nodes should have "+n-1+" edges, but there are " +e+" edges!");
 	}
 	
-	// add own class to mark edges that are part of the recorded path
+	//recPath.datasets.length
+	
+	// add class to each 'line' svg element that represents 
+	// an edge in the recorded path
 	var count = 0;
 	for(var edgeHash in allEdges){
+		
+		
 		var line = allEdges[edgeHash];
 		if(recEdges.includes(edgeHash)){
 			var classes = line.getAttribute("class");
