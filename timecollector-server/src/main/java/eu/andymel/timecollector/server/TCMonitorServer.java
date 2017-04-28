@@ -402,6 +402,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 			
 			// per TimeCollector that went this path
 			idx = -1;
+			
 			for(long[] times: collectedTimes){
 				idx++;
 				if(idx>maxView)break;
@@ -428,7 +429,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 //			hashes.add(hash); 
 
 //			String description = "Showing the last "+collectedTimes.size()+" of "+analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit;
-			String description = String.format("%s, bars: %s, milestones: %s", hash, lables.size(), numberOfRecordedMilestones);
+			String description = String.format("bars: %s, milestones: %s", lables.size(), numberOfRecordedMilestones);
 
 			singleGraphJsonObject.add("path", 			Json.parse(sbPath.toString()));
 			singleGraphJsonObject.add("hash", 			hash);
