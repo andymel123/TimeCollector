@@ -4,7 +4,7 @@
  * https://github.com/andymel123/TimeCollector
  */
 
-function drawAllowedPath(svgId, paths, config){
+function drawAllowedPath(svgId, paths, config, recPath){
 	if(!config)config={};
 	var numberOfPaths = paths.length;
 
