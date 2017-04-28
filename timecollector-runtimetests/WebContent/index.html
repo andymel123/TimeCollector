@@ -103,7 +103,7 @@
 
 				websocket.onmessage = function(event) {
 					var msg = JSON.parse(event.data);
-// 					console.log(msg);
+					console.log(msg);
 					handleServerEvent(msg);
 				}
 

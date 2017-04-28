@@ -4,3 +4,9 @@
 .edge:hover {
   stroke: blue;
 }
+.recNode{
+  fill: red;
+}
+.recEdge{
+  stroke: red;
+}

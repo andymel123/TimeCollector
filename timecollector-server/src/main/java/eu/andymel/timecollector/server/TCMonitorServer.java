@@ -375,7 +375,8 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 					String timeSpanName = tsNameFormat.getTimeSpanName(lastNode, node);
 
 					sbPath.append('"');
-					sbPath.append(lastNode.getId());
+//					sbPath.append(lastNode.getId());
+					sbPath.append(System.identityHashCode(lastNode));
 					sbPath.append("\",");
 					
 					JsonObject dataset = new JsonObject();
@@ -393,7 +394,8 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 			}
 			if(lastNode!=null){
 				sbPath.append('"');
-				sbPath.append(lastNode.getId());
+//				sbPath.append(lastNode.getId());
+				sbPath.append(System.identityHashCode(lastNode));
 				sbPath.append('"');
 			}
 			sbPath.append(']');

@@ -42,6 +42,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 
 	var gapY = (h - 2 * paddingY) / (numberOfPaths - 1);
 	var allNodes = {};
+	var allEdges = {};
 
 	//console.log("rad: "+nodeRadius+"%, padding: "+paddingX+"%/"+paddingY+"#, gapY: "+gapY+"%");
 
@@ -102,7 +103,9 @@ function drawAllowedPath(svgId, paths, config, recPath){
 					var y = 	parseFloat(circ.getAttribute('cy'));
 					var lastX = parseFloat(lastNode.getAttribute('cx'));
 					var lastY = parseFloat(lastNode.getAttribute('cy'));
-
+					var lastNodeHash = lastNode.getAttribute('nodehash');
+					var edgeHash = lastNodeHash+" -> "+nodeHash;
+					
 					if(lastNodeDidAlreadyExist && lastY==y){
 						/*
 						I have to add extra logic here
@@ -136,8 +139,8 @@ function drawAllowedPath(svgId, paths, config, recPath){
 					});
 					svg.appendChild(line);
 					// TODO milestone name as title!
-					addTitle(line, lastNode.getAttribute("id")+ " -> " + nodeId);
-				
+					addTitle(line, edgeHash);
+					allEdges[edgeHash] = line;
 				}
 				lastNodeDidAlreadyExist = true;
 			} else {
@@ -185,10 +188,9 @@ function drawAllowedPath(svgId, paths, config, recPath){
 					var lastX = parseFloat(lastNode.getAttribute('cx'));
 					var lastY = parseFloat(lastNode.getAttribute('cy'));
 					var pathOfLast = lastNode.getAttribute('pathidx');
-					if (pathOfLast != p) {
-						// this is a path split, put the node on the same x pos as the last node (it's on another height)
-						// 			          x = parseInt(lastX);
-					}
+					var lastNodeHash = lastNode.getAttribute('nodehash');
+					var edgeHash = lastNodeHash+" -> "+nodeHash;
+					
 					x =  lastX + gapX;
 					var line = buildNode(svg, 'line', {
 						x1 : lastX,
@@ -203,7 +205,9 @@ function drawAllowedPath(svgId, paths, config, recPath){
 					svg.appendChild(line);
 					
 					//console.log("", line);
-					addTitle(line, lastNode.getAttribute("id") + " -> " + nodeId);
+					addTitle(line, edgeHash);
+					allEdges[edgeHash] = line;
+
 				} else {
 					// this is the first node in this path
 					// this is only possible for the first path
@@ -220,7 +224,8 @@ function drawAllowedPath(svgId, paths, config, recPath){
 					fill : circleColor,
 					id : nodeId,
 					pathidx : p,
-					class : "node"
+					class : "node",
+					nodehash: nodeHash	
 				});
 				allNodes[nodeHash] = circ;
 
@@ -238,10 +243,57 @@ function drawAllowedPath(svgId, paths, config, recPath){
 		
 	}
 	
-	// I append lines(edges) immediately, but the nodes at the end
-	// so that the nodes are on top
+	/* I append lines(edges) immediately, but the nodes at the end
+	 so that the nodes are on top
+	 While I append edges I also add an own class to mark nodes
+	 that are part of the recorded path
+	 I also write edgeHashes to an array to do the same with the 
+	 edges afterwards */
+	var lastHash = null;
+	var recNodes = recPath.path;
+	var recEdges = [];
+	
+	for(var i=0; i<recNodes.length; i++){
+		var hash = recNodes[i];
+		var node = allNodes[hash];
+		if(recNodes.includes(hash)){
+			var classes = node.getAttribute("class");
+			node.setAttribute("class", classes+" recNode");
+			if(lastHash!=null){
+				recEdges.push(lastHash+"-"+hash);
+			}
+			lastHash = hash;
+		}
+		svg.appendChild(node);
+		delete allNodes[hash]; // remove to know which nodes I already added
+	}
+
+	// append nodes that are not in the recorded path
 	for(var hash in allNodes){
-		svg.appendChild(allNodes[hash]);
+		svg.appendChild(allNodes[hash]);	
+	}
+	
+	// just a little check
+	var n = recNodes.length;
+	var e = recEdges.length;
+	if(n-1 != e){
+		console.error(n + " nodes should have "+n-1+" edges, but there are " +e+" edges!");
+	}
+	
+	// add own class to mark edges that are part of the recorded path
+	var count = 0;
+	for(var edgeHash in allEdges){
+		var line = allEdges[edgeHash];
+		if(recEdges.includes(edgeHash)){
+			var classes = line.getAttribute("class");
+			line.setAttribute("class", classes+" recEdge");
+			count++;
+		}
+	}
+	
+	// and another check
+	if(count!=e){
+		console.error("Found just "+count+" edges from "+e);
 	}
 	
 	return svg;
