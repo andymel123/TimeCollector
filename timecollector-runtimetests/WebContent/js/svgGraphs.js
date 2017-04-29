@@ -11,7 +11,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	var edgeColor = 	config.edgeColor 	|| "#bbbbbb"
 	var edgeColor2 = 	config.edgeColor2	|| "#aaaaaa";
 	
-	var hPerPath = 		config.hperPath		|| 50;
+	var hPerPath = 		config.hPerPath		|| 50;
 	var w = 			config.w 			|| 2000;
 	var h = 			config.h 			|| hPerPath * numberOfPaths;
 	var nodeRadius  = 	config.nodeRadius 	|| 12;
@@ -209,6 +209,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	var recNodes = recPath.path;
 	var recEdges = [];
 	var nodeCounters = {};
+	var edgeCounters = {};
 	for(var i=0; i<recNodes.length; i++){
 		var hash = recNodes[i];
 		var node = allCircs[hash];
@@ -223,8 +224,22 @@ function drawAllowedPath(svgId, paths, config, recPath){
 
 		// push one entry to recEdges per visit of this edge
 		if(lastHash!=null){
-			if(nodeCounter[0]==1){
-				recEdges.push(lastHash+" -> "+hash);	
+			var edgeHash = lastHash+" -> "+hash;
+
+			if(edgeHash=="1604839423 -> 1512981843"){
+				var s=1;
+			}
+			
+			var edgeCounter = edgeCounters[edgeHash];
+			if(edgeCounter){
+				edgeCounter[0]++;
+			}else{
+				edgeCounter = edgeCounters[edgeHash] = [1];
+			}
+			
+			
+			if(edgeCounter[0]==1){
+				recEdges.push(edgeHash);	
 			}else{
 				
 				/* this recEdge hash belongs to a edge that has
@@ -239,7 +254,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 				var line = buildEdge2(x,y, lastX,lastY, edgeColor2);
 				realAppend(svg, line, layout);
 				
-				var edgeHash = nodeCounter[0]+"_"+lastHash+" -> "+hash;
+				var edgeHash = edgeCounter[0]+"_"+edgeHash;
 				recEdges.push(edgeHash);
 				allEdges[edgeHash] = line;
 			}
@@ -273,6 +288,11 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	var count = 0;
 	for(var i=0; i<recEdges.length; i++){
 		var edgeHash = recEdges[i];
+		
+		if(edgeHash=="1604839423 -> 1512981843"){
+			var s=1;
+		}
+		
 		var line = allEdges[edgeHash];
 		
 		var dataSet = recPath.datasets[i];
