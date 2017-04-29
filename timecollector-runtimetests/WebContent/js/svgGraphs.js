@@ -44,7 +44,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 
 	// remember all nodes and edges to paint them at the 
 	// end when I already know 
-	var allNodes = {};
+	var allCircs = {};
 	var allEdges = {};
 
 	//console.log("rad: "+nodeRadius+"%, padding: "+paddingX+"%/"+paddingY+"#, gapY: "+gapY+"%");
@@ -84,8 +84,8 @@ function drawAllowedPath(svgId, paths, config, recPath){
 			
 			var firstNodeHash = path[0];
 			var lastNodeHash = path[nodesInThisPath - 1];
-			var firstCirc = allNodes[firstNodeHash];
-			var lastCirc = allNodes[lastNodeHash];
+			var firstCirc = allCircs[firstNodeHash];
+			var lastCirc = allCircs[lastNodeHash];
 			
 			if (firstCirc && lastCirc) {
 				// this path starts and ends with already existing nodes
@@ -102,7 +102,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 		for (var n = 0; n < nodesInThisPath; n++) {
 			var nodeHash = path[n];
 			var nodeId = "n_" + svgId +"_"+nodeHash;
-			var circ = allNodes[nodeHash];
+			var circ = allCircs[nodeHash];
 			if(circ==nextExistingNode){
 				nextExistingNode = null;
 			}
@@ -169,7 +169,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 							// search
 							var nodesTilEnd = 1;
 							for (var a = n+1; a < nodesInThisPath; a++) {
-								var existingNode = allNodes[path[a]];
+								var existingNode = allCircs[path[a]];
 								nodesTilEnd++;
 								if(existingNode){
 									nextExistingNode = existingNode;
@@ -234,11 +234,11 @@ function drawAllowedPath(svgId, paths, config, recPath){
 					class : "node",
 					nodehash: nodeHash	
 				});
-				allNodes[nodeHash] = circ;
+				allCircs[nodeHash] = circ;
 
 				addTitle(circ, nodeHash);
 
-				// console.log("", circ);
+				console.log("added ", circ);
 
 				lastNodeDidAlreadyExist = false;
 			}
@@ -259,12 +259,28 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	var lastHash = null;
 	var recNodes = recPath.path;
 	var recEdges = [];
-	
+	var nodeCounters = {};
 	for(var i=0; i<recNodes.length; i++){
 		var hash = recNodes[i];
-		var node = allNodes[hash];
+		var node = allCircs[hash];
+
+		// I remember which nodes are in the recorded path
+		// as I have to append the others as well
+		var nodeCounter = nodeCounters[hash];
+		if(nodeCounter){
+			nodeCounter[0]++;
+		}else{
+			nodeCounters[hash] = [1];
+		}
+		
 		if(recNodes.includes(hash)){
-			var classes = node.getAttribute("class");
+			var classes = "kaputt";
+			try{
+				classes = node.getAttribute("class");	
+			}catch(e){
+				console.error("Problem with circ '"+hash+"'!"+e, node);
+			}
+			
 			node.setAttribute("class", classes+" recNode");
 			if(lastHash!=null){
 				recEdges.push(lastHash+" -> "+hash);
@@ -272,12 +288,17 @@ function drawAllowedPath(svgId, paths, config, recPath){
 			lastHash = hash;
 		}
 		svg.appendChild(node);
-		delete allNodes[hash]; // remove to know which nodes I already added
+//		delete allCircs[hash]; // remove to know which nodes I already added
+		
+		
 	}
 
 	// append nodes that are not in the recorded path
-	for(var hash in allNodes){
-		svg.appendChild(allNodes[hash]);	
+	for(var hash in nodeCounters){
+		if(nodeCounters[hash][0]==0){
+			// never visited in recorded path
+			svg.appendChild(allCircs[hash]);	
+		}
 	}
 	
 	// just a little check
