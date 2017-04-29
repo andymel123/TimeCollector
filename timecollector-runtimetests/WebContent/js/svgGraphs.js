@@ -8,7 +8,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	if(!config)config={};
 	var numberOfPaths = paths.length;
 
-	var circleColor = 	config.nodeColor 	|| "#999999";
+//	var circleColor = 	config.nodeColor 	|| "#b1b1b1";	css!
 	var edgeColor = 	config.edgeColor 	|| "#bbbbbb"
 	var edgeColor2 = 	config.edgeColor2	|| "#aaaaaa";
 	
@@ -39,22 +39,32 @@ function drawAllowedPath(svgId, paths, config, recPath){
 
 	var paddingX = nodeRadius + paddingX;
 	var paddingY = nodeRadius + paddingY;
-
+	
 	var gapY = (h - 2 * paddingY) / (numberOfPaths - 1);
+
+	// remember all nodes and edges to paint them at the 
+	// end when I already know 
 	var allNodes = {};
 	var allEdges = {};
 
 	//console.log("rad: "+nodeRadius+"%, padding: "+paddingX+"%/"+paddingY+"#, gapY: "+gapY+"%");
 
 	//var x = paddingX;
+	
+	// idx for node x coordinates
+//	var xGridIdx = 0;
+	// idx for node y coordinates
+//	var yGridIdx = 0;
+	// 
+	var yGridIdxExtra = 0;
 	for (var p = 0; p < numberOfPaths; p++) {
 		var path = paths[p];
 		var nodesInThisPath = path.length;
 		var gapX;
 
 		if (p == 0) {
-			// the first path should be the longest
-			// and gapX should fit to the longest path
+//			// the first path should be the longest
+//			// and gapX should fit to the longest path
 			gapX = (w - 2 * paddingX) / (nodesInThisPath - 1);
 		} else {
 			// this is an alternative path
@@ -86,7 +96,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 				} 
 			}
 		}
-		var lastNode = null;
+		var lastCirc = null;
 		var nextExistingNode = null;
 		var lastNodeDidAlreadyExist = false;
 		for (var n = 0; n < nodesInThisPath; n++) {
@@ -98,12 +108,12 @@ function drawAllowedPath(svgId, paths, config, recPath){
 			}
 			if (circ) {
 				// circle was already part of another path
-				if (lastNode) {
+				if (lastCirc) {
 					var x = 	parseFloat(circ.getAttribute('cx'));
 					var y = 	parseFloat(circ.getAttribute('cy'));
-					var lastX = parseFloat(lastNode.getAttribute('cx'));
-					var lastY = parseFloat(lastNode.getAttribute('cy'));
-					var lastNodeHash = lastNode.getAttribute('nodehash');
+					var lastX = parseFloat(lastCirc.getAttribute('cx'));
+					var lastY = parseFloat(lastCirc.getAttribute('cy'));
+					var lastNodeHash = lastCirc.getAttribute('nodehash');
 					var edgeHash = lastNodeHash+" -> "+nodeHash;
 					
 					if(lastNodeDidAlreadyExist && lastY==y){
@@ -122,21 +132,14 @@ function drawAllowedPath(svgId, paths, config, recPath){
 						advance that this will happen to calculate gapY including it 
 						*/
 						
+//						buildExtraPath(lastCirc, circ)
 						y = y-strokeWidth;
 						lastY = lastY-strokeWidth;
 					}
 					
 					// this line connects a node to a node of another path
-					var line = buildNode(svg, 'line', {
-						x1 : lastX,
-						y1 : lastY,
-						x2 : x,
-						y2 : y,
-						stroke : edgeColor2,
-						strokeWidth : strokeWidth,
-						//style:"stroke:#77de68;stroke-width:2",
-						class : "edge edge2"
-					});
+					var line = buildEdge2(lastX,lastY, x,y, edgeColor2);
+
 					svg.appendChild(line);
 					// TODO milestone name as title!
 					addTitle(line, edgeHash);
@@ -148,7 +151,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 				var x = paddingX;
 				var y = paddingY + (gapY * p);
 
-				if (lastNode) {
+				if (lastCirc) {
 					
 					if(p!=0){
 						// in alternative paths I calculate the x position dependant on
@@ -174,7 +177,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 							if(nextExistingNode){
 								// this (part of the) path merges into an already exitsing other path 
 								// a later node was found in the path that already exists
-								var startX = parseFloat(lastNode.getAttribute('cx'));
+								var startX = parseFloat(lastCirc.getAttribute('cx'));
 								var endX = parseFloat(nextExistingNode.getAttribute('cx'));
 								var distance = endX-startX;
 								gapX = distance / nodesTilEnd; 
@@ -185,23 +188,24 @@ function drawAllowedPath(svgId, paths, config, recPath){
 						
 					}
 					
-					var lastX = parseFloat(lastNode.getAttribute('cx'));
-					var lastY = parseFloat(lastNode.getAttribute('cy'));
-					var pathOfLast = lastNode.getAttribute('pathidx');
-					var lastNodeHash = lastNode.getAttribute('nodehash');
+					var lastX = parseFloat(lastCirc.getAttribute('cx'));
+					var lastY = parseFloat(lastCirc.getAttribute('cy'));
+					var pathOfLast = lastCirc.getAttribute('pathidx');
+					var lastNodeHash = lastCirc.getAttribute('nodehash');
 					var edgeHash = lastNodeHash+" -> "+nodeHash;
 					
 					x =  lastX + gapX;
-					var line = buildNode(svg, 'line', {
-						x1 : lastX,
-						y1 : lastY,
-						x2 : x,
-						y2 : y,
-						stroke : edgeColor,
-						strokeWidth : strokeWidth,
-						//style:"stroke:#77de68;stroke-width:2",
-						class : "edge"
-					});
+					var line = buildEdge(lastX,lastY, x,y, edgeColor); 
+//						buildNode(svg, 'line', {
+//						x1 : lastX,
+//						y1 : lastY,
+//						x2 : x,
+//						y2 : y,
+//						stroke : edgeColor,
+//						strokeWidth : strokeWidth,
+//						//style:"stroke:#77de68;stroke-width:2",
+//						class : "edge"
+//					});
 					svg.appendChild(line);
 					
 					//console.log("", line);
@@ -217,11 +221,10 @@ function drawAllowedPath(svgId, paths, config, recPath){
 					}
 				}
 
-				circ = buildNode(svg, 'circle', {
+				circ = buildNode('circle', {
 					cx : x,
 					cy : y,
 					r : nodeRadius,
-					fill : circleColor,
 					id : nodeId,
 					pathidx : p,
 					class : "node",
@@ -236,7 +239,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 				lastNodeDidAlreadyExist = false;
 			}
 
-			lastNode = circ;
+			lastCirc = circ;
 			
 			//if (n == 0) console.log(nodeHash, circ);
 		}
@@ -292,8 +295,8 @@ function drawAllowedPath(svgId, paths, config, recPath){
 			var classes = line.getAttribute("class");
 			line.setAttribute("class", classes+" recEdge");
 			line.setAttribute("stroke", color);
-			var sw = parseInt(line.getAttribute("stroke-width"));
-			line.setAttribute("stroke-width", sw*2);
+//			var sw = parseInt(line.getAttribute("stroke-width"));
+//			line.setAttribute("stroke-width", sw*2);
 			addTitle(line, dataSet.label);
 			count++;
 		}
@@ -307,6 +310,44 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	return svg;
 }
 
+function buildEdge(x1,y1, x2,y2, edgeColor){
+	return buildNode('line', {
+		  x1 : x1
+		, y1 : y1
+		, x2 : x2
+		, y2 : y2
+		, stroke : edgeColor
+//		strokeWidth : strokeWidth,
+		, class : "edge"
+	});
+}
+function buildEdge2(x1,y1, x2,y2, edgeColor){
+	return buildNode('line', {
+		  x1 : x1
+		, y1 : y1
+		, x2 : x2
+		, y2 : y2
+		, stroke : edgeColor
+//		strokeWidth : strokeWidth,
+		, class : "edge edge2"
+	});
+}
+
+function buildExtraPath(circ1, circ2, x1,y1, x2,y2, edgeColor){
+	
+	// TODO path instead of lines
+	
+	var lines = [
+		buildEdge2(x1,yGridIdxExtra,x2,yGridIdxExtra, 	edgeColor),	// main line
+		buildEdge2(x1,y1, 			x1,yGridIdxExtra, 	edgeColor),				// circ1 to main line
+		buildEdge2(x2,y2, 			x2,yGridIdxExtra, 	edgeColor),				// circ2 to main line
+	];
+	
+	/* this field saves the y idx of additional y layers that I need 
+	 * This is such a path placed on an additional layer, so +1 */
+	yGridIdxExtra++;
+}
+
 function addTitle(node, txt) {
 	var title = node.querySelector('title');
 	if(!title){
@@ -318,7 +359,7 @@ function addTitle(node, txt) {
 }
 
 // inspired by http://stackoverflow.com/a/37411738/7869582
-function buildNode(svg, n, v) {
+function buildNode(n, v) {
 	n = document.createElementNS("http://www.w3.org/2000/svg", n);
 	for ( var p in v)
 		n.setAttributeNS(null, p.replace(/[A-Z]/g, function(m, p,

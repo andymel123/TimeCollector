@@ -1,12 +1,27 @@
+.node{
+	fill: #b1b1b1;
+}
 .node:hover {
-  fill: blue;
+	fill: blue;
 }
+
+.edge{
+	/* don't set values for things that I set programmatically for recorded edges 
+	it would be overridden by this css value */
+	stroke-width: 5;
+}
+.edge2{
+}
+
 .edge:hover {
-  stroke: blue;
+/* 	stroke: blue; */
+	stroke-width: 25;
 }
-.recNode{
-  fill: red;
+
+.recNode {
+	fill: #585858;
 }
-.recEdge{
-/*   stroke: red; */
+
+.recEdge {
+	stroke-width: 10;
 }
