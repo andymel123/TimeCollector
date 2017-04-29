@@ -101,6 +101,11 @@ function drawAllowedPath(svgId, paths, config, recPath){
 		var lastNodeDidAlreadyExist = false;
 		for (var n = 0; n < nodesInThisPath; n++) {
 			var nodeHash = path[n];
+			
+			if(nodeHash=="1299641336"){
+				var stop=1;
+			}
+			
 			var nodeId = "n_" + svgId +"_"+nodeHash;
 			var circ = allCircs[nodeHash];
 			if(circ==nextExistingNode){
@@ -116,7 +121,10 @@ function drawAllowedPath(svgId, paths, config, recPath){
 					var lastNodeHash = lastCirc.getAttribute('nodehash');
 					var edgeHash = lastNodeHash+" -> "+nodeHash;
 					
-					if(lastNodeDidAlreadyExist && lastY==y){
+					if(allEdges[edgeHash]){
+						console.warn("edge '"+edgeHash+"' is here multiple times! I just add one and skip any other.");
+					} 
+					else if(lastNodeDidAlreadyExist && lastY==y){
 						/*
 						I have to add extra logic here
 														
@@ -133,17 +141,12 @@ function drawAllowedPath(svgId, paths, config, recPath){
 						*/
 						
 						var line = buildExtraPath(lastCirc, circ, x,y, lastX,lastY, edgeColor2, yGridIdxExtra);
-//						svg.appendChild(line);
 						addTitle(line, edgeHash);
 						allEdges[edgeHash] = line;
-//						y = y-strokeWidth;
-//						lastY = lastY-strokeWidth;
 					}else{
 						// this line connects a node to a node of another path
+						// add edge
 						var line = buildEdge2(lastX,lastY, x,y, edgeColor2);
-
-//						svg.appendChild(line);
-						// TODO milestone name as title!
 						addTitle(line, edgeHash);
 						allEdges[edgeHash] = line;
 					}
@@ -197,24 +200,16 @@ function drawAllowedPath(svgId, paths, config, recPath){
 					var pathOfLast = lastCirc.getAttribute('pathidx');
 					var lastNodeHash = lastCirc.getAttribute('nodehash');
 					var edgeHash = lastNodeHash+" -> "+nodeHash;
-					
-					x =  lastX + gapX;
-					var line = buildEdge(lastX,lastY, x,y, edgeColor); 
-//						buildNode(svg, 'line', {
-//						x1 : lastX,
-//						y1 : lastY,
-//						x2 : x,
-//						y2 : y,
-//						stroke : edgeColor,
-//						strokeWidth : strokeWidth,
-//						//style:"stroke:#77de68;stroke-width:2",
-//						class : "edge"
-//					});
-//					svg.appendChild(line);
-					
-					//console.log("", line);
-					addTitle(line, edgeHash);
-					allEdges[edgeHash] = line;
+
+					if(allEdges[edgeHash]){
+						console.warn("edge '"+edgeHash+"' is here multiple times! I just add one and skip any other.");
+					} else {
+						// add edge
+						x =  lastX + gapX;
+						var line = buildEdge(lastX,lastY, x,y, edgeColor); 
+						addTitle(line, edgeHash);
+						allEdges[edgeHash] = line;
+					} 
 
 				} else {
 					// this is the first node in this path
@@ -259,6 +254,11 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	 so that the nodes are on top*/
 	
 	for(var edgeHash in allEdges){
+		
+		if(edgeHash=="1604839423 -> 1299641336"){
+			var stop=1;
+		}
+		
 		var edge = allEdges[edgeHash];
 		realAppend(svg, edge);
 	}
