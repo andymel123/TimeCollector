@@ -238,8 +238,6 @@ function drawAllowedPath(svgId, paths, config, recPath){
 
 				addTitle(circ, nodeHash);
 
-				console.log("added ", circ);
-
 				lastNodeDidAlreadyExist = false;
 			}
 
@@ -250,6 +248,8 @@ function drawAllowedPath(svgId, paths, config, recPath){
 		
 	}
 	
+	var realYLayers = numberOfPaths + yGridIdxExtra[0];
+	console.log("Real y layers: "+realYLayers);
 	/* I append lines(edges) immediately, but the nodes at the end
 	 so that the nodes are on top
 	 While I append edges I also add an own class to mark nodes
@@ -382,6 +382,7 @@ function buildExtraPath(circ1, circ2, x1,y1, x2,y2, edgeColor, yGridIdxExtra){
 		, stroke: edgeColor
 		, fill: "none"
 		, class: "edge edge2"
+		, extraLayer: true
 	});
 	
 	/* this field saves the y idx of additional y layers that I need 
