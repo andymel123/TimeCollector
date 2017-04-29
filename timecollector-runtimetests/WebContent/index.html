@@ -8,6 +8,10 @@
 		<link href="css/bootstrap.css" rel="stylesheet">
    		<script src="js/bootstrap.js"></script>
 
+		<!-- toggle buttons -->
+		<link href="css/bootstrap-toggle.min.css" rel="stylesheet">
+		<script src="js/bootstrap-toggle.min.js"></script>
+
 		<!-- for painting the charts -->
 		<script src="js/Chart.js"></script>
 		
@@ -18,9 +22,6 @@
 		<script src="js/svgGraphs.js"></script>
 		<link href="css/svgGraphs.css" rel="stylesheet">
 		
-		<!-- toggle buttons -->
-		<link href="css/bootstrap-toggle.min.css" rel="stylesheet">
-		<script src="js/bootstrap-toggle.min.js"></script>
 		
 		
 		<style type="text/css">
@@ -68,7 +69,9 @@
 	<body>
 			
 		<div class="container" id="wrapper">
-			<nav class="navbar navbar-default navbar-fixed-top">
+<!-- 			<nav class="navbar navbar-default navbar-fixed-top"> -->
+			<nav class="navbar navbar-default navbar-static-top">
+			
 				<p id="pDescription"></p>
 			</nav>
 		
@@ -92,10 +95,8 @@
 			var chartDivs = {};
 			var pauseCBs = {};
 			
-// 			initChart();
-			
 			openWebsocket();
-		
+			
 			function openWebsocket(){
 				
 				websocket = new WebSocket(getWebSocketPath());
@@ -221,14 +222,14 @@
 				    }else{
 
 					    // div row
-				    	var divRow = $('<div/>', {'class':'row'})
+				    	var divRow = $('<div/>', {'class':'row divOnePathRow'})
 				    		.attr({
 								title: title
 							})
 					    	.appendTo(chartsContainer);
 
 					    var divRowMeta = $('<div/>', {'class':'row'}).appendTo(divRow);
-				    	var divRowCollapse = $('<div/>', {'class':'row'}).appendTo(divRow);
+				    	var divRowCollapse = $('<div/>', {'class':'row graphstyle'}).appendTo(divRow);
 					    
 				    	var divButtons = $('<div/>', {'class':'col-sm-2'}).appendTo(divRowMeta);
 						
@@ -251,7 +252,7 @@
 					    	.appendTo(divButtons);
 
 				    	// paint an allowedGraphs svg to use as background for the recorded graphs
-						var divSVG = $('<div/>', {'class':'col-sm-5'}).appendTo(divRowMeta);
+						var divSVG = $('<div/>', {'class':'col-sm-5 graphstyle'}).appendTo(divRowMeta);
 						var allowedGraphSVG = drawAllowedPath(
 								"svg_"+pathHash,
 					    		graphData.paths,

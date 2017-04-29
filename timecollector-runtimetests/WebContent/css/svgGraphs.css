@@ -1,9 +1,24 @@
+.divOnePathRow{
+    border-top-color: #b5b5b5;
+    border-top-style: double;
+}
+
+.svg_allowedGraph{
+	background-color: #eee;
+	border-radius: 5px;
+}
+
+
 .node{
 	fill: #b1b1b1;
 }
 .node:hover {
 	fill: blue;
 }
+.recNode {
+	fill: #585858;
+}
+
 
 .edge{
 	/* don't set values for things that I set programmatically for recorded edges 
@@ -12,16 +27,10 @@
 }
 .edge2{
 }
-
 .edge:hover {
-/* 	stroke: blue; */
 	stroke-width: 25;
 }
-
-.recNode {
-	fill: #585858;
-}
-
 .recEdge {
 	stroke-width: 10;
 }
+
