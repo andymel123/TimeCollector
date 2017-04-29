@@ -1,9 +1,8 @@
-package eu.andymel.timecollector;
+package eu.andymel.timecollector.util.teststuff;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.Random;
 
 /**
  * 
@@ -16,17 +15,9 @@ import java.util.Random;
  * @author andymatic
  *
  */
-public class TestClockIncrementRandom extends Clock {
+public class TestClockIncrementBy1 extends Clock {
 
-	private Random rng = new Random();
-	private long time = rng.nextInt(1_000_000);
-	private int minIncrement;
-	private int incrementSpan;
-	
-	public TestClockIncrementRandom(int minIncrement, int maxIncrement) {
-		this.minIncrement = minIncrement;
-		this.incrementSpan = maxIncrement-minIncrement;
-	}
+	long count = 0;
 	
 	@Override
 	public ZoneId getZone() {
@@ -40,8 +31,7 @@ public class TestClockIncrementRandom extends Clock {
 
 	@Override
 	public Instant instant() {
-		time = time + rng.nextInt(incrementSpan)+minIncrement;
-		return Instant.ofEpochMilli(time);
+		return Instant.ofEpochMilli(count++);
 	}
 	
 }

@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
+import eu.andymel.timecollector.util.teststuff.TestClockIncrementBy1;
 
 public class SerialPathFromEnumTest {
 

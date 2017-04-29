@@ -1,9 +1,5 @@
 package eu.andymel.timecollector;
 
-import static eu.andymel.timecollector.PathTestUtils.checkRecPath;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.time.Instant;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
@@ -16,6 +12,7 @@ import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.report.analyzer.AnalyzerAvgPath;
+import eu.andymel.timecollector.util.teststuff.TestClockIncrementBy1;
 
 public class LongPathTest {
 

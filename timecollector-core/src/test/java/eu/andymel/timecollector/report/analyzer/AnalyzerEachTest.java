@@ -10,14 +10,13 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.andymel.timecollector.TestClockIncrementBy1;
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.graphs.PermissionNode;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
-import eu.andymel.timecollector.report.analyzer.AnalyzerEachTest.SmallTestMilestones;
+import eu.andymel.timecollector.util.teststuff.TestClockIncrementBy1;
 
 public class AnalyzerEachTest {
 

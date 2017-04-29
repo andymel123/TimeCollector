@@ -1,8 +1,10 @@
 package eu.andymel.timecollector;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+
+import eu.andymel.timecollector.util.teststuff.TestClockIncrementRandom;
 
 public class TestClockIncrementRandomTest {
 

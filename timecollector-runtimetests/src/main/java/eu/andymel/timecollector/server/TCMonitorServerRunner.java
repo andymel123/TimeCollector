@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.report.analyzer.Analyzer;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
+import eu.andymel.timecollector.teststuff.TestClockIncrementRandom;
 import eu.andymel.timecollector.teststuff.TestTimeCollectorProvider;
 import eu.andymel.timecollector.teststuff.TestTimeCollectorProvider.TestMilestones;
-import eu.andymel.timecollector.util.NanoClock;
 
 
 
@@ -21,9 +21,10 @@ public class TCMonitorServerRunner {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(TCMonitorServerRunner.class);
 	
-	private final static Clock tcClock = new NanoClock();
+//	private final static Clock tcClock = new NanoClock();
+	private final static Clock tcClock = new TestClockIncrementRandom(500, 1000);
 	
-	;
+	
 	private final static TestMilestones[] milestones;
 	static{
 		milestones = new TestMilestones[]{
@@ -135,7 +136,10 @@ public class TCMonitorServerRunner {
 		int maxMS = 20;
 		Supplier<TimeCollectorWithPath<TestMilestones>> tcSupplier = ()->{
 			TimeCollectorWithPath<TestMilestones> tc = TestTimeCollectorProvider.getTC(tcClock);
-			walkPath(tc, minMS + rng.nextInt(maxMS-minMS));
+//			walkPath(tc, minMS + rng.nextInt(maxMS-minMS));
+//			walkPath(tc, 5); 
+			walkPath(tc, 5 + rng.nextInt(2));
+			
 			return tc;
 		};
 					
@@ -160,7 +164,7 @@ public class TCMonitorServerRunner {
 			
 			LOG.info("Start to generate test data...");
 			runTest(
-				100, 		// the test adds this amount of timeCollectors per second
+				10, 		// the test adds this amount of timeCollectors per second
 				analyzer,	// the analyzer to add the timeCollectors to
 				stopTest,
 				tcSupplier
@@ -215,6 +219,11 @@ public class TCMonitorServerRunner {
 //			}
 //		}
 		
+		if(len==5){
+			walkPathWithRepeat(tc);
+			return;
+		}
+		
 		if(len>milestones.length)return;
 		
 		for(int i=0; i<len;i++){
@@ -230,104 +239,51 @@ public class TCMonitorServerRunner {
 
 	
 	
-//	private static void walkPath0(TimeCollectorWithPath<TestMilestones> tc) {
-////LOG.info("path0");
-//tc.saveTime(TestMilestones.CREATION);
-//tc.saveTime(TestMilestones.HANDLER_CTX_S);
-//tc.saveTime(TestMilestones.SEARCH_HANDLER_S);
-//tc.saveTime(TestMilestones.SEARCH_HANDLER_E);
-//tc.saveTime(TestMilestones.HANDLER_S);
-//tc.saveTime(TestMilestones.DAO_GET_S);
-//tc.saveTime(TestMilestones.DBPOOL_S);
-//tc.saveTime(TestMilestones.DBPOOL_E);
-//tc.saveTime(TestMilestones.DB_GET_S);
-//tc.saveTime(TestMilestones.DB_GET_E);
-//tc.saveTime(TestMilestones.DAO_GET_E);
-//tc.saveTime(TestMilestones.CALC1_S);
-//tc.saveTime(TestMilestones.CALC1_E);
-//tc.saveTime(TestMilestones.DECIDER_S);
-//tc.saveTime(TestMilestones.DECIDER_E);
-//tc.saveTime(TestMilestones.DAO_SAVE_S);
-//tc.saveTime(TestMilestones.DBPOOL_S);
-//tc.saveTime(TestMilestones.DBPOOL_E);
-//tc.saveTime(TestMilestones.DB_SAVE1_S);
-//tc.saveTime(TestMilestones.DB_SAVE1_E);
-//tc.saveTime(TestMilestones.DAO_SAVE_E);
-//tc.saveTime(TestMilestones.HANDLER_E);
-//tc.saveTime(TestMilestones.HANDLER_CTX_E);
-//}
-//
-//private static void walkPath1(TimeCollectorWithPath<TestMilestones> tc) {
-////LOG.info("path1");
-//tc.saveTime(TestMilestones.CREATION);
-//tc.saveTime(TestMilestones.HANDLER_CTX_S);
-//tc.saveTime(TestMilestones.SEARCH_HANDLER_S);
-//tc.saveTime(TestMilestones.SEARCH_HANDLER_E);
-//tc.saveTime(TestMilestones.HANDLER_S);
-//tc.saveTime(TestMilestones.DAO_GET_S);
-//tc.saveTime(TestMilestones.DBPOOL_S);
-//tc.saveTime(TestMilestones.DBPOOL_E);
-//tc.saveTime(TestMilestones.DB_GET_S);
-//tc.saveTime(TestMilestones.DB_GET_E);
-//tc.saveTime(TestMilestones.DAO_GET_E);
-//tc.saveTime(TestMilestones.CALC1_S);
-//tc.saveTime(TestMilestones.CALC1_E);
-//tc.saveTime(TestMilestones.DECIDER_S);
-//tc.saveTime(TestMilestones.DECIDER_E);
-//tc.saveTime(TestMilestones.DAO_SAVE_S);
-//tc.saveTime(TestMilestones.DBPOOL_S);
-//tc.saveTime(TestMilestones.DBPOOL_E);
-//tc.saveTime(TestMilestones.DB_SAVE2_S);
-//tc.saveTime(TestMilestones.DB_SAVE2_E);
-//tc.saveTime(TestMilestones.DAO_SAVE_E);
-//tc.saveTime(TestMilestones.HANDLER_E);
-//tc.saveTime(TestMilestones.HANDLER_CTX_E);
-//
-//}
-//
-//private static void walkPath2(TimeCollectorWithPath<TestMilestones> tc) {
-////LOG.info("path2");
-//tc.saveTime(TestMilestones.CREATION);
-//tc.saveTime(TestMilestones.HANDLER_CTX_S);
-//tc.saveTime(TestMilestones.SEARCH_HANDLER_S);
-//tc.saveTime(TestMilestones.SEARCH_HANDLER_E);
-//tc.saveTime(TestMilestones.HANDLER_S);
-//tc.saveTime(TestMilestones.DAO_GET_S);
-//tc.saveTime(TestMilestones.DBPOOL_S);
-//tc.saveTime(TestMilestones.DBPOOL_E);
-//tc.saveTime(TestMilestones.DB_GET_S);
-//tc.saveTime(TestMilestones.DB_GET_E);
-//tc.saveTime(TestMilestones.DAO_GET_E);
-//tc.saveTime(TestMilestones.CALC1_S);
-//tc.saveTime(TestMilestones.CALC1_E);
-//tc.saveTime(TestMilestones.DECIDER_S);
-//tc.saveTime(TestMilestones.DECIDER_E);
-//tc.saveTime(TestMilestones.DAO_SAVE_S);
-//tc.saveTime(TestMilestones.DBPOOL_S);
-//tc.saveTime(TestMilestones.DBPOOL_E);
-//tc.saveTime(TestMilestones.DB_SAVE1_S);
-//// retry
-//tc.saveTime(TestMilestones.RETRY);
-//tc.saveTime(TestMilestones.DB_SAVE1_E);
-//tc.saveTime(TestMilestones.DAO_SAVE_E);
-//
-//tc.saveTime(TestMilestones.DAO_GET_S);
-//tc.saveTime(TestMilestones.DBPOOL_S);
-//tc.saveTime(TestMilestones.DBPOOL_E);
-//tc.saveTime(TestMilestones.DB_GET_S);
-//tc.saveTime(TestMilestones.DB_GET_E);
-//tc.saveTime(TestMilestones.DAO_GET_E);
-//tc.saveTime(TestMilestones.CALC1_S);
-//tc.saveTime(TestMilestones.CALC1_E);
-//tc.saveTime(TestMilestones.DECIDER_S);
-//tc.saveTime(TestMilestones.DECIDER_E);
-//tc.saveTime(TestMilestones.DAO_SAVE_S);
-//tc.saveTime(TestMilestones.DBPOOL_S);
-//tc.saveTime(TestMilestones.DBPOOL_E);
-//tc.saveTime(TestMilestones.DB_SAVE1_S);
-//tc.saveTime(TestMilestones.DB_SAVE1_E);
-//tc.saveTime(TestMilestones.DAO_SAVE_E);
-//tc.saveTime(TestMilestones.HANDLER_E);
-//tc.saveTime(TestMilestones.HANDLER_CTX_E);
-//}
+
+
+	private static void walkPathWithRepeat(TimeCollectorWithPath<TestMilestones> tc) {
+		// LOG.info("path2");
+		tc.saveTime(TestMilestones.CREATION);
+		tc.saveTime(TestMilestones.HANDLER_CTX_S);
+		tc.saveTime(TestMilestones.SEARCH_HANDLER_S);
+		tc.saveTime(TestMilestones.SEARCH_HANDLER_E);
+		tc.saveTime(TestMilestones.HANDLER_S);
+		tc.saveTime(TestMilestones.DAO_GET_S);
+		tc.saveTime(TestMilestones.DBPOOL_S);
+		tc.saveTime(TestMilestones.DBPOOL_E);
+		tc.saveTime(TestMilestones.DB_GET_S);
+		tc.saveTime(TestMilestones.DB_GET_E);
+		tc.saveTime(TestMilestones.DAO_GET_E);
+		tc.saveTime(TestMilestones.CALC1_S);
+		tc.saveTime(TestMilestones.CALC1_E);
+		tc.saveTime(TestMilestones.DECIDER_S);
+		tc.saveTime(TestMilestones.DECIDER_E);
+		tc.saveTime(TestMilestones.DAO_SAVE_S);
+		tc.saveTime(TestMilestones.DBPOOL_S);
+		tc.saveTime(TestMilestones.DBPOOL_E);
+		tc.saveTime(TestMilestones.DB_SAVE1_S);
+		// retry
+		tc.saveTime(TestMilestones.RETRY);
+		tc.saveTime(TestMilestones.DB_SAVE1_E);
+		tc.saveTime(TestMilestones.DAO_SAVE_E);
+
+		tc.saveTime(TestMilestones.DAO_GET_S);
+		tc.saveTime(TestMilestones.DBPOOL_S);
+		tc.saveTime(TestMilestones.DBPOOL_E);
+		tc.saveTime(TestMilestones.DB_GET_S);
+		tc.saveTime(TestMilestones.DB_GET_E);
+		tc.saveTime(TestMilestones.DAO_GET_E);
+		tc.saveTime(TestMilestones.CALC1_S);
+		tc.saveTime(TestMilestones.CALC1_E);
+		tc.saveTime(TestMilestones.DECIDER_S);
+		tc.saveTime(TestMilestones.DECIDER_E);
+		tc.saveTime(TestMilestones.DAO_SAVE_S);
+		tc.saveTime(TestMilestones.DBPOOL_S);
+		tc.saveTime(TestMilestones.DBPOOL_E);
+		tc.saveTime(TestMilestones.DB_SAVE1_S);
+		tc.saveTime(TestMilestones.DB_SAVE1_E);
+		tc.saveTime(TestMilestones.DAO_SAVE_E);
+		tc.saveTime(TestMilestones.HANDLER_E);
+		tc.saveTime(TestMilestones.HANDLER_CTX_E);
+	}
 }

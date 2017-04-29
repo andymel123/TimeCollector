@@ -12,6 +12,7 @@ import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.graphs.PermissionNode;
+import eu.andymel.timecollector.util.teststuff.TestClockIncrementBy1;
 
 public class NodesAndEdgesTest {
 
