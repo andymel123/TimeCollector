@@ -133,7 +133,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 						*/
 						
 						var line = buildExtraPath(lastCirc, circ, x,y, lastX,lastY, edgeColor2, yGridIdxExtra);
-						svg.appendChild(line);
+//						svg.appendChild(line);
 						addTitle(line, edgeHash);
 						allEdges[edgeHash] = line;
 //						y = y-strokeWidth;
@@ -142,7 +142,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 						// this line connects a node to a node of another path
 						var line = buildEdge2(lastX,lastY, x,y, edgeColor2);
 
-						svg.appendChild(line);
+//						svg.appendChild(line);
 						// TODO milestone name as title!
 						addTitle(line, edgeHash);
 						allEdges[edgeHash] = line;
@@ -210,7 +210,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 //						//style:"stroke:#77de68;stroke-width:2",
 //						class : "edge"
 //					});
-					svg.appendChild(line);
+//					svg.appendChild(line);
 					
 					//console.log("", line);
 					addTitle(line, edgeHash);
@@ -249,13 +249,22 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	}
 	
 	var realYLayers = numberOfPaths + yGridIdxExtra[0];
-	console.log("Real y layers: "+realYLayers);
-	/* I append lines(edges) immediately, but the nodes at the end
-	 so that the nodes are on top
-	 While I append edges I also add an own class to mark nodes
-	 that are part of the recorded path
-	 I also write edgeHashes to an array to do the same with the 
-	 edges afterwards */
+	
+	var yFactor = numberOfPaths / realYLayers; 
+	
+	console.log("Real y layers: "+realYLayers+", factor: "+yFactor);
+	
+	
+	/* I append lines(edges) first, the nodes at the end
+	 so that the nodes are on top*/
+	
+	for(var edgeHash in allEdges){
+		var edge = allEdges[edgeHash];
+		realAppend(svg, edge);
+	}
+	
+	/* I go through the recorded path and add a class to mark 
+	 * nodes and edges that are part of the recorded path */
 	var lastHash = null;
 	var recNodes = recPath.path;
 	var recEdges = [];
@@ -287,17 +296,19 @@ function drawAllowedPath(svgId, paths, config, recPath){
 			}
 			lastHash = hash;
 		}
-		svg.appendChild(node);
+//		svg.appendChild(node);
+		realAppend(svg, node);
 //		delete allCircs[hash]; // remove to know which nodes I already added
-		
 		
 	}
 
 	// append nodes that are not in the recorded path
-	for(var hash in nodeCounters){
-		if(nodeCounters[hash][0]==0){
+	for(var hash in allCircs){
+		var nodeCounter = nodeCounters[hash];
+		if(!nodeCounter || nodeCounter[0]==0){
 			// never visited in recorded path
-			svg.appendChild(allCircs[hash]);	
+//			svg.appendChild(allCircs[hash]);
+			realAppend(svg, allCircs[hash]);
 		}
 	}
 	
@@ -333,6 +344,10 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	}
 	
 	return svg;
+}
+
+function realAppend(svg, elem){
+	svg.appendChild(elem);
 }
 
 function buildEdge(x1,y1, x2,y2, edgeColor){
