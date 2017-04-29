@@ -283,17 +283,18 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	// add class to each 'line' svg element that represents 
 	// an edge in the recorded path
 	var count = 0;
-//	for(var edgeHash in allEdges){
 	for(var i=0; i<recEdges.length; i++){
 		var edgeHash = recEdges[i];
 		var line = allEdges[edgeHash];
-		var color = recPath.datasets[i].backgroundColor;
+		var dataSet = recPath.datasets[i];
+		var color = dataSet.backgroundColor;
 		if(recEdges.includes(edgeHash)){
 			var classes = line.getAttribute("class");
 			line.setAttribute("class", classes+" recEdge");
 			line.setAttribute("stroke", color);
 			var sw = parseInt(line.getAttribute("stroke-width"));
 			line.setAttribute("stroke-width", sw*2);
+			addTitle(line, dataSet.label);
 			count++;
 		}
 	}
@@ -307,10 +308,13 @@ function drawAllowedPath(svgId, paths, config, recPath){
 }
 
 function addTitle(node, txt) {
-	var title = document.createElementNS(
-			"http://www.w3.org/2000/svg", "title");
+	var title = node.querySelector('title');
+	if(!title){
+		var title = document.createElementNS(
+				"http://www.w3.org/2000/svg", "title");
+		node.append(title)
+	}
 	title.textContent = txt;
-	node.append(title)
 }
 
 // inspired by http://stackoverflow.com/a/37411738/7869582
