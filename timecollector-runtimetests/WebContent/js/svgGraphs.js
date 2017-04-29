@@ -56,7 +56,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	// idx for node y coordinates
 //	var yGridIdx = 0;
 	// 
-	var yGridIdxExtra = 0;
+	var yGridIdxExtra = [0];
 	for (var p = 0; p < numberOfPaths; p++) {
 		var path = paths[p];
 		var nodesInThisPath = path.length;
@@ -132,18 +132,22 @@ function drawAllowedPath(svgId, paths, config, recPath){
 						advance that this will happen to calculate gapY including it 
 						*/
 						
-//						buildExtraPath(lastCirc, circ)
-						y = y-strokeWidth;
-						lastY = lastY-strokeWidth;
+						var line = buildExtraPath(lastCirc, circ, x,y, lastX,lastY, edgeColor2, yGridIdxExtra);
+						svg.appendChild(line);
+						addTitle(line, edgeHash);
+						allEdges[edgeHash] = line;
+//						y = y-strokeWidth;
+//						lastY = lastY-strokeWidth;
+					}else{
+						// this line connects a node to a node of another path
+						var line = buildEdge2(lastX,lastY, x,y, edgeColor2);
+
+						svg.appendChild(line);
+						// TODO milestone name as title!
+						addTitle(line, edgeHash);
+						allEdges[edgeHash] = line;
 					}
 					
-					// this line connects a node to a node of another path
-					var line = buildEdge2(lastX,lastY, x,y, edgeColor2);
-
-					svg.appendChild(line);
-					// TODO milestone name as title!
-					addTitle(line, edgeHash);
-					allEdges[edgeHash] = line;
 				}
 				lastNodeDidAlreadyExist = true;
 			} else {
@@ -333,19 +337,35 @@ function buildEdge2(x1,y1, x2,y2, edgeColor){
 	});
 }
 
-function buildExtraPath(circ1, circ2, x1,y1, x2,y2, edgeColor){
+function buildExtraPath(circ1, circ2, x1,y1, x2,y2, edgeColor, yGridIdxExtra){
 	
 	// TODO path instead of lines
 	
-	var lines = [
-		buildEdge2(x1,yGridIdxExtra,x2,yGridIdxExtra, 	edgeColor),	// main line
-		buildEdge2(x1,y1, 			x1,yGridIdxExtra, 	edgeColor),				// circ1 to main line
-		buildEdge2(x2,y2, 			x2,yGridIdxExtra, 	edgeColor),				// circ2 to main line
-	];
+//	var lines = [
+//		buildEdge2(x1,yGridIdxExtra,x2,yGridIdxExtra, 	edgeColor),	// main line
+//		buildEdge2(x1,y1, 			x1,yGridIdxExtra, 	edgeColor),				// circ1 to main line
+//		buildEdge2(x2,y2, 			x2,yGridIdxExtra, 	edgeColor),				// circ2 to main line
+//	];
+//	
+	
+	// use the actual value of extra y layer as 
+	// height (0,1,2,...), this is multiplied later
+	var yIdx = ++yGridIdxExtra[0];
+//	yGridIdxExtra[0]++;	// each additional path gets an own y idx
+	
+	return buildNode('path', {
+		d: 	 "M"+x1+" "+y1		// move to first node
+			+"L"+x1+" "+yIdx	// line to extra layer x=firstNode
+			+"L"+x2+" "+yIdx	// line on extra layer x=secondNode
+			+"L"+x2+" "+y2		// line to secondNode
+		, stroke: edgeColor
+		, fill: "none"
+		, class: "edge edge2"
+	});
 	
 	/* this field saves the y idx of additional y layers that I need 
 	 * This is such a path placed on an additional layer, so +1 */
-	yGridIdxExtra++;
+	
 }
 
 function addTitle(node, txt) {
