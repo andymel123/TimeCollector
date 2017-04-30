@@ -19,6 +19,8 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	var paddingX = 		config.paddingX 	|| 15;
 	var paddingY = 		config.paddingY 	|| 15;
 	
+	paddingY = 50;
+	
 	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	svg.setAttribute("id", svgId);
 	svg.setAttribute("width", "100%");
@@ -29,8 +31,28 @@ function drawAllowedPath(svgId, paths, config, recPath){
 
 	var paddingX = nodeRadius + paddingX;
 	var paddingY = nodeRadius + paddingY;
+
 	
-	var gapY = (h - 2 * paddingY) / (numberOfPaths - 1);
+	var gapY = (h - 2 * paddingY) / (numberOfPaths-1);
+
+	var paddingTestRect1 = buildNode('rect', {
+		x: paddingX, y: paddingY, 
+		width: w-2*paddingX, height: h-2*paddingY, 
+		fill:'none'
+		, stroke:'black', strokeWidth:1 
+	})
+	svg.appendChild(paddingTestRect1);
+	
+	var paddingTestRect2 = buildNode('rect', {
+		x: paddingX, y: paddingY, 
+		width: w-2*paddingX, height: (numberOfPaths-1)*gapY, 
+		fill:'none'
+		, stroke:'red', strokeWidth:1 
+	})
+	svg.appendChild(paddingTestRect2);
+	
+	
+	
 
 	// remember all nodes and edges to paint them at the 
 	// end when I already know 
@@ -188,7 +210,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	
 	// infos that I need when appending the elements to the svg
 	var layout = {
-		factor: numberOfPaths / realYLayers,
+		factor: (numberOfPaths-1) / (realYLayers-1),
 		numberOfOrigPaths: numberOfPaths,
 		origGapY: gapY,
 		paddingY: paddingY
@@ -336,11 +358,16 @@ function realAppend(svg, elem, layout){
 //			paddingY: paddingY
 //		}
 		
+		var gap = layout.origGapY * layout.factor;
+		
+		var transform = function(origY){
+			// multiply by factor (but don't multiply the padding!)
+			return (origY-layout.paddingY) * layout.factor +layout.paddingY;
+		}
 		
 		if(elem.getAttribute("extra-layer")){
 			// this is an extra path
-			var offsetY = (layout.paddingY + layout.numberOfOrigPaths * layout.origGapY)*layout.factor;
-			var gap = layout.origGapY * layout.factor;
+			var offsetY = layout.paddingY + (layout.numberOfOrigPaths * gap);
 			switch(elem.nodeName){
 				case "line":{
 					var y1 = parseFloat(elem.getAttribute("y1"));
@@ -356,8 +383,8 @@ function realAppend(svg, elem, layout){
 					var y2 = parseFloat(elem.getAttribute("ny2"));
 					var yIdx = parseInt(elem.getAttribute("y-idx"));
 					
-					var newY1 = y1 * layout.factor;
-					var newY2 = y2 * layout.factor;
+					var newY1 = transform(y1);
+					var newY2 = transform(y2);
 					var yE = offsetY + yIdx * gap
 					
 					var pathString = 
@@ -382,13 +409,13 @@ function realAppend(svg, elem, layout){
 				case "line":{
 					var y1 = parseFloat(elem.getAttribute("y1"));
 					var y2 = parseFloat(elem.getAttribute("y2"));
-					elem.setAttribute("y1", y1 * layout.factor);
-					elem.setAttribute("y2", y2 * layout.factor);
+					elem.setAttribute("y1", transform(y1));
+					elem.setAttribute("y2", transform(y2));
 					break;
 				}
 				case "circle":{
 					var cy = parseFloat(elem.getAttribute("cy"));
-					elem.setAttribute("cy", cy * layout.factor);
+					elem.setAttribute("cy", transform(cy));
 					break;
 				}
 				default:{

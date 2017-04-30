@@ -252,13 +252,13 @@
 					    	.appendTo(divButtons);
 
 				    	// paint an allowedGraphs svg to use as background for the recorded graphs
-						var divSVG = $('<div/>', {'class':'col-sm-10 graphstyle'}).appendTo(divRowMeta);
+						var divSVG = $('<div/>', {'class':'col-sm-5 graphstyle'}).appendTo(divRowMeta);
 						var allowedGraphSVG = drawAllowedPath(
 								"svg_"+pathHash,
 					    		graphData.paths,
 					    		{
 //		 			    			h: 150,
-									hPerPath: 50,
+									hPerPath: 150,
 									nodeRadius: 12,
 					    			strokeWidth: 6,
 					    			paddingY: 20
