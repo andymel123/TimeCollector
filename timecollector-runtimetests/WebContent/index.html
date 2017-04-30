@@ -221,20 +221,23 @@
 				    	continue;
 				    }else{
 
-					    // div row
+					    // one div per recorded path (row + col div)
 				    	var divRow = $('<div/>', {'class':'row divOnePathRow'})
 				    		.attr({
 								title: title
 							})
 					    	.appendTo(chartsContainer);
-
-					    var divRowMeta = $('<div/>', {'class':'row'}).appendTo(divRow);
-				    	var divRowCollapse = $('<div/>', {'class':'row graphstyle'}).appendTo(divRow);
+						var div12Col = $('<div/>', {'class':'col-xs-12'}).appendTo(divRow);
+					    
+						// 2 rows: 1 always visible meta data row, 1 collapsable for the graphs 
+					    var divRowMeta = $('<div/>', {'class':'row'}).appendTo(div12Col);
+				    	var divRowCollapse = $('<div/>', {'class':'row graphstyle'}).appendTo(div12Col);
 					    
 				    	var divButtons = $('<div/>', {'class':'col-sm-2'}).appendTo(divRowMeta);
+						var divButtonRow = $('<div/>', {'class':'row'}).appendTo(divButtons);
 						
 				    	/// button
-						$('<input/>', {'class':''})
+						$('<input/>', {'class':'col-sm-9'})
 						.attr({
 					        type: "button",
 					        id: "meta_"+hashId,
@@ -243,13 +246,15 @@
 					        "data-toggle": "collapse",
 					        "data-target": "#div_"+hashId
 					    })
-					    .appendTo(divButtons);
+					    .appendTo(divButtonRow);
 				    	
-				    	var pauseButton = $('<input type="checkbox" checked data-toggle="toggle">', {'class':''})
-							.attr({
+				    	var pauseButton = $(
+					    		'<input type="checkbox" checked data-toggle="toggle">', 
+					    		{'class':'col-sm-2'}
+				    		).attr({
 								id: "pause_"+hashId
 							})
-					    	.appendTo(divButtons);
+					    	.appendTo(divButtonRow);
 
 				    	// paint an allowedGraphs svg to use as background for the recorded graphs
 						var divSVG = $('<div/>', {'class':'col-sm-5 graphstyle'}).appendTo(divRowMeta);
@@ -258,10 +263,10 @@
 					    		graphData.paths,
 					    		{
 //		 			    			h: 150,
-									hPerPath: 150,
+									hPerPath: 50,
 									nodeRadius: 12,
 					    			strokeWidth: 6,
-					    			paddingY: 20
+					    			paddingY: 15
 					    		},
 					    		recPath
 					    	);

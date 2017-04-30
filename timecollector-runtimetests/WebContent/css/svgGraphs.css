@@ -1,6 +1,11 @@
 .divOnePathRow{
-    border-top-color: #b5b5b5;
-    border-top-style: double;
+    border-top-color: #eaeaea;
+    border-top-style: solid;
+    border-bottom-color: #eaeaea;
+    border-bottom-style: solid;
+    border-width: 1px;
+    padding-top: 5px;
+    margin-bottom: 1px;
 }
 
 .svg_allowedGraph{

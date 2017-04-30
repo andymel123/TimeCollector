@@ -8,18 +8,26 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	if(!config)config={};
 	var numberOfPaths = paths.length;
 
-	var edgeColor = 	config.edgeColor 	|| "#bbbbbb"
-	var edgeColor2 = 	config.edgeColor2	|| "#aaaaaa";
+	var readWithFallback = function(configVal, fallback){
+		if(typeof configVal !== 'undefined'){
+			return configVal;
+		} else {
+			return fallback;			
+		}
+	}
 	
-	var hPerPath = 		config.hPerPath		|| 50;
-	var w = 			config.w 			|| 2000;
-	var h = 			config.h 			|| hPerPath * numberOfPaths;
-	var nodeRadius  = 	config.nodeRadius 	|| 12;
-	var strokeWidth = 	config.strokeWidth 	|| 5;
-	var paddingX = 		config.paddingX 	|| 15;
-	var paddingY = 		config.paddingY 	|| 15;
+	var edgeColor = 	readWithFallback(config.edgeColor, 	"#bbbbbb");
+	var edgeColor2 = 	readWithFallback(config.edgeColor2,	"#aaaaaa");
 	
-	paddingY = 50;
+	var hPerPath = 		readWithFallback(config.hPerPath	,50);
+	var w = 			readWithFallback(config.w 			,2000);
+	var h = 			readWithFallback(config.h 			,hPerPath * numberOfPaths);
+	var nodeRadius  = 	readWithFallback(config.nodeRadius 	,12);
+	var strokeWidth = 	readWithFallback(config.strokeWidth ,5);
+	var paddingX = 		readWithFallback(config.paddingX 	,15);
+	var paddingY = 		readWithFallback(config.paddingY 	,15);
+	
+//	paddingY = 50;
 	
 	var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	svg.setAttribute("id", svgId);
@@ -35,21 +43,21 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	
 	var gapY = (h - 2 * paddingY) / (numberOfPaths-1);
 
-	var paddingTestRect1 = buildNode('rect', {
-		x: paddingX, y: paddingY, 
-		width: w-2*paddingX, height: h-2*paddingY, 
-		fill:'none'
-		, stroke:'black', strokeWidth:1 
-	})
-	svg.appendChild(paddingTestRect1);
-	
-	var paddingTestRect2 = buildNode('rect', {
-		x: paddingX, y: paddingY, 
-		width: w-2*paddingX, height: (numberOfPaths-1)*gapY, 
-		fill:'none'
-		, stroke:'red', strokeWidth:1 
-	})
-	svg.appendChild(paddingTestRect2);
+//	var paddingTestRect1 = buildNode('rect', {
+//		x: paddingX, y: paddingY, 
+//		width: w-2*paddingX, height: h-2*paddingY, 
+//		fill:'none'
+//		, stroke:'black', strokeWidth:1 
+//	})
+//	svg.appendChild(paddingTestRect1);
+//	
+//	var paddingTestRect2 = buildNode('rect', {
+//		x: paddingX, y: paddingY, 
+//		width: w-2*paddingX, height: (numberOfPaths-1)*gapY, 
+//		fill:'none'
+//		, stroke:'red', strokeWidth:1 
+//	})
+//	svg.appendChild(paddingTestRect2);
 	
 	
 	
