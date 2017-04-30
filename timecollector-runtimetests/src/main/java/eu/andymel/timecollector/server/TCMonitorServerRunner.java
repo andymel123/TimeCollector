@@ -139,7 +139,7 @@ public class TCMonitorServerRunner {
 //			walkPath(tc, minMS + rng.nextInt(maxMS-minMS));
 //			walkPath(tc, 5); 
 			walkPath(tc, 5 + rng.nextInt(2));
-			
+//			walkPath(tc, 4);
 			return tc;
 		};
 					

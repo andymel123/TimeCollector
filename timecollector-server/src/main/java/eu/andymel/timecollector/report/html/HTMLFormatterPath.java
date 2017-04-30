@@ -52,6 +52,7 @@ public class HTMLFormatterPath<ID_TYPE> extends AbstractHTMLFormatter<ID_TYPE> {
 		return new File("templatePath.html");
 	}
 	
+	@Override
 	public String getHTMLString(TimeUnit unit) {
 		
 		AnalyzerAvgPath<ID_TYPE> analyzer = (AnalyzerAvgPath<ID_TYPE>)getAnalyzer(); // checked in constructor

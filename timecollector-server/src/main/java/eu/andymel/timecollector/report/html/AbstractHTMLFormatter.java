@@ -72,6 +72,7 @@ public abstract class AbstractHTMLFormatter<ID_TYPE> implements TimeSpanNameForm
 	}
 
 	
+	@Override
 	public String getTimeSpanName(GraphNode<ID_TYPE, NodePermissions> from, GraphNode<ID_TYPE, NodePermissions> to) {
 		return String.format("%s => %s", from.getId(), to.getId());
 	}

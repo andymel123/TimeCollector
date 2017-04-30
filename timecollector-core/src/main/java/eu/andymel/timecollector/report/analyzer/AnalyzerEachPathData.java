@@ -20,6 +20,7 @@ import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
+import eu.andymel.timecollector.util.AvgMaxCalcLong;
 
 /**
  * This holds the timespans for all {@link TimeCollector}s that collected 
@@ -42,7 +43,8 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 	/** at idx 0 in those arrays the time when this timecollector was added is saved. In the 
 	 * other indexes the timespan duration in nanoseconds is saved. */
 	private final LinkedList<long[]> collectedSpans;
-//	private final List<long[]> collectedSpansView;
+	private final AvgMaxCalcLong[] totalAvgTimes;
+	
 	
 	private final int numberOfTimespans;
 	private final String toStringValue;
@@ -61,11 +63,18 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 		this.allowedGraph = allowedGraph;
 		this.recPath = Collections.unmodifiableList(listWithoutInstant);
 		this.hashOfRecPath = hashOfRecPath;
-		this.collectedSpans = new LinkedList<>();
-//		this.collectedSpansView = Collections.unmodifiableList(collectedSpans);
 		this.numberOfTimespans = recPath.size()-1; // -1 as there are 2 timespans between 3 milestones
 		this.toStringValue = getClass().getSimpleName()+"["+hashOfRecPath+", "+numberOfTimespans+" timeSpans]";
 		this.maxNumberOfCollectedPaths = maxNumberOfCollectedPaths;
+
+		// this list collects single request times
+		this.collectedSpans = new LinkedList<>();
+		
+		// this array collects the total averages since start
+		this.totalAvgTimes = new AvgMaxCalcLong[numberOfTimespans];
+		for(int i=0; i<totalAvgTimes.length; i++){
+			totalAvgTimes[i] = AvgMaxCalcLong.create();
+		}
 	}
 	
 
@@ -79,7 +88,7 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 		Objects.requireNonNull(recPath, "'recPath' is null!");
 		int size = recPath.size();
 		if(size==0)return null;
-		if(numberOfTimespans!=size-1){
+		if(numberOfTimespans!=size-1){	// -1 as there is the current time on idx 0
 			throw new IllegalStateException("Can't add a rec path of size "+recPath.size()+" into "+this);
 		}
 		long[] times = new long[numberOfTimespans+1]; // +1 as I save the current time to idx 0
@@ -113,13 +122,21 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 			}
 			collectedSpans.add(times);	
 		}
+		// add the new times to the AverageCalcuator that belongs to the timespan
+		synchronized (totalAvgTimes) {
+			for(int i=0; i<totalAvgTimes.length; i++){
+				totalAvgTimes[i].add(times[i+1]);	// +1 as there is the current time on idx 0
+			}
+		}
 		return spansRemovedToFreeASlot;
 	}
 	
+	@Override
 	public Integer getHashOfRecPath() {
 		return hashOfRecPath;
 	}
 	
+	@Override
 	public List<GraphNode<ID_TYPE, NodePermissions>> getRecPath() {
 		return recPath;
 	}
@@ -128,13 +145,35 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 	 * @return a shallow copy of the internal list of collected times. 
 	 * Shallow: the arrays inside the list are not copied.
 	 */
+	@Override
 	public synchronized List<long[]> getCollectedTimes() {
 		return new ArrayList<>(collectedSpans);
 	}
 
 
+	@Override
 	public AllowedPathsGraph<ID_TYPE> getAllowedGraph() {
 		return allowedGraph;
+	}
+
+
+	@Override
+	public long[] getTotalAvgTimes() {
+		int entries = 3;	// 3 = min,avg,max
+		long[] times = new long[totalAvgTimes.length * entries];
+
+		int idx = 0;
+		synchronized (totalAvgTimes) {
+			for(int i=0; i<totalAvgTimes.length; i++){
+				AvgMaxCalcLong avgCalc = totalAvgTimes[i];
+				
+				times[idx++] = avgCalc.getMin();
+				times[idx++] = (long)avgCalc.getAvg();
+				times[idx++] = avgCalc.getMax();
+				
+			}
+			return times;
+		}
 	}
 	
 }

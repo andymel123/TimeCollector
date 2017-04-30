@@ -7,12 +7,16 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
+import static eu.andymel.timecollector.PathTestUtils.*;
+import static org.junit.Assert.*;
+
 import eu.andymel.timecollector.exceptions.MilestoneNotAllowedException;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.report.analyzer.AnalyzerAvgPath;
 import eu.andymel.timecollector.util.teststuff.TestClockIncrementBy1;
+import eu.andymel.timecollector.util.teststuff.TestTimeCollectorProvider;
+import eu.andymel.timecollector.util.teststuff.TestTimeCollectorProvider.TestMilestones;
 
 public class LongPathTest {
 

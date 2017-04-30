@@ -52,6 +52,7 @@ public class HTMLFormatterBars<ID_TYPE> extends AbstractHTMLFormatter<ID_TYPE> {
 		return new File("templateBars.html");
 	}
 	
+	@Override
 	public String getHTMLString(TimeUnit unit) {
 		Objects.requireNonNull("'unit' is null!");
 		AnalyzerAvgPath<ID_TYPE> analyzer = (AnalyzerAvgPath<ID_TYPE>)getAnalyzer(); // checked in constructor

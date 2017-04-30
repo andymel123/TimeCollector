@@ -43,6 +43,7 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> extends AbstractNode<ID_TYPE, PAYL
 	}
 	
 	
+	@Override
 	void addNextNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
 		checkMutable();
 		if(!isAllowMutltipleEdges() && edgesToNext.size()>0){
@@ -52,6 +53,7 @@ public class GraphNode<ID_TYPE, PAYLOAD_TYPE> extends AbstractNode<ID_TYPE, PAYL
 	}
 	
 
+	@Override
 	void addPrevNode(Edge<GraphNode<ID_TYPE, PAYLOAD_TYPE>> e){
 		checkMutable();
 		if(!isAllowMutltipleEdges() && edgesToPrev.size()>0){

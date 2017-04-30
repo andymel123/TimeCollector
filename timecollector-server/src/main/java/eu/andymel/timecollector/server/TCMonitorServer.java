@@ -338,19 +338,68 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 		graphData.add("recPaths", 	recPathsJson);
 		
 		TimeSpanNameFormatter tsNameFormat = TimeSpanNameFormatter.DEFAULT_TIMESPAN_NAME_FORMATTER;
-		
+
+		// for each of the different recorded paths
 		for(AnalyzerEachEntry e: recordedPaths){
 		
 			JsonObject singleGraphJsonObject = new JsonObject();
+
+			/*
+			 * the msg json I build
+			 * 
+			 * description: string (some meta data, for now how many collectors analyzed)
+			 * graphsData: Array of allowedGraphs
+			 * 		{
+			 * 			nodes: Array of unique milestone names
+			 * 			paths: Array of allowed paths with those nodes. Each path is again an Array 
+			 * 				Arrays of unique Milestone names
+			 * 			recPaths: Array of recorded paths
+			 * 				{
+			 * 					labels: Array of strings (time of request)
+			 * 					datasets: Array of canvas.js datasets (per timespan)
+			 * 						{
+			 * 							backgroundColor: string (like "#ff00ff")
+			 * 							borderColor: string (like "#ff00ff")
+			 * 							data: Array of numbers (time for this timespan per request)
+			 * 							label: name of this timespan
+			 * 						}
+			 * 					description: string (like "bars: 100, milestones: 6")
+			 * 					hash: int
+			 * 					path: array of unique milestone names
+			 * 					totalTimes: 
+			 * 						// NOT YET DONE
+			 * 						{
+			 * 							min: array of times (one per timespan)
+			 * 							avg: array of times (one per timespan)
+			 * 							max: array of times (one per timespan)
+			 * 						}
+			 * 				}
+			 * 		}
+			 * time: number (time needed to read data and build the msg in ms)
+			 * type: string ("fulldata")
+			 * 
+			 */
+			
 			
 			JsonArray lables = new JsonArray();
 			JsonArray data = new JsonArray();
-			
-			
+			JsonArray totalTimesDataSet = new JsonArray();
+
 			List<GraphNode> recPath = e.getRecPath();
 			if(recPath==null || recPath.size()==0){
 				throw new IllegalStateException("There is no recorded path in this entry?! "+e);
 			}
+			
+			int numberOfTimeSpans = recPath.size()-1;
+			
+			long[] totalAvgTimes = e.getTotalAvgTimes();
+			if(totalAvgTimes.length != 3 * numberOfTimeSpans){
+				throw new IllegalStateException("We have a recpath of size "+numberOfTimeSpans+
+						" but the totalAvgTimes array has a length of "+totalAvgTimes.length+ "."
+						+ " It should be recpath.len * 3 == totalAvgTimes.len as totalAvgTimes"
+						+ " should hold min,avg,max of each entry of the recPath!");
+			}
+			
 			List<long[]> collectedTimes = e.getCollectedTimes(); // returns a copy of the internal array, so no copying is needed here
 			if(collectedTimes==null || collectedTimes.size()==0){
 				throw new IllegalStateException("There is a recpath but no recorded times?! "+Arrays.toString(recPath.toArray()));
@@ -436,6 +485,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 			singleGraphJsonObject.add("description", 	description);
 			singleGraphJsonObject.add("labels", 		lables);
 			singleGraphJsonObject.add("datasets", 		data);
+			singleGraphJsonObject.add("totalTimes",		totalTimesDataSet);
 			recPathsJson.add(singleGraphJsonObject);
 		}
 		

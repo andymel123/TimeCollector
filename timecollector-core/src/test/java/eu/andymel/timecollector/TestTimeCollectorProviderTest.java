@@ -4,8 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import eu.andymel.timecollector.TestTimeCollectorProvider.TestMilestones;
 import eu.andymel.timecollector.util.NanoClock;
+import eu.andymel.timecollector.util.teststuff.TestTimeCollectorProvider;
+import eu.andymel.timecollector.util.teststuff.TestTimeCollectorProvider.TestMilestones;
 
 public class TestTimeCollectorProviderTest {
 

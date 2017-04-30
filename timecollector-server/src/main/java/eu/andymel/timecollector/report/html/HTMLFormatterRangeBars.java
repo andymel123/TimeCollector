@@ -53,6 +53,7 @@ public class HTMLFormatterRangeBars<ID_TYPE> extends AbstractHTMLFormatter<ID_TY
 		return new File("templateRangeBar.html");
 	}
 	
+	@Override
 	public String getHTMLString(TimeUnit unit) {
 		
 		AnalyzerAvgPath<ID_TYPE> analyzer = (AnalyzerAvgPath<ID_TYPE>)getAnalyzer(); // checked in constructor

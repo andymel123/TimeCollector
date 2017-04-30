@@ -49,6 +49,7 @@ public class HTMLFormatterStackedBars<ID_TYPE> extends AbstractHTMLFormatter<ID_
 		return new File("templateEach.html");
 	}
 	
+	@Override
 	public String getHTMLString(TimeUnit unit) {
 		
 		AnalyzerEachPath<ID_TYPE> analyzer = (AnalyzerEachPath<ID_TYPE>)getAnalyzer(); // checked in constructor

@@ -114,6 +114,7 @@ public class AnalyzerAvgPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollector
 	}
 
 
+	@Override
 	public long getNumberOfAddedTimeCollectors() {
 		return countTimeCollectorsAdded;
 	}

@@ -90,7 +90,9 @@ public class TestTimeCollectorProvider {
 				nBEFORE_DECIDER, nAFTER_DECIDER,	// 15
 				nBEFORE_DAO_SAVE,
 				nBEFORE_DBPOOL_SAVE, nAFTER_DBPOOL_SAVE,	// 18
-				nBEFORE_DB_SAVE_DESICION1, nRETRY, nAFTER_DB_SAVE_DESICION1,	// 21
+				nBEFORE_DB_SAVE_DESICION1, 
+				nRETRY, 
+				nAFTER_DB_SAVE_DESICION1,	// 21
 				nBEFORE_DB_SAVE_DESICION2, nAFTER_DB_SAVE_DESICION2,	// 23
 				nAFTER_DAO_SAVE, nAFTER_HANDLER, nAFTER_HANDLER_CONTEXT	//26
 			)
@@ -137,7 +139,8 @@ public class TestTimeCollectorProvider {
 							nAFTER_DAO_SAVE,
 						nAFTER_HANDLER,
 					nAFTER_HANDLER_CONTEXT
-			).path(
+			)
+			.path(
 				// alternative path in the second DAO
 				// another db request
 				nAFTER_DBPOOL_SAVE, // getting the pool connection uses the same milestone
@@ -150,7 +153,11 @@ public class TestTimeCollectorProvider {
 			.path(
 				/* if db request for saving descion1 leads to an db error
 				 * we try again (jump back to reading in the new state from the db) */
-				nBEFORE_DB_SAVE_DESICION1, nRETRY, nAFTER_DB_SAVE_DESICION1, nAFTER_DAO_SAVE, nBEFORE_DAO_GETSTATE
+				nBEFORE_DB_SAVE_DESICION1, 
+				nRETRY, 
+				nAFTER_DB_SAVE_DESICION1, 
+				nAFTER_DAO_SAVE
+				, nBEFORE_DAO_GETSTATE
 			)					
 			.build();
 		

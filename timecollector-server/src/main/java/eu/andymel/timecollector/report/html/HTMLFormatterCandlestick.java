@@ -45,6 +45,7 @@ public class HTMLFormatterCandlestick<ID_TYPE> extends AbstractHTMLFormatter<ID_
 		super(analyzer);
 	}
 	
+	@Override
 	public String getHTMLString(TimeUnit unit) {
 		
 		AnalyzerAvgPath<ID_TYPE> analyzer = (AnalyzerAvgPath<ID_TYPE>)getAnalyzer(); // checked in constructor

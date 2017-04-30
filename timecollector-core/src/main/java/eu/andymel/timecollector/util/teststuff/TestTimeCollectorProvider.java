@@ -1,7 +1,8 @@
-package eu.andymel.timecollector;
+package eu.andymel.timecollector.util.teststuff;
 
 import java.time.Clock;
 
+import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.PermissionNode;
 
