@@ -29,7 +29,7 @@ public class ColorGenerator {
 	}
 
 	public static int[] getPattern(int index) {
-	    int n = (int)Math.cbrt(index);
+	    int n = (int)java.lang.Math.cbrt(index);
 	    index -= (n*n*n);
 	    int[] p = new int[3];
 	    Arrays.fill(p,n);

@@ -91,7 +91,8 @@
 	    	
 			var canvas = document.getElementById("cvs"); 
 			var websocket;
-			var charts = {};
+			var bigCharts = {};
+			var totalAvgCharts = {};
 			var chartDivs = {};
 			var pauseCBs = {};
 			
@@ -164,16 +165,16 @@
 							for (i = 0; i < recPathsArray.length; ++i) {
 							    var recPath = recPathsArray[i];
 						
+							    var hashId = recPath.hash;
+							    
 								// update the right chart
-								var hashId = getIdFromHash(recPath.hash);
+								var bigChartHashId = "big_"+hashId;
 								
 								$("#meta_"+hashId).attr("value", recPath.description);
-								
-								if(chartDivs[hashId].attr("aria-expanded")=="true" && 
-									pauseCBs[hashId].prop('checked')){
-									// only if currently visible
-	// 								console.log("updating "+hashId);
-									var chartOfHash = charts[hashId];
+
+								// update big chart if currently visible and not paused
+								if(chartDivs[hashId].attr("aria-expanded")=="true" && pauseCBs[hashId].prop('checked')){
+									var chartOfHash = bigCharts[hashId];
 									if(chartOfHash && chartOfHash.data){
 									    chartOfHash.data.labels = convertLabels(recPath.labels);
 										chartOfHash.data.datasets = recPath.datasets;
@@ -181,6 +182,34 @@
 									}else{
 										console.error("chart of hash '"+hashId+" is not valid!", chartOfHash);
 									}
+								}
+								
+								// update total avg chart
+								var totalAvgChart = totalAvgCharts[hashId];
+								if(totalAvgChart && totalAvgChart.data && recPath.datasets && recPath.datasets.length>0){
+									
+									var totalAvgDataset = [];
+									var totalAvgTimesArray = recPath.totalTimes;
+									for(var t=0; t<totalAvgTimesArray.length; t++){
+										
+										var min = totalAvgTimesArray[t].min;
+										var avg = totalAvgTimesArray[t].avg;
+										var max = totalAvgTimesArray[t].max;
+										
+										totalAvgDataset.push(
+											{
+												label: recPath.datasets[t].label+" (min: "+min+", max: "+max+")"
+												, data: [avg]
+												, backgroundColor: recPath.datasets[t].backgroundColor
+											}
+										);
+									}
+									
+									totalAvgChart.data.labels = ["Average since start"];
+ 									totalAvgChart.data.datasets = totalAvgDataset;	// TODO
+									totalAvgChart.update();
+								}else{
+									console.error("chart of hash '"+hashId+" is not valid!", chartOfHash);
 								}
 							}
 						}
@@ -192,39 +221,40 @@
 
 			}
 			
-			function getIdFromHash(hash){
-				return "cvs"+hash;
-			}
+// 			function getIdFromHash(hash){
+// 				return "cvs"+hash;
+// 			}
 			
 			
 			function initCharts(msg) {
 				var graphsDataArray = msg.graphsData;
 				for (i = 0; i < graphsDataArray.length; ++i) {
-					initChartsForRecPaths(graphsDataArray[i]);
+					initChartsOfAllowedGraph(graphsDataArray[i]);
 				}
 			}
 
-			function initChartsForRecPaths(graphData){
+			function initChartsOfAllowedGraph(graphData){
 				
 				var recPathsArray = graphData.recPaths;
 
 				for (i = 0; i < recPathsArray.length; ++i) {
 					var recPath = recPathsArray[i];
-					var pathHash = recPath.hash;
-					var hashId = getIdFromHash(pathHash);
+					var hashId = recPath.hash;
+// 					var hashId = getIdFromHash(pathHash);
 					
 				    var title = recPath.path.join(" -> ");
 				    
-				    var canvas = document.getElementById(hashId);
-				    if(canvas){
+				    var divRow = document.getElementById(hashId);
+				    if(divRow){
 				    	// we alread have a chart for this path
 				    	continue;
 				    }else{
 
 					    // one div per recorded path (row + col div)
-				    	var divRow = $('<div/>', {'class':'row divOnePathRow'})
+				    	divRow = $('<div/>', {'class':'row divOnePathRow'})
 				    		.attr({
-								title: title
+				    			id: hashId
+// 								, title: title
 							})
 					    	.appendTo(chartsContainer);
 						var div12Col = $('<div/>', {'class':'col-xs-12'}).appendTo(divRow);
@@ -244,7 +274,7 @@
 // 					        value: hashId,
 					        title: title,
 					        "data-toggle": "collapse",
-					        "data-target": "#div_"+hashId
+					        "data-target": "#collapse_"+hashId
 					    })
 					    .appendTo(divButtonRow);
 				    	
@@ -256,10 +286,12 @@
 							})
 					    	.appendTo(divButtonRow);
 
+						pauseCBs[hashId] = pauseButton;
+
 				    	// paint an allowedGraphs svg to use as background for the recorded graphs
 						var divSVG = $('<div/>', {'class':'col-sm-5 graphstyle'}).appendTo(divRowMeta);
 						var allowedGraphSVG = drawAllowedPath(
-								"svg_"+pathHash,
+								"svg_"+hashId,
 					    		graphData.paths,
 					    		{
 //		 			    			h: 150,
@@ -274,60 +306,114 @@
 				    	
 					    // collapsable row
 					    var divCvs = $('<div/>', {'class':'collapse col-sm-12 divCanvasWrapper'})
-							.attr("id", "div_"+hashId)
+							.attr("id", "collapse_"+hashId)
 						    .appendTo(divRowCollapse);
 				    	
-					    // canvas
-				    	var newCanvas = 
-				    	    $('<canvas/>')
-				    	    .attr("id", hashId)
-				    	    .width(2000)
-				    	    .height(400)
-				    		.appendTo(divCvs);
-				    	
-				    	var canvas = newCanvas[0];
-				    	
-						var ctx = canvas.getContext("2d");
-						var data = {
-							labels: [],
-							datasets: []
-						};
-
-						var barchart = new Chart(ctx, {
-							type : 'bar',
-							data : data,
-							options : {
-								legend: {
-							        display: false,
-							        position: "left",
-							        labels:{
-							        	fontSize: 8
-							        }
-							    },
-								animation:false,
-								scales : {
-									responsive : true,
-									maintainAspectRatio : false,
-									xAxes : [ {
-										stacked : true
-									} ],
-									yAxes : [ {
-										stacked : true,
-										ticks : {
-											beginAtZero : true
-										}
-									} ]
-								}
-							}
-						});
-						// save chart in dictonary
-						charts[hashId] = barchart;
 						chartDivs[hashId] = divCvs;
-						pauseCBs[hashId] = pauseButton;
-						// finally append the new canvas into the chartsContainer
+					    
+						buildBigChart(
+					    	divCvs, 
+					    	hashId, 
+					    	2000, 
+					    	300
+					    );
+						
+						// total average times						
+						var divTotalAvgChart = $('<div/>', {'class':'col-sm-5 graphstyle'}).appendTo(divRowMeta);
+						buildTotalAvgChart(
+							divTotalAvgChart, 
+							hashId, 
+							1000,
+							80
+						);
+						
 				    }
 				}
 
+			}
+			
+			function buildTotalAvgChart(divCvs, hashId, w,h){
+				
+				// canvas
+		    	var newCanvas = 
+		    	    $('<canvas/>')
+		    	    .attr("id", "total_"+hashId)
+		    	    .width(w).height(h)
+		    		.appendTo(divCvs);
+		    	
+		    	var canvas = newCanvas[0];
+		    	
+				var ctx = canvas.getContext("2d");
+
+				var barchart = new Chart(ctx, {
+					type : 'horizontalBar',
+					options : {
+						tooltips: {
+							titleFontSize: 0
+						},
+						legend: {
+					        display: false,
+					    },
+						animation:false,
+						scales : {
+							responsive : true,
+							maintainAspectRatio : false,
+							xAxes : [ {
+								stacked : true
+							} ],
+							yAxes : [ {
+								stacked : true,
+								ticks : {
+									beginAtZero : true
+								}
+							} ]
+						}
+					}
+				});
+				// save chart in dictonary
+				totalAvgCharts[hashId] = barchart;
+			}
+			
+			function buildBigChart(divCvs, hashId, w,h){
+				// canvas
+		    	var newCanvas = 
+		    	    $('<canvas/>')
+		    	    .attr("id", "big_"+hashId)
+		    	    .width(w).height(h)
+		    		.appendTo(divCvs);
+		    	
+		    	var canvas = newCanvas[0];
+		    	
+				var ctx = canvas.getContext("2d");
+
+				var barchart = new Chart(ctx, {
+					type : 'bar',
+					options : {
+						legend: {
+					        display: false,
+					        position: "left",
+					        labels:{
+					        	fontSize: 8
+					        }
+					    },
+						animation:false,
+						scales : {
+							responsive : true,
+							maintainAspectRatio : false,
+							xAxes : [ {
+								stacked : true
+							} ],
+							yAxes : [ {
+								stacked : true,
+								ticks : {
+									beginAtZero : true
+								}
+							} ]
+						}
+					}
+				});
+				// save chart in dictonary
+				bigCharts[hashId] = barchart;
 			}
 			
 			function convertLabels(msg_labels){

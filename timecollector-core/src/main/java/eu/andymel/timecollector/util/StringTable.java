@@ -109,7 +109,7 @@ public class StringTable {
 		
 		StringBuilder sbf = new StringBuilder();
 		for(int c=0; c<columnWidths.length; c++){
-			int offset = Math.max(offsets[c], 0);
+			int offset = java.lang.Math.max(offsets[c], 0);
 			
 //			if(offset<0)throw new IllegalArgumentException("The offset with idx "+c+" is "+offset);  maybe someone wants to decrease the column width...test it (TODO)
 			int colWidth = (int)columnWidths[c].getMax()+offset;

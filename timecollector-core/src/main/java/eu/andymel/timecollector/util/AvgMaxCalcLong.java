@@ -1,5 +1,8 @@
 package eu.andymel.timecollector.util;
 
+/**
+ * @author andymatic
+ */
 public class AvgMaxCalcLong {
 
 	private long count;

@@ -45,6 +45,7 @@ import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEnt
 import eu.andymel.timecollector.report.analyzer.AnalyzerListener;
 import eu.andymel.timecollector.util.ColorGenerator;
 import eu.andymel.timecollector.util.NanoClock;
+import eu.andymel.timecollector.util.Math;
 
 public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 
@@ -237,7 +238,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 			throw new IllegalStateException("Already Started?!");
 		}
 		
-		long delay = (long)(Math.max(60000/updatesPerMinute, 1));
+		long delay = (long)(java.lang.Math.max(60000/updatesPerMinute, 1));
 		
 		if(LOG.isInfoEnabled()){
 			LOG.info("Updating every {} ms", delay);
@@ -264,7 +265,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 
 	private static JsonObject getAnalyzerStateAsJson(AnalyzerEachPath<?> monitoredAnalyzer, Clock clock) {
 
-		return getFullDataJsonObject(monitoredAnalyzer, TimeUnit.MICROSECONDS, clock);
+		return getFullDataJsonObject(monitoredAnalyzer, TimeUnit.MILLISECONDS, clock);
 		
 	}
 
@@ -366,13 +367,11 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 			 * 					description: string (like "bars: 100, milestones: 6")
 			 * 					hash: int
 			 * 					path: array of unique milestone names
-			 * 					totalTimes: 
-			 * 						// NOT YET DONE
-			 * 						{
-			 * 							min: array of times (one per timespan)
-			 * 							avg: array of times (one per timespan)
-			 * 							max: array of times (one per timespan)
-			 * 						}
+			 * 					totalTimes: array of {		(per timespan)
+		 * 							min: array of times (one per timespan)
+		 * 							avg: array of times (one per timespan)
+		 * 							max: array of times (one per timespan)
+		 * 						}
 			 * 				}
 			 * 		}
 			 * time: number (time needed to read data and build the msg in ms)
@@ -383,8 +382,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 			
 			JsonArray lables = new JsonArray();
 			JsonArray data = new JsonArray();
-			JsonArray totalTimesDataSet = new JsonArray();
-
+			
 			List<GraphNode> recPath = e.getRecPath();
 			if(recPath==null || recPath.size()==0){
 				throw new IllegalStateException("There is no recorded path in this entry?! "+e);
@@ -399,6 +397,9 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 						+ " It should be recpath.len * 3 == totalAvgTimes.len as totalAvgTimes"
 						+ " should hold min,avg,max of each entry of the recPath!");
 			}
+			
+			StringBuilder sbTotalTimes = new StringBuilder("[");
+			int totalIdx = 0; 
 			
 			List<long[]> collectedTimes = e.getCollectedTimes(); // returns a copy of the internal array, so no copying is needed here
 			if(collectedTimes==null || collectedTimes.size()==0){
@@ -436,6 +437,14 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 					dataArrays[idx] = dataArray;
 
 					data.add(dataset);
+					
+					if(totalIdx!=0)sbTotalTimes.append(',');
+					sbTotalTimes.append('{');
+					sbTotalTimes.append("\"min\":").append(	convertNanos(totalAvgTimes[totalIdx++], unit));
+					sbTotalTimes.append(",\"avg\":").append(convertNanos(totalAvgTimes[totalIdx++], unit));
+					sbTotalTimes.append(",\"max\":").append(convertNanos(totalAvgTimes[totalIdx++], unit));
+					sbTotalTimes.append('}');
+
 				}
 				lastNode = node;
 			}
@@ -464,7 +473,8 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 				
 				// per milestone
 				for(int t=1; t<times.length; t++){
-					dataArrays[t].add(unit.convert(times[t], TimeUnit.NANOSECONDS));
+					double d = convertNanos(times[t], unit);
+					dataArrays[t].add(d);
 				}
 
 			}
@@ -479,17 +489,27 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 
 //			String description = "Showing the last "+collectedTimes.size()+" of "+analyzer.getNumberOfAddedTimeCollectors()+" analyzed TimeCollectors. Times written in "+unit;
 			String description = String.format("bars: %s, milestones: %s", lables.size(), numberOfRecordedMilestones);
-
+			String totalTimesJsonString = sbTotalTimes.append(']').toString();
+			
 			singleGraphJsonObject.add("path", 			Json.parse(sbPath.toString()));
 			singleGraphJsonObject.add("hash", 			hash);
 			singleGraphJsonObject.add("description", 	description);
 			singleGraphJsonObject.add("labels", 		lables);
 			singleGraphJsonObject.add("datasets", 		data);
-			singleGraphJsonObject.add("totalTimes",		totalTimesDataSet);
+			try{
+				singleGraphJsonObject.add("totalTimes",		Json.parse(totalTimesJsonString));
+			}catch(Exception e2){
+				throw new RuntimeException("Can't parse json '"+totalTimesJsonString+"'", e2);
+			}
 			recPathsJson.add(singleGraphJsonObject);
 		}
 		
 	}
+
+	private static double convertNanos(long nanos, TimeUnit unit) {
+		return Math.convertNanos(nanos, unit, 3);
+	}
+		
 
 	private static String getHexColorString(int idx) {
 		Color c = ColorGenerator.getColor(idx);
