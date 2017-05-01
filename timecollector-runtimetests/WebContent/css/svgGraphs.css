@@ -16,9 +16,12 @@
 
 .node{
 	fill: #b1b1b1;
+    stroke: white;
+    stroke-width: 4px;
 }
 .node:hover {
-	fill: blue;
+	fill: white;
+	stroke: #717171;
 }
 .recNode {
 	fill: #585858;
@@ -33,7 +36,8 @@
 .edge2{
 }
 .edge:hover {
-	stroke-width: 25;
+	stroke-width: 16;
+    stroke-linecap: round;
 }
 .recEdge {
 	stroke-width: 10;

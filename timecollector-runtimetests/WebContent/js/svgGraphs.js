@@ -282,23 +282,21 @@ function drawAllowedPath(svgId, paths, config, recPath){
 				var lastY = parseFloat(lastCirc.getAttribute('cy'));
 				
 				var line = buildEdge2(x,y, lastX,lastY, edgeColor2);
-				realAppend(svg, line, layout);
-				
+				line.setAttribute("rec", edgeCounter[0]);
 				var edgeHash = edgeCounter[0]+"_"+edgeHash;
 				recEdges.push(edgeHash);
 				allEdges[edgeHash] = line;
+				
+				realAppend(svg, line, layout);
+				
 			}
 		}
 		
 		if(nodeCounter[0]==1){
 			// only 1 time (not for each rec visit)
-			
 			// mark as recNode
 			var classes = node.getAttribute("class");	
 			node.setAttribute("class", classes+" recNode");
-
-			// append to svg
-			realAppend(svg, node, layout);	
 		}
 
 		lastHash = hash;
@@ -343,11 +341,11 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	
 	// append nodes that are not in the recorded path
 	for(var hash in allCircs){
-		var nodeCounter = nodeCounters[hash];
-		if(!nodeCounter || nodeCounter[0]==0){
+//		var nodeCounter = nodeCounters[hash];
+//		if(!nodeCounter || nodeCounter[0]==0){
 			// never visited in recorded path
 			realAppend(svg, allCircs[hash], layout);
-		}
+//		}
 	}
 	
 	return svg;
@@ -377,13 +375,14 @@ function realAppend(svg, elem, layout){
 			// this is an extra path
 			var offsetY = layout.paddingY + (layout.numberOfOrigPaths * gap);
 			switch(elem.nodeName){
-				case "line":{
-					var y1 = parseFloat(elem.getAttribute("y1"));
-					var y2 = parseFloat(elem.getAttribute("y2"));
-					elem.setAttribute("y1", offsetY + y1 * gap);
-					elem.setAttribute("y2", offsetY + y2 * gap);
-					break;
-				}
+//	there are only path elements as extra-layer	elements at the moment		
+//				case "line":{
+//					var y1 = parseFloat(elem.getAttribute("y1"));
+//					var y2 = parseFloat(elem.getAttribute("y2"));
+//					elem.setAttribute("y1", offsetY + y1 * gap);
+//					elem.setAttribute("y2", offsetY + y2 * gap);
+//					break;
+//				}
 				case "path":{
 					var x1 = parseFloat(elem.getAttribute("nx1"));
 					var y1 = parseFloat(elem.getAttribute("ny1"));
@@ -417,8 +416,17 @@ function realAppend(svg, elem, layout){
 				case "line":{
 					var y1 = parseFloat(elem.getAttribute("y1"));
 					var y2 = parseFloat(elem.getAttribute("y2"));
-					elem.setAttribute("y1", transform(y1));
-					elem.setAttribute("y2", transform(y2));
+					y1 = transform(y1);
+					y2 = transform(y2);
+					
+					var recCount = elem.getAttribute("rec");
+					if(recCount && recCount > 1){
+						y1 += 8 * (recCount-1);	// -1 as the first can be drawn directly above the allowedGraph line, the second should be some px off
+						y2 += 8 * (recCount-1);
+					}
+					
+					elem.setAttribute("y1", y1);
+					elem.setAttribute("y2", y2);
 					break;
 				}
 				case "circle":{
