@@ -21,49 +21,6 @@
 		<!-- my own svg graph drawing -->
 		<script src="js/svgGraphs.js"></script>
 		<link href="css/svgGraphs.css" rel="stylesheet">
-		
-		
-		
-		<style type="text/css">
-			    body{
-			     	color: #333;
-			     	font-family: Arial, Helvetica, sans-serif;
-			    }
-			    #wrapper {
-					width: 100%;
-				}
-				#chartContainer{
-				}
-				#chartContainer > div{
-/* 					margin-bottom: 0.4em;					 */
-				} 
-				.divCanvasWrapper{
-				}
-				canvas{
-					
-				}
-				input[type="button"] {
-					text-align: left;
-				}
-				#menuContainer{
-					background-color: #CCC;
-					padding: 0px;
-				}
-				#menuContainer ul{
-					list-style-type: none;
-					padding: 0px;
-					margin: 0px;
-				}
-				#menuContainer input{
-					width: 100%;
-				}
-				input[aria-expanded="true"]{
-					font-weight: bold;
-					background-color: #90ff90;
-				}
-				
-		</style>
-		
 	</head>
 	
 	<body>
@@ -260,7 +217,7 @@
 						var div12Col = $('<div/>', {'class':'col-xs-12'}).appendTo(divRow);
 					    
 						// 2 rows: 1 always visible meta data row, 1 collapsable for the graphs 
-					    var divRowMeta = $('<div/>', {'class':'row'}).appendTo(div12Col);
+					    var divRowMeta = $('<div/>', {'class':'row divGraphMetaData'}).appendTo(div12Col);
 				    	var divRowCollapse = $('<div/>', {'class':'row graphstyle'}).appendTo(div12Col);
 					    
 				    	var divButtons = $('<div/>', {'class':'col-sm-2'}).appendTo(divRowMeta);
@@ -294,11 +251,10 @@
 								"svg_"+hashId,
 					    		graphData.paths,
 					    		{
-//		 			    			h: 150,
-									hPerPath: 50,
-									nodeRadius: 12,
-					    			strokeWidth: 6,
-					    			paddingY: 15
+									  hPerPath: 50
+									, nodeRadius: 12
+									, paddingX: 8
+									, paddingY: 6
 					    		},
 					    		recPath
 					    	);

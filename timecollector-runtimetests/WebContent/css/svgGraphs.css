@@ -1,3 +1,18 @@
+body{
+	color: #383838;
+	font-family: Arial, Helvetica, sans-serif;
+}
+#wrapper {
+	width: 100%;
+}
+input[type="button"] {
+	text-align: left;
+}
+input[aria-expanded="true"]{
+	font-weight: bold;
+	background-color: rgb(8, 224, 8);
+}
+
 .divOnePathRow{
     border-top-color: #eaeaea;
     border-top-style: solid;
@@ -7,9 +22,13 @@
     padding-top: 5px;
     margin-bottom: 1px;
 }
+.divGraphMetaData{
+	background-color: rgba(172, 205, 228, 0.55);
+    padding-top: 5px;
+}
 
 .svg_allowedGraph{
-	background-color: #eee;
+	background-color: white;
 	border-radius: 5px;
 }
 
