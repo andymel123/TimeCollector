@@ -91,10 +91,11 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 				tc.getAllowedGraph(), 
 				path, 
 				hash, 
-				maxNumberCollectors
+				maxNumberCollectors,
+				this.clock
 			)
 		);
-		pathData.addTimes(path, this.clock);
+		pathData.addTimes(path);
 		countTimeCollectorsAdded++;
 		informListeners(tc);
 	}

@@ -49,8 +49,17 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 	private final int numberOfTimespans;
 	private final String toStringValue;
 	private final int maxNumberOfCollectedPaths;
+	private final Clock clock;
 	
-	AnalyzerEachPathData(AllowedPathsGraph<ID_TYPE> allowedGraph, List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> recPath, Integer hashOfRecPath, int maxNumberOfCollectedPaths) {
+	/**
+	 * 
+	 * @param allowedGraph
+	 * @param recPath
+	 * @param hashOfRecPath
+	 * @param maxNumberOfCollectedPaths
+	 * @param clock
+	 */
+	AnalyzerEachPathData(AllowedPathsGraph<ID_TYPE> allowedGraph, List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> recPath, Integer hashOfRecPath, int maxNumberOfCollectedPaths, Clock clock) {
 		Objects.requireNonNull(allowedGraph, "'allowedGraph' is null!");
 		Objects.requireNonNull(recPath, "'recPath' is null!");
 		Objects.requireNonNull(hashOfRecPath, "'hashOfRecPath' is null!");
@@ -66,7 +75,8 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 		this.numberOfTimespans = recPath.size()-1; // -1 as there are 2 timespans between 3 milestones
 		this.toStringValue = getClass().getSimpleName()+"["+hashOfRecPath+", "+numberOfTimespans+" timeSpans]";
 		this.maxNumberOfCollectedPaths = maxNumberOfCollectedPaths;
-
+		this.clock = clock;
+		
 		// this list collects single request times
 		this.collectedSpans = new LinkedList<>();
 		
@@ -84,7 +94,7 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 	 * example if you set maxNumberOfCollectedPaths to 100 and you add timeCollector 101 the first is removed and 
 	 * returned while the new is added. The long at idx 0 is the time the timeCollector was added to the Analyzer
 	 */
-	long[] addTimes(List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> recPath, Clock clock){
+	long[] addTimes(List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> recPath){
 		Objects.requireNonNull(recPath, "'recPath' is null!");
 		int size = recPath.size();
 		if(size==0)return null;
