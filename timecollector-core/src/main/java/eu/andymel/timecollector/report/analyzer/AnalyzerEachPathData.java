@@ -19,7 +19,6 @@ import eu.andymel.timecollector.TimeCollector;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
-import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
 import eu.andymel.timecollector.util.AvgMaxCalcLong;
 
 /**
@@ -32,7 +31,7 @@ import eu.andymel.timecollector.util.AvgMaxCalcLong;
  *
  * @param <ID_TYPE> the milestone type
  */
-class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
+class AnalyzerEachPathData<ID_TYPE> implements RecordedPathCollectorView<ID_TYPE>, RecordedPathCollector<ID_TYPE>{
 
 	private static final Logger LOG = LoggerFactory.getLogger(AnalyzerEachPathData.class);
 	
@@ -94,7 +93,8 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 	 * example if you set maxNumberOfCollectedPaths to 100 and you add timeCollector 101 the first is removed and 
 	 * returned while the new is added. The long at idx 0 is the time the timeCollector was added to the Analyzer
 	 */
-	long[] addTimes(List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> recPath){
+	@Override
+	public long[] addRecordedPath(List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> recPath){
 		Objects.requireNonNull(recPath, "'recPath' is null!");
 		int size = recPath.size();
 		if(size==0)return null;
@@ -185,5 +185,7 @@ class AnalyzerEachPathData<ID_TYPE> implements AnalyzerEachEntry<ID_TYPE>{
 			return times;
 		}
 	}
+
+
 	
 }

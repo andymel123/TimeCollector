@@ -19,8 +19,8 @@ import eu.andymel.timecollector.graphs.AllowedPathsGraph;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.graphs.NodePermissions;
 import eu.andymel.timecollector.report.analyzer.Analyzer;
+import eu.andymel.timecollector.report.analyzer.RecordedPathCollectorView;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
-import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
 import eu.andymel.timecollector.util.ColorGenerator;
 
 public class HTMLFormatterStackedBars<ID_TYPE> extends AbstractHTMLFormatter<ID_TYPE> {
@@ -55,13 +55,13 @@ public class HTMLFormatterStackedBars<ID_TYPE> extends AbstractHTMLFormatter<ID_
 		AnalyzerEachPath<ID_TYPE> analyzer = (AnalyzerEachPath<ID_TYPE>)getAnalyzer(); // checked in constructor
 		Objects.requireNonNull(analyzer, "'analyzer' is null");
 
-		Collection<SimpleEntry<AllowedPathsGraph<ID_TYPE>,List<AnalyzerEachEntry<ID_TYPE>>>> data = analyzer.getCopyOFData();
+		Collection<SimpleEntry<AllowedPathsGraph<ID_TYPE>,List<RecordedPathCollectorView<ID_TYPE>>>> data = analyzer.getCopyOFData();
 		
 		if(data.size()!=1){
 			throw new RuntimeException("Not yet implemented!");
 		}
 		
-		List<AnalyzerEachEntry<ID_TYPE>> recordedPaths = data.iterator().next().getValue();
+		List<RecordedPathCollectorView<ID_TYPE>> recordedPaths = data.iterator().next().getValue();
 		Objects.requireNonNull(recordedPaths, "'recordedPaths' is null!");
 		
 		if(recordedPaths.size()>1){
@@ -70,11 +70,11 @@ public class HTMLFormatterStackedBars<ID_TYPE> extends AbstractHTMLFormatter<ID_
 			
 		}
 
-		AnalyzerEachEntry<ID_TYPE> e = null;
-		Iterator<AnalyzerEachEntry<ID_TYPE>> it = recordedPaths.iterator();
+		RecordedPathCollectorView<ID_TYPE> e = null;
+		Iterator<RecordedPathCollectorView<ID_TYPE>> it = recordedPaths.iterator();
 		int maxSize = 0;
 		while(it.hasNext()){
-			AnalyzerEachEntry<ID_TYPE> pathData = it.next();
+			RecordedPathCollectorView<ID_TYPE> pathData = it.next();
 			int collectedTCs = pathData.getCollectedTimes().size();
 			if(collectedTCs>maxSize){
 				maxSize = collectedTCs;

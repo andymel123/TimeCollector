@@ -10,8 +10,8 @@ import java.util.List;
 
 import eu.andymel.timecollector.TimeCollectorWithPath;
 import eu.andymel.timecollector.graphs.AllowedPathsGraph;
+import eu.andymel.timecollector.report.analyzer.RecordedPathCollectorView;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
-import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
 import eu.andymel.timecollector.teststuff.TestClockIncrementBy1;
 import eu.andymel.timecollector.teststuff.TestTimeCollectorProvider;
 import eu.andymel.timecollector.teststuff.TestTimeCollectorProvider.TestMilestones;
@@ -73,7 +73,7 @@ public class PerformanceTestAnalyzerEach {
 		}
 		PerformanceTestsUtils.end("Create/save on pathTC, add to AnalyzerEach", amount, start);
 		
-		Collection<SimpleEntry<AllowedPathsGraph<TestMilestones>,List<AnalyzerEachEntry<TestMilestones>>>> data = analyzerEach.getCopyOFData();
+		Collection<SimpleEntry<AllowedPathsGraph<TestMilestones>,List<RecordedPathCollectorView<TestMilestones>>>> data = analyzerEach.getCopyOFData();
 		
 		
 		

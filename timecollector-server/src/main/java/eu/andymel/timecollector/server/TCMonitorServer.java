@@ -40,8 +40,8 @@ import eu.andymel.timecollector.graphs.AllowedPathsLayoutHelpData;
 import eu.andymel.timecollector.graphs.GraphNode;
 import eu.andymel.timecollector.report.TimeSpanNameFormatter;
 import eu.andymel.timecollector.report.analyzer.Analyzer;
+import eu.andymel.timecollector.report.analyzer.RecordedPathCollectorView;
 import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath;
-import eu.andymel.timecollector.report.analyzer.AnalyzerEachPath.AnalyzerEachEntry;
 import eu.andymel.timecollector.report.analyzer.AnalyzerListener;
 import eu.andymel.timecollector.util.ColorGenerator;
 import eu.andymel.timecollector.util.NanoClock;
@@ -280,7 +280,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 			start = clock.instant();
 		}
 		
-		List<SimpleEntry<AllowedPathsGraph<?>, List<AnalyzerEachEntry<?>>>> dataFull = analyzer.getCopyOFData();
+		List<SimpleEntry<AllowedPathsGraph<?>, List<RecordedPathCollectorView<?>>>> dataFull = analyzer.getCopyOFData();
 		
 		if(dataFull.size()==0)return null;
 
@@ -293,10 +293,10 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 		completeJsonObject.add("graphsData", graphsData);
 		
 		// per allowed graph
-		for(SimpleEntry<AllowedPathsGraph<?>, List<AnalyzerEachEntry<?>>> allowedGraphData: dataFull){
+		for(SimpleEntry<AllowedPathsGraph<?>, List<RecordedPathCollectorView<?>>> allowedGraphData: dataFull){
 			
 			AllowedPathsGraph<?> allowedGraph = allowedGraphData.getKey();
-			List<AnalyzerEachEntry<?>> recPathData = allowedGraphData.getValue();
+			List<RecordedPathCollectorView<?>> recPathData = allowedGraphData.getValue();
 			
 			JsonObject graphData = new JsonObject();
 			graphsData.add(graphData);
@@ -329,7 +329,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 		return completeJsonObject;
 	}
 	
-	private static void appendFullDataOfRecPaths(List<AnalyzerEachEntry<?>> recordedPaths, JsonObject graphData, TimeUnit unit) {
+	private static void appendFullDataOfRecPaths(List<RecordedPathCollectorView<?>> recordedPaths, JsonObject graphData, TimeUnit unit) {
 		
 		Objects.requireNonNull(recordedPaths, "'recordedPaths' is null!");
 		Objects.requireNonNull(graphData, "'graphsData' is null!");
@@ -341,7 +341,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
 		TimeSpanNameFormatter tsNameFormat = TimeSpanNameFormatter.DEFAULT_TIMESPAN_NAME_FORMATTER;
 
 		// for each of the different recorded paths
-		for(AnalyzerEachEntry e: recordedPaths){
+		for(RecordedPathCollectorView e: recordedPaths){
 		
 			JsonObject singleGraphJsonObject = new JsonObject();
 

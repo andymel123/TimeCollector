@@ -29,8 +29,6 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 	
 	private static final int MAX_NUMBER_OF_COLLECTED_PATHS = 100;			
 	
-//	private final HashMap<Integer, AnalyzerEachPathData<ID_TYPE>> dataOfDifferentPaths;
-	
 	/** 
 	 * A {@link HashMap} that hols {@link HashMap}s
 	 * The outer Hashmap maps one HashMap to each {@link AllowedPathsGraph}
@@ -38,7 +36,7 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 	 * All findings of the timestamps that went the exact same way through the code are saved in that
 	 * {@link AnalyzerEachPathData} 
 	 */
-	private final HashMap<AllowedPathsGraph<ID_TYPE>, HashMap<Integer, AnalyzerEachPathData<ID_TYPE>>> data;
+	private final HashMap<AllowedPathsGraph<ID_TYPE>, HashMap<Integer, RecordedPathCollector<ID_TYPE>>> data;
 	private final Clock clock;
 	
 	private volatile int countTimeCollectorsAdded = 0;
@@ -72,20 +70,21 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 		List<List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>>> recordedPaths = tc.getRecordedPaths();
 		if(recordedPaths.size()==0)return;
 		if(recordedPaths.size()>1){
-			LOG.warn("Not able to add multiple possible paths of a timecollector to "+this+". Using the first path.");
+			// think about how to display such information if it's not sure which was the real path
+			LOG.warn("Not able to add multiple possible paths of "+tc+" to "+this+". Using the first path.");
 		}
 		
 		List<SimpleEntry<GraphNode<ID_TYPE, NodePermissions>, Instant>> path = recordedPaths.get(0);
 		Integer hashOfPath = Integer.valueOf(hashOfPath(path));
 
 		// get the HashMap to collect data for this allowedGraph or generate a new hashmap
-		HashMap<Integer, AnalyzerEachPathData<ID_TYPE>> dataOfDifferentPathsOfSameAllowedGraph = data.computeIfAbsent(
+		HashMap<Integer, RecordedPathCollector<ID_TYPE>> dataOfDifferentPathsOfSameAllowedGraph = data.computeIfAbsent(
 			tc.getAllowedGraph(), 
 			allowedGraph -> new HashMap<>()
 		);
 		
 		// get data collector for this kind of path or generate a new such container
-		AnalyzerEachPathData<ID_TYPE> pathData = dataOfDifferentPathsOfSameAllowedGraph.computeIfAbsent(
+		RecordedPathCollector<ID_TYPE> pathData = dataOfDifferentPathsOfSameAllowedGraph.computeIfAbsent(
 			hashOfPath, 
 			hash -> new AnalyzerEachPathData<ID_TYPE>(
 				tc.getAllowedGraph(), 
@@ -95,7 +94,7 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 				this.clock
 			)
 		);
-		pathData.addTimes(path);
+		pathData.addRecordedPath(path);
 		countTimeCollectorsAdded++;
 		informListeners(tc);
 	}
@@ -116,16 +115,16 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
         return hashCode;
 	}
 
-	public synchronized List<SimpleEntry<AllowedPathsGraph<ID_TYPE>, List<AnalyzerEachEntry<ID_TYPE>>>> getCopyOFData(){
+	public synchronized List<SimpleEntry<AllowedPathsGraph<ID_TYPE>, List<RecordedPathCollectorView<ID_TYPE>>>> getCopyOFData(){
 		/* I copy the actual state of the data synchronized and return it so no 
 		 * concurrent modifications can happen while the caller of this method 
 		 * reads the returned data. I return it as a List, not as 
 		 * HashMap as (at least for me at the moment) fast copy is more important 
 		 * than finding some data for one specific entry */
 		
-		ArrayList<SimpleEntry<AllowedPathsGraph<ID_TYPE>, List<AnalyzerEachEntry<ID_TYPE>>>> result = new ArrayList<>(data.size());
+		ArrayList<SimpleEntry<AllowedPathsGraph<ID_TYPE>, List<RecordedPathCollectorView<ID_TYPE>>>> result = new ArrayList<>(data.size());
 		
-		for(Entry<AllowedPathsGraph<ID_TYPE>, HashMap<Integer, AnalyzerEachPathData<ID_TYPE>>> e: data.entrySet()){
+		for(Entry<AllowedPathsGraph<ID_TYPE>, HashMap<Integer, RecordedPathCollector<ID_TYPE>>> e: data.entrySet()){
 			result.add(new SimpleEntry<>(
 				e.getKey(),	// no copy but the real graph (should be immutable) 
 				new ArrayList<>(e.getValue().values()))	// copy if the inner list as well as it changes frequently
@@ -134,29 +133,6 @@ public class AnalyzerEachPath<ID_TYPE> implements Analyzer<ID_TYPE, TimeCollecto
 		return result;
 	}
 	
-	public interface AnalyzerEachEntry<ID_TYPE> {
-		
-		AllowedPathsGraph<ID_TYPE> getAllowedGraph();
-
-		Integer getHashOfRecPath();
-		
-		List<GraphNode<ID_TYPE, NodePermissions>> getRecPath();
-		
-		/**
-		 * @return a long[] with the length of the number of timespans + 1. 
-		 * At idx 0 is the time when the timespan was added. at idx 1-n the times of the timespans. 
-		 */
-		List<long[]> getCollectedTimes();
-		
-		/**
-		 * @return a {@code long} array with a length of the number of timespans * 3.
-		 * You find the minimum value of the first timespan at idx 0, the avg of the first timespan on idx 1 and the maximum at idx 2. 
-		 * Then it repeats with the min,avg,max of the second timespan at idx 3-5 and so on. Thats why the length is number of timespans * 3  
-		 */
-		long[] getTotalAvgTimes();
-		
-	}
-
 	@Override
 	public long getNumberOfAddedTimeCollectors() {
 		return countTimeCollectorsAdded;
