@@ -41,7 +41,8 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	var paddingY = nodeRadius + paddingY;
 
 	
-	var gapY = (h - 2 * paddingY) / (numberOfPaths-1);
+//	var gapY = (h - 2 * paddingY) / (numberOfPaths-1);
+	var gapY = (h - 2 * paddingY) / (numberOfPaths); // div by one more to let space for multiple rec-paths (painted one under each other)
 
 //	var paddingTestRect1 = buildNode('rect', {
 //		x: paddingX, y: paddingY, 
@@ -67,6 +68,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 	var allCircs = {};
 	var allEdges = {};
 
+	var pathsWithDrawnNodes = 0;
 	var yGridIdxExtra = [0];
 	for (var p = 0; p < numberOfPaths; p++) {
 		var path = paths[p];
@@ -83,6 +85,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 		var lastCirc = null;
 		var nextExistingNode = null;
 		var lastNodeDidAlreadyExist = false;
+		var pathHasOwnNodesDrawn = false;
 		for (var n = 0; n < nodesInThisPath; n++) {
 			var nodeHash = path[n];
 			
@@ -108,12 +111,12 @@ function drawAllowedPath(svgId, paths, config, recPath){
 					if(allEdges[edgeHash]){
 						console.warn("edge '"+edgeHash+"' is here multiple times! I just add one and skip any other.");
 					} 
-					else if(lastNodeDidAlreadyExist && lastY==y){
+					else if(lastNodeDidAlreadyExist){ // && lastY==y){
 						/* Simply drawing a line as edge between these nodes would
 						not be visible as there will be other lines there for sure
 						So I draw this line on another y (connected to the nodes
 						with vertical lines */
-						var line = buildExtraPath(lastCirc, circ, x,y, lastX,lastY, edgeColor2, yGridIdxExtra);
+						var line = buildExtraPath(x,y, lastX,lastY, edgeColor2, yGridIdxExtra);
 						addTitle(line, edgeHash);
 						allEdges[edgeHash] = line;
 					}else{
@@ -207,19 +210,23 @@ function drawAllowedPath(svgId, paths, config, recPath){
 				addTitle(circ, nodeHash);
 
 				lastNodeDidAlreadyExist = false;
+				pathHasOwnNodesDrawn = true;
 			}
 
 			lastCirc = circ;
 		}
 		
+		if(pathHasOwnNodesDrawn){
+			pathsWithDrawnNodes += 1;
+		}
 	}
 	
-	var realYLayers = numberOfPaths + yGridIdxExtra[0];
+	realYLayers = pathsWithDrawnNodes + yGridIdxExtra[0];
 	
 	// infos that I need when appending the elements to the svg
 	var layout = {
 		factor: (numberOfPaths-1) / (realYLayers-1),
-		numberOfOrigPaths: numberOfPaths,
+		numberOfOrigPaths: pathsWithDrawnNodes,
 		origGapY: gapY,
 		paddingY: paddingY
 	}
@@ -272,6 +279,9 @@ function drawAllowedPath(svgId, paths, config, recPath){
 				recEdges.push(edgeHash);	
 			}else{
 				
+				var origLineOrPath = allEdges[edgeHash];
+				var isExtraPath = origLineOrPath && origLineOrPath.getAttribute("extra-layer");
+				
 				/* this recEdge hash belongs to a edge that has
 				 * been visited multiple times in this recorded path
 				 * append an own line for each visit */
@@ -280,13 +290,17 @@ function drawAllowedPath(svgId, paths, config, recPath){
 				var y = 	parseFloat(node.getAttribute('cy'));
 				var lastX = parseFloat(lastCirc.getAttribute('cx'));
 				var lastY = parseFloat(lastCirc.getAttribute('cy'));
-				
-				var line = buildEdge2(x,y, lastX,lastY, edgeColor2);
+
+				var line;
+				if(!isExtraPath){
+					var line = buildEdge2(x,y, lastX,lastY, edgeColor2);
+				}else{
+					var line = buildExtraPath(x,y, lastX,lastY, edgeColor2, yGridIdxExtra, origLineOrPath);
+				}
 				line.setAttribute("rec", edgeCounter[0]);
 				var edgeHash = edgeCounter[0]+"_"+edgeHash;
 				recEdges.push(edgeHash);
 				allEdges[edgeHash] = line;
-				
 				realAppend(svg, line, layout);
 				
 			}
@@ -353,7 +367,7 @@ function drawAllowedPath(svgId, paths, config, recPath){
 
 function realAppend(svg, elem, layout){
 
-	if(layout && layout.factor!=1){
+	if(layout){//} && layout.factor!=1){
 		/* if factor is != 1 we have to move all elements closer together
 		 * because we have to paint additional paths on other y coordinates */
 
@@ -394,6 +408,13 @@ function realAppend(svg, elem, layout){
 					var newY2 = transform(y2);
 					var yE = offsetY + yIdx * gap
 					
+					var recCount = parseInt(elem.getAttribute("rec"));
+					if(recCount && recCount > 1){
+						yE += 4 * (recCount-1);	// -1 as the first can be drawn directly above the allowedGraph line, the second should be some px off
+						yE += 4 * (recCount-1);
+					}
+
+					
 					var pathString = 
 						 "M"+x1+" "+newY1	// move to first node
 						+"L"+x1+" "+yE		// line to extra layer x=firstNode
@@ -401,7 +422,11 @@ function realAppend(svg, elem, layout){
 						+"L"+x2+" "+newY2	// line to secondNode
 					;
 					
-					elem.setAttribute("d", pathString);	
+					try{
+						elem.setAttribute("d", pathString);	
+					}catch(e){
+						console.error(e);
+					}
 					
 					console.log(x1+","+y1+" "+x2+","+y2+", factor "+layout.factor+", offsetY "+offsetY+", gap "+gap+" => pathStringh: ", pathString);
 					
@@ -419,10 +444,10 @@ function realAppend(svg, elem, layout){
 					y1 = transform(y1);
 					y2 = transform(y2);
 					
-					var recCount = elem.getAttribute("rec");
+					var recCount = parseInt(elem.getAttribute("rec"));
 					if(recCount && recCount > 1){
-						y1 += 8 * (recCount-1);	// -1 as the first can be drawn directly above the allowedGraph line, the second should be some px off
-						y2 += 8 * (recCount-1);
+						y1 += 10 * (recCount-1);	// -1 as the first can be drawn directly above the allowedGraph line, the second should be some px off
+						y2 += 10 * (recCount-1);
 					}
 					
 					elem.setAttribute("y1", y1);
@@ -465,11 +490,16 @@ function buildEdge2(x1,y1, x2,y2, edgeColor){
 	});
 }
 
-function buildExtraPath(circ1, circ2, x1,y1, x2,y2, edgeColor, yGridIdxExtra){
+function buildExtraPath(x1,y1, x2,y2, edgeColor, yGridIdxExtra, origPath){
 	
 	// use the actual value of extra y layer as 
 	// height (0,1,2,...), this is multiplied later
-	var yIdx = yGridIdxExtra[0]++;
+	var yIdx;
+	if(!origPath){
+		yIdx = yGridIdxExtra[0]++;	
+	}else{
+		yIdx = origPath.getAttribute("y-idx");
+	}
 	
 	return buildNode('path', {
 		stroke: edgeColor
