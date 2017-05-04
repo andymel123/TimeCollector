@@ -94,28 +94,42 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
         // Setup the basic application "context" for this application at "/"
         // This is also known as the handler tree (in jetty speak)
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath(config.getContextPath());
+        context.setContextPath("/");
         jettyServer.setHandler(context);
-        
         
         // static files
         ServletHolder holderHome = new ServletHolder("static-files", DefaultServlet.class);
-        String staticFilesHome = config.getStaticWebContentDir();
-        File f = new File(staticFilesHome);
-        File[] listFiles = f.listFiles();
-    	
-        if(!f.exists() || !f.isDirectory() || listFiles==null || listFiles.length==0){
-        	String files = "-";
-        	if(listFiles!=null){
-        		files = ""+listFiles.length;
-        	}
-        	
-        	throw new IllegalArgumentException("There is a problem with the given directory for searching "
-        			+ "static files of the time collector monitor server! The absolute path does either "
-        			+ "not exist("+f.exists()+"), is not a directory("+f.isDirectory()+") or is empty("+(listFiles==null || listFiles.length==0)+")! '"+f+"'");
-        }
         
-        LOG.info("static home '"+f.getAbsolutePath()+"' ("+f.listFiles().length+" files "+Arrays.toString(f.listFiles())+")");
+//        String staticFilesHome = config.getStaticWebContentDir();
+        
+        String staticFilesHome = this.getClass().getClassLoader().getResource("eu/andymel/timecollector/server/staticcontent").toExternalForm();
+        
+        LOG.info("staticFilesHome from jar: " +staticFilesHome);
+        
+//        File f = new File(staticFilesHome);
+//        File[] listFiles = f.listFiles();
+//    	
+//        if(!f.exists() || !f.isDirectory() || listFiles==null || listFiles.length==0){
+//        	String files = "-";
+//        	if(listFiles!=null){
+//        		files = ""+listFiles.length;
+//        	}
+//        	
+//        	String s = "There is a problem with the given directory for searching static files of the time collector monitor server! "
+//        			+ "The absolute path '"+f.getAbsolutePath()+"' ";
+//
+//        	if(!f.exists()){
+//        		s+="does not exist!";
+//        	} else if(!f.isDirectory()){
+//        		s+="is not a directory!";
+//			} else if((listFiles==null || listFiles.length==0)){
+//				s+="is empty!";
+//			}
+//        	
+//        	throw new IllegalArgumentException(s);
+//        }
+        
+//        LOG.info("static home '"+f.getAbsolutePath()+"' ("+f.listFiles().length+" files "+Arrays.toString(f.listFiles())+")");
         holderHome.setInitParameter("resourceBase", staticFilesHome);
         
         /* I'm not totally sure why I need this but I assume it's needed to be able to 
@@ -125,7 +139,7 @@ public class TCMonitorServer implements AnalyzerListener, TCWebSocketDispatcher{
         
 //        holderHome.setInitParameter("dirAllowed","true");
         
-        String staticSubPath = config.getSubPathStaticWebContent();
+        String staticSubPath = config.getContextPath();
         context.addServlet(holderHome, staticSubPath);
         
         

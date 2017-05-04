@@ -98,18 +98,6 @@ public class TCMonitorServerRunner {
 
 			@Override
 			public String getContextPath() {
-				// those two work: /foo/ or /foo
-				// if its not simply "/" it has to be added in the javascript
-				// as well (function getWebSocketPath())
-				return "/";
-			}
-
-			@Override
-			public String getStaticWebContentDir() {
-				return "WebContent";
-			}
-			@Override
-			public String getSubPathStaticWebContent() {
 				// for example "/foo/*"
 				return "/static/*";
 			}
@@ -155,6 +143,7 @@ public class TCMonitorServerRunner {
 			s.start(true);
 		} catch (Exception e) {
 			LOG.error("Can't start Jetty Server", e);
+			return;
 		}
 
 		try{

@@ -1,0 +1,64 @@
+body{
+	color: #383838;
+	font-family: Arial, Helvetica, sans-serif;
+}
+#wrapper {
+	width: 100%;
+}
+input[type="button"] {
+	text-align: left;
+}
+input[aria-expanded="true"]{
+	font-weight: bold;
+	background-color: rgb(8, 224, 8);
+}
+
+.divOnePathRow{
+    border-top-color: #eaeaea;
+    border-top-style: solid;
+    border-bottom-color: #eaeaea;
+    border-bottom-style: solid;
+    border-width: 1px;
+    padding-top: 5px;
+    margin-bottom: 1px;
+}
+.divGraphMetaData{
+	background-color: rgba(172, 205, 228, 0.55);
+    padding-top: 5px;
+}
+
+.svg_allowedGraph{
+	background-color: white;
+	border-radius: 5px;
+}
+
+
+.node{
+	fill: #b1b1b1;
+    stroke: white;
+    stroke-width: 4px;
+}
+.node:hover {
+	fill: white;
+	stroke: #717171;
+}
+.recNode {
+	fill: #585858;
+}
+
+
+.edge{
+	/* don't set values for things that I set programmatically for recorded edges 
+	it would be overridden by this css value */
+	stroke-width: 5;
+}
+.edge2{
+}
+.edge:hover {
+	stroke-width: 16;
+    stroke-linecap: round;
+}
+.recEdge {
+	stroke-width: 10;
+}
+

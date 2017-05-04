@@ -7,15 +7,15 @@ public interface TCMonitorServerConfig {
 	 */
 	int getPort();
 
-	/**
-	 * @return the parent context path 
-	 */
-	String getContextPath();
-
-	/**
-	 * @return the path on the disk where the static files are
-	 */
-	String getStaticWebContentDir();
+//	/**
+//	 * @return the parent context path 
+//	 */
+//	String getContextPath();
+//
+//	/**
+//	 * @return the path on the disk where the static files are
+//	 */
+//	String getStaticWebContentDir();
 
 	/**
 	 * @return the sub context path under the parent context path that has to be
@@ -23,7 +23,7 @@ public interface TCMonitorServerConfig {
 	 * If getContextPath() returns /foo and this method returns /bar/*, all paths
 	 * that start http://host:port/foo/bar/ will map to static files
 	 */
-	String getSubPathStaticWebContent();
+	String getContextPath();
 
 	double getUpdatesPerMinute();
 
