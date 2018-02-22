@@ -14,7 +14,4 @@ Here is a screenshot of the browser gui. You can see
   * The chart on the right shows the timespan between the milestones, 1 color = 1 edge on the path between two milestones
   * With a click on the button on the left the details open and you see a chart how the timings changed over time
 
-![https://www.andymel.eu/res/ss_timecollector.png](https://www.andymel.eu/res/ss_timecollector.png "Screenshot TimeCollector")
-![Screenshot TimeCollector](https://www.andymel.eu/res/ss_timecollector.png "Screenshot TimeCollector")
-![Screenshot TimeCollector](https://github.com/andymel123/TimeCollector/blob/master/ss_timecollector.png "Screenshot TimeCollector")
 ![Screenshot TimeCollector](ss_timecollector.png "Screenshot TimeCollector")
