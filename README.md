@@ -15,3 +15,6 @@ Here is a screenshot of the browser gui. You can see
   * With a click on the button on the left the details open and you see a chart how the timings changed over time
 
 ![https://www.andymel.eu/res/ss_timecollector.png](https://www.andymel.eu/res/ss_timecollector.png "Screenshot TimeCollector")
+![Screenshot TimeCollector](https://www.andymel.eu/res/ss_timecollector.png "Screenshot TimeCollector")
+![Screenshot TimeCollector](https://github.com/andymel123/TimeCollector/blob/master/ss_timecollector.png "Screenshot TimeCollector")
+![Screenshot TimeCollector](ss_timecollector.png "Screenshot TimeCollector")
