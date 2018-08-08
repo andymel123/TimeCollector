@@ -1,4 +1,7 @@
 # PathProtector / TimeCollector
+
+Library to set milestones in java code and restrict any java objects to only pass those milestones in a preconfigured order. Monitor how long objects need on their path from milestone to milestone.
+
 With this libary you can 
 * define "milestones" anywhere in your code
 * define "allowed paths" for your objects
