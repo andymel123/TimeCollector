@@ -21,7 +21,8 @@
 	<url>https://github.com/andymel123/TimeCollector</url>
 	
 	<properties>
-		<jetty.version>9.4.3.v20170317</jetty.version>
+		<!-- updated from 9.4.3.v20170317 because of github security alert -->
+		<jetty.version>[9.4.17.v20190418,)</jetty.version>
 	</properties>
 	
 	<dependencies>
